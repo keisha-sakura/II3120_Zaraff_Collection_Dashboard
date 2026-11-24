@@ -40,22 +40,7 @@ export function LiveContentPage() {
   }
   return (
     <>
-      <PageHeader
-        title="Jadwalkan live"
-        secondaryAction={
-          editing?.status === "published" && (
-            <Button
-              variant="secondary"
-              onClick={async () => {
-                if (await run({ type: "complete-live", liveId: editing.id }))
-                  go(`/penjualan/live/${editing.id}/klaim/impor`);
-              }}
-            >
-              Selesaikan live
-            </Button>
-          )
-        }
-      />
+      <PageHeader title={editing ? "Edit live" : "Jadwalkan live"} />
       <LiveSteps step="content" />
       <Card className="max-w-4xl">
         <form onSubmit={submit} className="space-y-5">

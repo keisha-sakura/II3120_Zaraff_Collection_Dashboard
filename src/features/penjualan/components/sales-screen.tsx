@@ -13,6 +13,7 @@ import { OrdersPage } from "../pages/pesanan-daftar/page-content";
 import { OrderDetailPage } from "../pages/pesanan-detail/page-content";
 import { CustomersPage } from "../pages/pelanggan-daftar/page-content";
 import { CustomerDetailPage } from "../pages/pelanggan-detail/page-content";
+import { LiveDetailPage } from "../pages/live-detail/page-content";
 export function SalesScreen({ view }: { view: SalesView }) {
   const { user } = useSales();
   const tabs = getNavigation(user.role)
@@ -65,6 +66,9 @@ export function SalesScreen({ view }: { view: SalesView }) {
       break;
     case "P10":
       content = <CustomerDetailPage id={id} />;
+      break;
+    case "P11":
+      content = <LiveDetailPage id={id} />;
       break;
   }
   return (

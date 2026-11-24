@@ -2,7 +2,7 @@
 
 Owner/Admin mengakses jadwal/promosi, wizard live, impor/hasil klaim, pesanan/detail dan pelanggan/detail. Live Host hanya membaca jadwal dengan hostId sesuai sesi; API juga membatasi data dan tidak mengirim pesanan, pelanggan atau keuangan. Komposisi halaman di `src/features/penjualan/pages`.
 
-Wizard memilih waktu/host aktif, barang tersedia, konten dan kanal; draft tersimpan per pengguna, bukan bersama semua Admin. Publikasi mencatat status promosi internal, belum mengirim TikTok. Tombol Selesaikan live memungkinkan impor setelah sesi selesai.
+Wizard memilih waktu/host aktif, barang tersedia, konten dan kanal; draft tersimpan per pengguna, bukan bersama semua Admin. Setelah publikasi, aplikasi langsung membuka `/penjualan/live/[liveId]` untuk menampilkan jadwal, host, isi promosi, kanal dan barang yang tersimpan. Membuka live berstatus Dipublikasikan dari jadwal juga menuju detail tanpa membuat/mengubah draft. Edit live adalah aksi terpisah yang mengisi wizard dengan data lama; hasil perubahan kembali ke detail. Draft yang belum dipublikasikan tetap dilanjutkan melalui wizard. Publikasi mencatat status promosi internal, belum mengirim TikTok. Tombol Selesaikan live tersedia di detail dan memungkinkan impor setelah sesi selesai.
 
 Impor mendukung CSV, teks terstruktur dan input manual. Normalisasi handle/kode, validasi waktu sampai milidetik, lalu pilih klaim valid tertua per barang; timestamp sama mengikuti nomor baris asli. Duplikat identik ditandai. Alasan hasil dan sumber batch tersimpan. Seluruh reservasi, order/detail snapshot harga/diskon dan invoice dibuat dalam satu transaksi. Live yang sudah diproses tidak membuat pesanan lagi; barang tidak dapat terjual ke dua order.
 

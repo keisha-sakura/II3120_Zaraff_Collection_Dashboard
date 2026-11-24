@@ -75,6 +75,10 @@ test("search and tabs never expose a page outside the active role", () => {
   assert.equal(isRole("superadmin"), false);
 });
 test("path matching handles entity IDs without prefix permission leaks", () => {
+  for (const role of ["owner", "admin"])
+    assert.ok(canAccessPath(role, "/penjualan/live/live-261128"));
+  for (const role of ["live-host", "packing", "penyortir"])
+    assert.equal(canAccessPath(role, "/penjualan/live/live-261128"), false);
   assert.ok(canAccessPath("penyortir", "/gudang/inventaris/ZR-2610-0013"));
   assert.ok(canAccessPath("packing", "/pengiriman/packing/ORD-261121-001"));
   assert.equal(

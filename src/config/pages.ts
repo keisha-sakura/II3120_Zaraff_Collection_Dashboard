@@ -72,6 +72,13 @@ const definitions = [
     [...managementRoles, "live-host"],
   ],
   [
+    "P11",
+    "Detail live",
+    "/penjualan/live/[liveId]",
+    "penjualan",
+    managementRoles,
+  ],
+  [
     "P02",
     "Konten dan jadwal live",
     "/penjualan/live/baru/konten",
@@ -252,7 +259,7 @@ export const pages: readonly PageDefinition[] = definitions.map(
     module,
     roles: allowedRoles,
     public: id === "M01",
-    designAvailable: id !== "B05",
+    designAvailable: id !== "B05" && id !== "P11",
   }),
 );
 export function getPage(id: PageId): PageDefinition {

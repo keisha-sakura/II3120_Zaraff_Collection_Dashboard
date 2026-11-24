@@ -45,8 +45,16 @@ export function LiveSchedulePage() {
           caption="Jadwal live yang akan datang"
           rows={upcoming}
           rowKey={(live) => live.id}
-          rowHref={hostOnly ? undefined : () => "/penjualan/live/baru/konten"}
+          rowHref={
+            hostOnly
+              ? undefined
+              : (live) =>
+                  live.status === "published"
+                    ? `/penjualan/live/${live.id}`
+                    : "/penjualan/live/baru/konten"
+          }
           beforeRowNavigate={async (live) =>
+            live.status === "published" ||
             !!(await run({ type: "start-draft", liveId: live.id }))
           }
           columns={[

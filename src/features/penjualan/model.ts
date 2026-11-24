@@ -96,7 +96,8 @@ export type SalesView = {
     | "P07"
     | "P08"
     | "P09"
-    | "P10";
+    | "P10"
+    | "P11";
   entityId?: string;
 };
 export const liveHosts = [

@@ -11,7 +11,7 @@ export async function requireRecord(page: PageId, id?: string) {
     ? state.warehouse.bales.some((row) => row.id === id)
     : ["G08", "G10"].includes(page)
       ? state.warehouse.items.some((row) => row.id === id)
-      : ["P05", "P06"].includes(page)
+      : ["P05", "P06", "P11"].includes(page)
         ? state.sales.lives.some(
             (row) =>
               row.id === id &&

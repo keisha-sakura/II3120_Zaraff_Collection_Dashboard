@@ -222,3 +222,34 @@ test("equal claim timestamps use original source line and explain both decisions
     /Waktu sama.*baris 1/,
   );
 });
+
+test("editing a published live restores all saved fields and preserves the original until saved", () => {
+  const data = fresh();
+  const saved = structuredClone(
+    data.sales.lives.find((row) => row.status === "published"),
+  );
+  const editing = apply(data, { type: "start-draft", liveId: saved.id });
+  assert.deepEqual(editing.sales.draft, {
+    title: saved.title,
+    content: saved.content,
+    scheduledAt: saved.scheduledAt,
+    hostId: saved.hostId,
+    promotionChannels: saved.promotionChannels,
+    itemIds: saved.itemIds,
+    editingId: saved.id,
+  });
+  const canceled = apply(editing, { type: "discard-draft" });
+  assert.deepEqual(
+    canceled.sales.lives.find((row) => row.id === saved.id),
+    saved,
+  );
+  const updated = apply(editing, { type: "save-live", publish: true });
+  assert.equal(updated.entityId, saved.id);
+  assert.equal(updated.sales.lives.length, data.sales.lives.length);
+  const live = updated.sales.lives.find((row) => row.id === saved.id);
+  assert.equal(live.title, saved.title);
+  assert.equal(live.content, saved.content);
+  assert.equal(live.status, "published");
+  assert.deepEqual(live.itemIds, saved.itemIds);
+  assert.equal(updated.sales.draft, null);
+});
