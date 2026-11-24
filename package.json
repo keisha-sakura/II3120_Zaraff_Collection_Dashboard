@@ -2,10 +2,13 @@
   "name": "zaraff-collection-dashboard",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.18.0"
   },
   "scripts": {
+    "test": "node --experimental-strip-types --test tests/*.test.mjs",
+    "design:inventory": "node scripts/design-inventory.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -17,6 +20,7 @@
     "check": "npm run lint && npm run typecheck && npm run format:check"
   },
   "dependencies": {
+    "@fontsource/plus-jakarta-sans": "^5.3.0",
     "next": "^16.4.6",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
