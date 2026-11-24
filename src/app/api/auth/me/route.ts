@@ -1,9 +1,10 @@
-import { NextResponse } from "next/server";
-import { apiUser, apiError, noStore } from "@/server/http";
-export async function GET() {
+import { errorResponse } from "@backend/lib/errors";
+import { userFromRequest } from "@backend/lib/requireRole";
+
+export async function GET(request: Request) {
   try {
-    return NextResponse.json({ user: await apiUser() }, { headers: noStore });
+    return Response.json({ user: userFromRequest(request) });
   } catch (error) {
-    return apiError(error);
+    return errorResponse(error);
   }
 }

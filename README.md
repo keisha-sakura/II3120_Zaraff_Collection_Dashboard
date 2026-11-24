@@ -2,6 +2,26 @@
 
 Dashboard operasional full-stack Next.js: frontend dan API satu server, SQLite persisten dengan Drizzle ORM. Modul Beranda, Gudang, Penjualan, Pembayaran, Pengiriman, Laporan/Strategi, dan Pengaturan memakai database; login wajib untuk semua dashboard.
 
+## Backend prototype (Phase 1)
+
+The Prisma-backed backend prototype is introduced alongside the existing dashboard. It uses `DATABASE_URL="file:./dev.db?connection_limit=1"`; create `.env` from `.env.example`, then run:
+
+```bash
+npm run db:generate
+npm run db:push
+npm run seed
+npm test
+```
+
+`npm test` pushes the schema, resets the prototype seed safely, and runs Vitest. The five prototype accounts are `pemilik`, `admin`, `penyortir`, `host`, and `pengemas`, all with password `password123`.
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| POST | `/api/auth/login` | Obtain JWT for a dashboard role |
+| GET | `/api/auth/me` | Read the authenticated JWT identity |
+
+The bearer format is `Authorization: Bearer <token>`; login also sets an HTTP-only `zaraff_token` cookie. Errors use `{ "error": { "kode", "pesan" } }`.
+
 ## Menjalankan lokal
 
 Prasyarat: Node.js 22.18+ dan npm. Di PowerShell gunakan `npm.cmd` jika `npm.ps1` diblokir.

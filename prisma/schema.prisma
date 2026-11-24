@@ -1,0 +1,278 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Location {
+  id          String   @id @default(cuid())
+  kode        String   @unique
+  deskripsi   String
+  bales       Bale[]
+  items       Item[]
+  countScopes StockCountLocation[]
+  foundItems  StockCountItem[]
+}
+
+model Bale {
+  id            String          @id @default(cuid())
+  supplier      String
+  jenis         String
+  beratKg       Float
+  jumlahItem    Int
+  tanggalTerima DateTime
+  status        String
+  locationId    String?
+  location      Location?       @relation(fields: [locationId], references: [id])
+  items         Item[]
+  movements     StockMovement[]
+}
+
+model Item {
+  id               String    @id @default(cuid())
+  kode             String    @unique
+  baleId           String
+  kategori         String
+  kondisi          String
+  grade            String?
+  harga            Int?
+  status           String
+  alasanRetur      String?
+  locationId       String?
+  orderId          String?
+  laundrySejak     DateTime
+  tersediaSejak    DateTime?
+  terjualPada      DateTime?
+  keluarGudangPada DateTime?
+  createdAt        DateTime  @default(now())
+  bale             Bale      @relation(fields: [baleId], references: [id])
+  location         Location? @relation(fields: [locationId], references: [id])
+  @@index([status])
+  @@index([kode])
+}
+
+model StockMovement {
+  id           String   @id @default(cuid())
+  objekTipe    String
+  objekId      String
+  tipe         String
+  nilaiLama    String?
+  nilaiBaru    String
+  userId       String
+  waktu        DateTime @default(now())
+  baleId       String?
+  orderId      String?
+  stockCountId String?
+  bale         Bale?    @relation(fields: [baleId], references: [id])
+}
+
+model StockCount {
+  id             String               @id @default(cuid())
+  status         String
+  dibuatOleh     String
+  disetujuiOleh  String?
+  waktuMulai     DateTime             @default(now())
+  waktuSubmit    DateTime?
+  waktuSetuju    DateTime?
+  locations      StockCountLocation[]
+  foundItems     StockCountItem[]
+}
+
+model StockCountLocation {
+  id           String     @id @default(cuid())
+  stockCountId String
+  locationId   String
+  stockCount   StockCount @relation(fields: [stockCountId], references: [id], onDelete: Cascade)
+  location     Location   @relation(fields: [locationId], references: [id])
+  @@unique([stockCountId, locationId])
+}
+
+model StockCountItem {
+  id           String     @id @default(cuid())
+  stockCountId String
+  kodeItem     String
+  locationId   String
+  stockCount   StockCount @relation(fields: [stockCountId], references: [id], onDelete: Cascade)
+  location     Location   @relation(fields: [locationId], references: [id])
+  @@unique([stockCountId, kodeItem])
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  customerId  String
+  status      String
+  subtotal    Int
+  diskon      Int
+  total       Int
+  sumber      String
+  dibuatPada  DateTime    @default(now())
+  items       OrderItem[]
+}
+
+model OrderItem {
+  id      String @id @default(cuid())
+  orderId String
+  itemId  String
+  kode    String
+  harga   Int
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  @@unique([orderId, itemId])
+}
+
+model Customer {
+  id            String @id @default(cuid())
+  nama          String
+  noWa          String
+  handleSosmed  String @unique
+  isMember      Boolean @default(false)
+  saldoDeposit  Int @default(0)
+}
+
+model Invoice {
+  id          String   @id @default(cuid())
+  orderId     String   @unique
+  subtotal    Int
+  diskon      Int
+  jumlah      Int
+  status      String
+  dibuatPada  DateTime @default(now())
+  payments    Payment[]
+}
+
+model Payment {
+  id              String   @id @default(cuid())
+  invoiceId       String
+  metode          String
+  buktiBayar      String?
+  jumlah          Int
+  status          String
+  alasanPenolakan String?
+  waktu           DateTime @default(now())
+  invoice         Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+model Shipment {
+  id             String          @id @default(cuid())
+  orderId        String          @unique
+  noResi         String          @unique
+  kurir          String
+  status         String
+  diperbaruiPada DateTime        @updatedAt
+  events         ShipmentEvent[]
+}
+
+model ShipmentEvent {
+  id         String   @id @default(cuid())
+  shipmentId String
+  status     String
+  catatan    String?
+  waktu      DateTime @default(now())
+  shipment   Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+}
+
+model PricingRule {
+  id       String @id @default(cuid())
+  kategori String
+  kondisi  String
+  grade    String
+  harga    Int
+  @@unique([kategori, kondisi, grade])
+}
+
+model DiscountRule {
+  id     String @id @default(cuid())
+  tipe   String @unique
+  persen Int
+}
+
+model NotificationLog {
+  id          String   @id @default(cuid())
+  tipe        String
+  tujuan      String
+  isi         String
+  waktu       DateTime @default(now())
+  statusKirim String
+}
+
+model Promotion {
+  id          String          @id @default(cuid())
+  judul       String
+  isi         String
+  kanal       String
+  jadwalLive  DateTime
+  status      String
+  dibuatPada  DateTime        @default(now())
+  items       PromotionItem[]
+}
+
+model PromotionItem {
+  id          String    @id @default(cuid())
+  promotionId String
+  itemId      String
+  kode        String
+  promotion   Promotion @relation(fields: [promotionId], references: [id], onDelete: Cascade)
+  @@unique([promotionId, itemId])
+}
+
+model LiveSession {
+  id      String  @id @default(cuid())
+  judul   String
+  status  String
+  mulai   DateTime @default(now())
+  selesai DateTime?
+  claims  Claim[]
+}
+
+model Claim {
+  id             String      @id @default(cuid())
+  sessionId      String
+  kodeItem       String
+  customerId     String
+  handle         String
+  komentar       String
+  waktuKomentar DateTime
+  status         String
+  alasan         String?
+  session        LiveSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}
+
+model Strategy {
+  id         String   @id @default(cuid())
+  periode    String
+  isi        String
+  dibuatOleh String
+  dibuatPada DateTime @default(now())
+  @@unique([periode])
+}
+
+model PackingRecord {
+  id           String   @id @default(cuid())
+  orderId      String   @unique
+  qcDiterima   Boolean  @default(false)
+  qcOleh       String?
+  qcWaktu      DateTime?
+  qcHasil      String?
+  dikemasOleh  String?
+  dikemasWaktu DateTime?
+}
+
+model AppUser {
+  id           String @id @default(cuid())
+  username     String @unique
+  passwordHash String
+  role         String
+}
+
+model StatusLog {
+  id          String   @id @default(cuid())
+  entitas     String
+  entitasId   String
+  dariStatus  String?
+  keStatus    String
+  userId      String
+  waktu       DateTime @default(now())
+  @@index([entitas, entitasId])
+}
