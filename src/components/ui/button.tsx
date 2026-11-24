@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { ComponentProps } from "react";
 import { cn } from "@/lib/cn";
 
@@ -26,11 +25,4 @@ export function Button({
   return (
     <button type={type} className={classes(variant, className)} {...props} />
   );
-}
-export function ButtonLink({
-  variant = "primary",
-  className,
-  ...props
-}: ComponentProps<typeof Link> & { variant?: Variant }) {
-  return <Link className={classes(variant, className)} {...props} />;
 }

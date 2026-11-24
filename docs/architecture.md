@@ -6,7 +6,9 @@ Referensi asli ada di [design/reference](design/reference), terutama [GUIDE.html
 
 Teks/skrip dalam ekspor diperlakukan sebagai data desain. Runtime ekspor hanya untuk melihat referensi, tidak diimport ke Next.js. Screenshot copy tidak otomatis berarti halaman baru.
 
-Beranda lima role, sembilan halaman Gudang, sepuluh halaman Penjualan, lima halaman Pembayaran, lima halaman Pengiriman, tujuh halaman Laporan, dan tiga halaman Pengaturan sudah diimplementasikan. `/` mengarah ke Beranda Owner, `/pratinjau` memilih role demo, `/fondasi` menampilkan katalog komponen interaktif, dan `/api/health` memeriksa respons server. Modul bisnis lainnya, autentikasi, dan database menyusul. Detail alur: [Gudang](warehouse.md), [Penjualan](sales.md), [Pembayaran](payments.md), [Pengiriman](shipping.md), [Laporan](reports.md), dan [Pengaturan](settings.md).
+Beranda lima role, sembilan halaman Gudang, sepuluh halaman Penjualan, lima halaman Pembayaran, lima halaman Pengiriman, tujuh halaman Laporan, dan tiga halaman Pengaturan sudah diimplementasikan. `/` mengarah ke Beranda Owner, `/pratinjau` memilih role demo, `/api/health` memeriksa respons server. Modul bisnis lainnya, autentikasi, dan database menyusul. Detail alur: [Gudang](warehouse.md), [Penjualan](sales.md), [Pembayaran](payments.md), [Pengiriman](shipping.md), [Laporan](reports.md), dan [Pengaturan](settings.md).
+
+Halaman Fondasi dan adapter katalog lamanya sudah dihapus. Pratinjau tetap tersedia untuk memilih role. Folder per modul dan komponen bersama tetap dipakai oleh halaman aktif.
 
 Sesuai perubahan scope pengguna, notifikasi dan layar S05 dihapus dari aplikasi. Ekspor desain aslinya tetap disimpan sebagai referensi historis. Search input, dropdown, dan input lain memakai radius kontrol 14px, tinggi minimum 44px, serta token warna/fokus yang sama.
 
@@ -51,8 +53,8 @@ src/
     laporan/pages/<halaman>/
     pengaturan/pages/<halaman>/
 
-    auth/pages/masuk/
-    foundation/components/     # Preview fondasi sementara
+
+
   mocks/data/                  # Fixture per domain, tanpa JSX
   mocks/repositories/          # Adapter demo; bukan DB seed
   types/domain.ts              # Kontrak entitas
@@ -72,7 +74,7 @@ Contoh route nanti:
 // return <InventoryPage items={items} />;
 ```
 
-Import fixture hanya pada adapter atau composition layer demo. Komponen presentasi menerima data sebagai props. Kontrak `WarehouseRepository` dan adapter mock menyediakan contoh jalur penggantian ke backend tanpa mengubah UI. Nilai uang berupa angka rupiah; tanggal menggunakan ISO dan diformat `Asia/Jakarta`.
+Import fixture hanya pada adapter atau composition layer demo. Komponen presentasi menerima data sebagai props. Beranda memakai kontrak repository server; modul interaktif mengakses workspace demo langsung melalui provider dan operasi domainnya. Nilai uang berupa angka rupiah; tanggal menggunakan ISO dan diformat `Asia/Jakarta`.
 
 ## Design system
 
@@ -96,7 +98,7 @@ Font Plus Jakarta Sans 400–800 di-host lokal melalui `@fontsource/plus-jakarta
 - `DashboardShell`: sidebar sesuai role, header pencarian langsung, profil dengan aksi Keluar. Menerima user dan callback logout, belum melakukan login palsu.
 - `ModuleTabs`: navigasi halaman dalam modul; berikan tab dari `getNavigation(role)` dan active tab induk untuk halaman detail.
 - `PageHeader`: satu slot primary, satu secondary, satu cancel teks. Form stepper, dialog, dan halaman harus tetap mengikuti batas aksi GUIDE.
-- `Button`/`ButtonLink`: primary, secondary, danger, text. Batal memakai text.
+- `Button`: primary, secondary, danger, text. Batal memakai text.
 - `DataTable<T>`: kolom typed, empty state, row link untuk detail tanpa tombol aksi. Satu link keyboard per row; seluruh sel mengarah ke detail. Jangan gabungkan mode row link dengan checkbox/input/link lain.
 - `FormField`, `Input`, `Select`, `Textarea`, `FilterSelect`: label, hint, error, dan filter. Select memakai menu custom bertoken global, tanda centang pilihan aktif, keyboard panah/Home/End/Enter/Space, pencarian lewat ketikan, Escape, dan penutupan klik luar. Popover top layer menjaga menu terlihat di dalam dialog; nilai native select tersembunyi mempertahankan FormData dan validasi required. Hubungkan `id`, `aria-describedby`, dan `aria-invalid` pada call site.
 - `Badge`, `LocationBadge`, `Card`, `StatCard`, `Progress`, `EmptyState`: komponen presentasi tanpa ketergantungan fixture.

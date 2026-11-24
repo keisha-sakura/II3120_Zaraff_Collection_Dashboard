@@ -30,12 +30,6 @@ export function RolePreview({ users }: { users: readonly User[] }) {
           </Link>
         ))}
       </div>
-      <Link
-        href="/fondasi"
-        className="text-primary mt-6 inline-block text-sm font-semibold hover:underline"
-      >
-        Lihat katalog komponen
-      </Link>
     </main>
   );
 }

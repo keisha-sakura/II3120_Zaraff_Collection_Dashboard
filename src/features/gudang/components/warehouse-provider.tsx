@@ -2,7 +2,10 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 import type { User } from "@/types/domain";
 import type { WarehouseCommand, WarehouseState } from "../model";
-import { executeWarehouseCommand, useWarehouseSnapshot } from "../store";
+import {
+  executeDemoWarehouseCommand,
+  useDemoWorkspace,
+} from "@/mocks/store/operations-store";
 import { Alert } from "@/components/ui/alert";
 import { useDashboardNavigation } from "@/components/layout/dashboard-link";
 import type { PriceRules } from "@/features/pengaturan/model";
@@ -23,7 +26,7 @@ export function WarehouseProvider({
   user: User;
   children: ReactNode;
 }) {
-  const snapshot = useWarehouseSnapshot();
+  const snapshot = useDemoWorkspace();
   const navigation = useDashboardNavigation();
   const [error, setError] = useState<string | null>(null);
   if (!snapshot)
@@ -35,7 +38,7 @@ export function WarehouseProvider({
   function run(command: WarehouseCommand) {
     try {
       setError(null);
-      return executeWarehouseCommand(command, user.name);
+      return executeDemoWarehouseCommand(command, user.name);
     } catch (error) {
       setError(
         error instanceof Error
@@ -48,8 +51,8 @@ export function WarehouseProvider({
   return (
     <WarehouseContext.Provider
       value={{
-        state: snapshot.data,
-        priceRules: snapshot.priceRules,
+        state: snapshot.data.warehouse,
+        priceRules: snapshot.data.settings.priceRules,
         user,
         go: (href) => navigation?.navigate(href),
         run,

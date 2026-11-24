@@ -25,7 +25,7 @@ Untuk macOS/Linux: `cp .env.example .env.local`.
 npm run dev
 ```
 
-Buka http://localhost:3000 untuk Beranda Owner, http://localhost:3000/pratinjau untuk memilih role demo, http://localhost:3000/fondasi untuk katalog komponen, dan http://localhost:3000/api/health untuk cek backend. FE dan BE berjalan di port yang sama; tidak perlu Express atau server backend terpisah.
+Buka http://localhost:3000 untuk Beranda Owner, http://localhost:3000/pratinjau untuk memilih role demo, http://localhost:3000/api/health untuk cek backend. FE dan BE berjalan di port yang sama; tidak perlu Express atau server backend terpisah.
 
 Jika PowerShell memblokir `npm.ps1`, gunakan `npm.cmd` sebagai pengganti `npm`, misalnya `npm.cmd run dev`. Tidak perlu mengubah execution policy.
 
@@ -85,7 +85,7 @@ Beranda kelima role sudah dibangun. `/` mengarah ke `/beranda`. Gunakan `/pratin
 | Live Host   | `/beranda?role=live-host` |
 | Tim Packing | `/beranda?role=packing`   |
 
-Menu profil hanya memiliki aksi Keluar, yang mengembalikan mode demo ke pemilih role. Pencarian diketik langsung di bar header, tanpa dialog atau shortcut Ctrl K. Hasil mengikuti role; notifikasi dan halamannya dihapus dari scope aplikasi. Tautan modul yang belum diimplementasikan menampilkan pemberitahuan. Dummy data beranda berada di `src/mocks/data/home.ts` dan diambil melalui repository server-only; komposisi per role ada di `src/features/beranda/pages/`. Katalog komponen tetap tersedia di `/fondasi`.
+Menu profil hanya memiliki aksi Keluar, yang mengembalikan mode demo ke pemilih role. Pencarian diketik langsung di bar header, tanpa dialog atau shortcut Ctrl K. Hasil mengikuti role; notifikasi dan halamannya dihapus dari scope aplikasi. Tautan modul yang belum diimplementasikan menampilkan pemberitahuan. Dummy data beranda berada di `src/mocks/data/home.ts` dan diambil melalui repository server-only; komposisi per role ada di `src/features/beranda/pages/`.
 
 Modul Gudang juga tersedia untuk Owner, Admin, dan Penyortir: buka `/gudang/bale?role=penyortir` atau pilih Gudang dari sidebar Beranda. Tab modul menyediakan Bale & Sortir, Laundry, dan Inventaris. Alur terima bale, sortir/retur, konfirmasi selesai sortir, grading, dan pindah lokasi dapat dicoba. Perubahan demo disimpan di localStorage browser yang sama dan dipakai bersama oleh ketiga role. Role Live Host dan Tim Packing mendapat 404 jika mencoba URL Gudang. Detail alur dan integrasi backend ada di [docs/warehouse.md](docs/warehouse.md).
 

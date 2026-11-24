@@ -1,4 +1,4 @@
-# Modul Gudang
+﻿# Modul Gudang
 
 Halaman mengikuti artboard G01–G10 yang tersedia (nomor G06 tidak ada di ekspor). Komponen tetap menggunakan warna di `globals.css` dan komponen bersama. Route Next.js tipis berada di `src/app/gudang/`, sementara komposisi setiap halaman ada di `src/features/gudang/pages/`.
 
@@ -29,10 +29,10 @@ Filter daftar bale (status, supplier, periode) dan inventaris (kode, kategori, g
 
 ## Data dan integrasi backend
 
-- `src/mocks/data/warehouse-demo.ts`: fixture interaktif dan aturan rekomendasi harga. Mengembangkan fixture dasar tanpa mengubah contoh repository katalog fondasi. Ada bale arsip tambahan untuk menjaga relasi barang lama.
+- `src/mocks/data/warehouse-demo.ts`: fixture interaktif dan aturan rekomendasi harga. Mengembangkan fixture dasar yang dipakai seed operasional. Ada bale arsip tambahan untuk menjaga relasi barang lama.
 - `model.ts`: tipe state, input, command, dan view.
 - `operations.ts`: transisi murni, validasi bisnis, pembuatan kode WIB, dan pencatatan riwayat. Tidak mengubah snapshot sebelumnya.
-- `store.ts`: adapter ke workspace bersama di `src/mocks/store/operations-store.ts`, dengan sinkronisasi antartab dan fallback ke memori.
+- Provider Gudang langsung memakai workspace bersama di `src/mocks/store/operations-store.ts`, dengan sinkronisasi antartab dan fallback ke memori.
 - `persistence.ts`: pemeriksaan struktur snapshot sebelum dipakai UI. Snapshot rusak/tidak sesuai versi diganti fixture awal.
 - `components/warehouse-provider.tsx`: batas akses state/action untuk UI. Komponen halaman tidak menulis localStorage sendiri.
 - `route.tsx`: pemilihan user demo dan pembatasan role di server; kelak gunakan sesi terverifikasi.
