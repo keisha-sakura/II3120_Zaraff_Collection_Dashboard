@@ -71,6 +71,10 @@ Daftarkan variabel baru tanpa nilai rahasia di `.env.example`. Simpan nilai loka
 
 GitHub Actions menjalankan pemeriksaan dan build pada push serta pull request. Commit `package-lock.json` supaya instalasi konsisten; gunakan `npm ci` pada clone baru dan CI.
 
+## Halaman login
+
+Buka `/masuk` untuk melihat UI login sesuai referensi M01. Halaman ini berdiri sendiri dan tidak menjadi syarat membuka dashboard. Submit hanya menampilkan informasi bahwa login belum aktif; tidak ada request autentikasi atau penyimpanan kredensial/sesi. Gunakan tautan Pratinjau untuk memilih role. `/` dan semua route dashboard tetap dapat dibuka langsung.
+
 ## Status starter
 
 Fondasi mencakup lima role (Owner, Admin, Penyortir, Live Host, Tim Packing), registry halaman dan navigasi, token desain global, komponen reusable, folder per halaman, serta fixture dan contoh repository terpisah.

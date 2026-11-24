@@ -12,6 +12,8 @@ Halaman Fondasi dan adapter katalog lamanya sudah dihapus. Pratinjau tetap terse
 
 Sesuai perubahan scope pengguna, notifikasi dan layar S05 dihapus dari aplikasi. Ekspor desain aslinya tetap disimpan sebagai referensi historis. Search input, dropdown, dan input lain memakai radius kontrol 14px, tinggi minimum 44px, serta token warna/fokus yang sama.
 
+Halaman login M01 tersedia di `/masuk`, dengan komposisi pada `src/features/auth/pages/masuk/page-content.tsx`. UI mengikuti kartu dan gradasi referensi, memakai komponen form bersama, validasi required, serta tombol tampil/sembunyikan kata sandi. Submit demo menampilkan informasi tanpa memanggil API atau menyimpan kredensial/sesi; input kata sandi dikosongkan sesudah submit. Tidak ada middleware, route guard login, atau pengalihan dashboard ke login. Pratinjau dan Beranda tetap dapat dibuka langsung.
+
 ## Role dan akses
 
 GUIDE menentukan menu utama. Anotasi canvas menentukan akses layar, dengan klarifikasi pengguna bahwa Live Host termasuk scope dan hanya memiliki Beranda serta Jadwal Live. Nama profil pada artboard bukan sumber hak akses.
