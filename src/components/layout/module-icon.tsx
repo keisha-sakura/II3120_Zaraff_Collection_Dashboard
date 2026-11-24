@@ -8,7 +8,6 @@ const paths: Record<ModuleId, string> = {
   laporan: "M4 20V10M10 20V4M16 20v-7M3 20h18",
   pengaturan:
     "M12 3v3M12 18v3M3 12h3M18 12h3M6 6l2 2M16 16l2 2M6 18l2-2M16 8l2-2M9 9h6v6H9z",
-  notifikasi: "M6 16V11a6 6 0 0 1 12 0v5l2 2H4l2-2zM10 21h4",
   auth: "M10 4h10v16H10M3 12h12M11 8l4 4-4 4",
 };
 export function ModuleIcon({ module }: { module: ModuleId }) {

@@ -31,7 +31,7 @@ export function Dialog({
       }}
       onClose={(event) => {
         // Native close events are queued. Ignore an earlier close if the
-        // controlled dialog has already reopened (e.g. Escape, then Ctrl K).
+        // controlled dialog has already reopened after an earlier dismissal.
         if (!event.currentTarget.open) onClose();
       }}
       className="dashboard-dialog"

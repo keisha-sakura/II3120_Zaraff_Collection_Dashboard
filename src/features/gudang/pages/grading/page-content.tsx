@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { DetailList } from "@/components/ui/detail-list";
 import { FormField, Select, Input, Checkbox } from "@/components/ui/form-field";
 import { formatCurrency, formatDate } from "@/lib/format";
-import { mockPriceRules } from "@/mocks/data/warehouse-demo";
 import type { Grade } from "@/types/domain";
 import { recommendedGrade, daysSince, type WarehouseItem } from "../../model";
 import { useWarehouse } from "../../components/warehouse-provider";
@@ -31,11 +30,11 @@ export function GradingPage({ id }: { id: string }) {
   return <GradingForm key={id} item={item} />;
 }
 function GradingForm({ item }: { item: WarehouseItem }) {
-  const { state, run, go } = useWarehouse();
+  const { state, priceRules, run, go } = useWarehouse();
   const suggested = recommendedGrade(item.condition);
   const [grade, setGrade] = useState<Grade>(suggested);
   const [price, setPrice] = useState(
-    String(mockPriceRules[item.category][suggested]),
+    String(priceRules[item.category][suggested]),
   );
   const [clean, setClean] = useState(false);
   function submit(event: FormEvent<HTMLFormElement>) {
@@ -63,7 +62,7 @@ function GradingForm({ item }: { item: WarehouseItem }) {
         <Card>
           <form onSubmit={submit} className="space-y-5">
             <Alert
-              title={`Rekomendasi dari aturan harga: grade ${suggested} · ${formatCurrency(mockPriceRules[item.category][suggested])}`}
+              title={`Rekomendasi dari aturan harga: grade ${suggested} · ${formatCurrency(priceRules[item.category][suggested])}`}
             />
             <div className="grid gap-5 sm:grid-cols-2">
               <FormField id="grade-final" label="Grade final">
@@ -73,7 +72,7 @@ function GradingForm({ item }: { item: WarehouseItem }) {
                   onChange={(event) => {
                     const value = event.target.value as Grade;
                     setGrade(value);
-                    setPrice(String(mockPriceRules[item.category][value]));
+                    setPrice(String(priceRules[item.category][value]));
                   }}
                 >
                   {["A", "B", "C"].map((value) => (

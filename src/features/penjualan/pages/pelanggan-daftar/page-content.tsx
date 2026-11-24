@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DataTable } from "@/components/ui/data-table";
 import { Dialog } from "@/components/ui/dialog";
-import { FilterSelect, Input } from "@/components/ui/form-field";
+import { FilterSelect } from "@/components/ui/form-field";
+import { SearchInput } from "@/components/ui/search-input";
 import { formatCurrency } from "@/lib/format";
 import type { CustomerInput } from "../../model";
 import { useSales } from "../../components/sales-provider";
@@ -48,7 +49,7 @@ export function CustomersPage() {
           <option value="inactive">Bukan member</option>
         </FilterSelect>
         <div className="w-full sm:w-72">
-          <Input
+          <SearchInput
             aria-label="Cari pelanggan"
             placeholder="Cari nama atau handle"
             value={query}

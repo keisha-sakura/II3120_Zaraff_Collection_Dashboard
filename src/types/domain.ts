@@ -95,10 +95,3 @@ export type Strategy = {
   authorId: string;
   recipientIds: string[];
 };
-export type Notification = {
-  id: string;
-  type: "payment" | "reminder" | "invoice" | "tracking" | "broadcast";
-  message: string;
-  createdAt: string;
-  recipientRoles: Role[];
-};

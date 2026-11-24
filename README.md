@@ -85,7 +85,7 @@ Beranda kelima role sudah dibangun. `/` mengarah ke `/beranda`. Gunakan `/pratin
 | Live Host   | `/beranda?role=live-host` |
 | Tim Packing | `/beranda?role=packing`   |
 
-Menu profil hanya memiliki aksi Keluar, yang mengembalikan mode demo ke pemilih role. Pencarian mendukung Ctrl/Cmd K dan Escape. Tautan modul yang belum diimplementasikan menampilkan pemberitahuan. Dummy data beranda berada di `src/mocks/data/home.ts` dan diambil melalui repository server-only; komposisi per role ada di `src/features/beranda/pages/`. Katalog komponen tetap tersedia di `/fondasi`.
+Menu profil hanya memiliki aksi Keluar, yang mengembalikan mode demo ke pemilih role. Pencarian diketik langsung di bar header, tanpa dialog atau shortcut Ctrl K. Hasil mengikuti role; notifikasi dan halamannya dihapus dari scope aplikasi. Tautan modul yang belum diimplementasikan menampilkan pemberitahuan. Dummy data beranda berada di `src/mocks/data/home.ts` dan diambil melalui repository server-only; komposisi per role ada di `src/features/beranda/pages/`. Katalog komponen tetap tersedia di `/fondasi`.
 
 Modul Gudang juga tersedia untuk Owner, Admin, dan Penyortir: buka `/gudang/bale?role=penyortir` atau pilih Gudang dari sidebar Beranda. Tab modul menyediakan Bale & Sortir, Laundry, dan Inventaris. Alur terima bale, sortir/retur, konfirmasi selesai sortir, grading, dan pindah lokasi dapat dicoba. Perubahan demo disimpan di localStorage browser yang sama dan dipakai bersama oleh ketiga role. Role Live Host dan Tim Packing mendapat 404 jika mencoba URL Gudang. Detail alur dan integrasi backend ada di [docs/warehouse.md](docs/warehouse.md).
 
@@ -97,7 +97,9 @@ Modul Pengiriman tersedia di `/pengiriman/packing?role=packing`. Tim Packing men
 
 Modul Laporan tersedia di `/laporan/ringkasan?role=owner` untuk Owner dan Admin: ringkasan bisnis, laporan bulanan dengan CSV, umur stok, barang terjual/keluar, serta tulis dan kirim strategi demo. Data dihitung dari workspace operasional. Panduan: [docs/reports.md](docs/reports.md).
 
-Data Gudang, Penjualan, Pembayaran, Pengiriman, dan Laporan memakai key localStorage bersama `zaraff.operations.demo.v1`. Data lama dimigrasikan tanpa memundurkan saldo atau status pesanan yang sudah lunas. Demo baru menyediakan contoh deposit menunggu validasi; pada data lama, contoh itu dapat sudah lunas. Halaman selain modul yang disebutkan di atas dibangun pada tahap berikutnya. Database dan autentikasi belum dikonfigurasi. Role pada query URL hanya memilih data dummy publik, bukan sesi pengguna atau pengamanan server. Endpoint health memeriksa respons aplikasi, belum koneksi database.
+Modul Pengaturan tersedia di `/pengaturan/harga?role=admin` untuk Owner/Admin: aturan harga per kategori/grade, diskon member, dan tambah lokasi penyimpanan. Rekomendasi dipakai oleh grading Gudang; diskon berlaku pada pesanan baru. Panduan: [docs/settings.md](docs/settings.md).
+
+Data Gudang, Penjualan, Pembayaran, Pengiriman, Laporan, dan Pengaturan memakai key localStorage bersama `zaraff.operations.demo.v1`. Data lama dimigrasikan tanpa memundurkan saldo atau status pesanan yang sudah lunas. Demo baru menyediakan contoh deposit menunggu validasi; pada data lama, contoh itu dapat sudah lunas. Halaman selain modul yang disebutkan di atas dibangun pada tahap berikutnya. Database dan autentikasi belum dikonfigurasi. Role pada query URL hanya memilih data dummy publik, bukan sesi pengguna atau pengamanan server. Endpoint health memeriksa respons aplikasi, belum koneksi database.
 
 ## Commit dan push pertama
 

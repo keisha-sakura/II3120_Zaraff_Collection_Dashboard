@@ -6,19 +6,21 @@ Referensi asli ada di [design/reference](design/reference), terutama [GUIDE.html
 
 Teks/skrip dalam ekspor diperlakukan sebagai data desain. Runtime ekspor hanya untuk melihat referensi, tidak diimport ke Next.js. Screenshot copy tidak otomatis berarti halaman baru.
 
-Beranda lima role, sembilan halaman Gudang, sepuluh halaman Penjualan, lima halaman Pembayaran, lima halaman Pengiriman, dan tujuh halaman Laporan sudah diimplementasikan. `/` mengarah ke Beranda Owner, `/pratinjau` memilih role demo, `/fondasi` menampilkan katalog komponen interaktif, dan `/api/health` memeriksa respons server. Modul bisnis lainnya, autentikasi, dan database menyusul. Detail alur: [Gudang](warehouse.md), [Penjualan](sales.md), [Pembayaran](payments.md), [Pengiriman](shipping.md), dan [Laporan](reports.md).
+Beranda lima role, sembilan halaman Gudang, sepuluh halaman Penjualan, lima halaman Pembayaran, lima halaman Pengiriman, tujuh halaman Laporan, dan tiga halaman Pengaturan sudah diimplementasikan. `/` mengarah ke Beranda Owner, `/pratinjau` memilih role demo, `/fondasi` menampilkan katalog komponen interaktif, dan `/api/health` memeriksa respons server. Modul bisnis lainnya, autentikasi, dan database menyusul. Detail alur: [Gudang](warehouse.md), [Penjualan](sales.md), [Pembayaran](payments.md), [Pengiriman](shipping.md), [Laporan](reports.md), dan [Pengaturan](settings.md).
+
+Sesuai perubahan scope pengguna, notifikasi dan layar S05 dihapus dari aplikasi. Ekspor desain aslinya tetap disimpan sebagai referensi historis. Search input, dropdown, dan input lain memakai radius kontrol 14px, tinggi minimum 44px, serta token warna/fokus yang sama.
 
 ## Role dan akses
 
 GUIDE menentukan menu utama. Anotasi canvas menentukan akses layar, dengan klarifikasi pengguna bahwa Live Host termasuk scope dan hanya memiliki Beranda serta Jadwal Live. Nama profil pada artboard bukan sumber hak akses.
 
-| Role        | Menu sidebar                                                            | Akses khusus                                                                                           |
-| ----------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| Owner       | Beranda, Gudang, Penjualan, Pembayaran, Pengiriman, Laporan, Pengaturan | Semua halaman manajemen dan log notifikasi                                                             |
-| Admin       | Sama dengan Owner                                                       | Anotasi membolehkan laporan, strategi, dan pengaturan juga                                             |
-| Penyortir   | Beranda, Gudang                                                         | Bale/sortir, retur, laundry, grading, inventaris/detail; log notifikasi                                |
-| Live Host   | Beranda, Penjualan                                                      | Jadwal Live saja; tidak ada akses pesanan, pelanggan, impor klaim, form publikasi, atau log notifikasi |
-| Tim Packing | Beranda, Pengiriman                                                     | Antrean/detail packing; log notifikasi. Tidak termasuk siap dikirim, input resi, atau dalam pengiriman |
+| Role        | Menu sidebar                                                            | Akses khusus                                                                           |
+| ----------- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| Owner       | Beranda, Gudang, Penjualan, Pembayaran, Pengiriman, Laporan, Pengaturan | Semua halaman manajemen                                                                |
+| Admin       | Sama dengan Owner                                                       | Anotasi membolehkan laporan, strategi, dan pengaturan juga                             |
+| Penyortir   | Beranda, Gudang                                                         | Bale/sortir, retur, laundry, grading, inventaris/detail                                |
+| Live Host   | Beranda, Penjualan                                                      | Jadwal Live saja; tidak ada akses pesanan, pelanggan, impor klaim, atau form publikasi |
+| Tim Packing | Beranda, Pengiriman                                                     | Antrean/detail packing. Tidak termasuk siap dikirim, input resi, atau dalam pengiriman |
 
 Semua role memakai route `/beranda` dengan komposisi berbeda. `B05` adalah ID internal yang ditambahkan untuk Beranda Live Host: desainnya belum tersedia, bukan ID asli ekspor.
 
@@ -48,7 +50,7 @@ src/
     pengiriman/pages/<halaman>/
     laporan/pages/<halaman>/
     pengaturan/pages/<halaman>/
-    notifikasi/pages/log/
+
     auth/pages/masuk/
     foundation/components/     # Preview fondasi sementara
   mocks/data/                  # Fixture per domain, tanpa JSX
@@ -87,20 +89,20 @@ Semua nilai warna ada di `src/app/globals.css`. Komponen hanya memakai token sem
 | location-soft           | #FFF3C9                     | Label lokasi                    |
 | brand-gradient          | #F2C230 → #D98A5F → #A84F7D | Strip merek, logo, progress     |
 
-Font Plus Jakarta Sans 400–800 di-host lokal melalui `@fontsource/plus-jakarta-sans`; tidak memerlukan request Google Fonts saat build. Acuan desktop 1440px, sidebar 228px, konten maksimum 1240px, padding desktop 32px, card radius 14px, control radius 10px. Shell juga membungkus menu pada layar kecil.
+Font Plus Jakarta Sans 400–800 di-host lokal melalui `@fontsource/plus-jakarta-sans`; tidak memerlukan request Google Fonts saat build. Acuan desktop 1440px, sidebar 228px, konten maksimum 1240px, padding desktop 32px, card radius 14px, control radius 14px. Shell juga membungkus menu pada layar kecil.
 
 ## Komponen dan aturan interaksi
 
-- `DashboardShell`: sidebar sesuai role, header pencarian, notifikasi yang diizinkan, profil dengan aksi Keluar. Menerima user dan callback logout, belum melakukan login palsu.
+- `DashboardShell`: sidebar sesuai role, header pencarian langsung, profil dengan aksi Keluar. Menerima user dan callback logout, belum melakukan login palsu.
 - `ModuleTabs`: navigasi halaman dalam modul; berikan tab dari `getNavigation(role)` dan active tab induk untuk halaman detail.
 - `PageHeader`: satu slot primary, satu secondary, satu cancel teks. Form stepper, dialog, dan halaman harus tetap mengikuti batas aksi GUIDE.
 - `Button`/`ButtonLink`: primary, secondary, danger, text. Batal memakai text.
 - `DataTable<T>`: kolom typed, empty state, row link untuk detail tanpa tombol aksi. Satu link keyboard per row; seluruh sel mengarah ke detail. Jangan gabungkan mode row link dengan checkbox/input/link lain.
-- `FormField`, `Input`, `Select`, `Textarea`, `FilterSelect`: label, hint, error, dan filter pill. Hubungkan `id`, `aria-describedby`, dan `aria-invalid` pada call site.
+- `FormField`, `Input`, `Select`, `Textarea`, `FilterSelect`: label, hint, error, dan filter. Select memakai menu custom bertoken global, tanda centang pilihan aktif, keyboard panah/Home/End/Enter/Space, pencarian lewat ketikan, Escape, dan penutupan klik luar. Popover top layer menjaga menu terlihat di dalam dialog; nilai native select tersembunyi mempertahankan FormData dan validasi required. Hubungkan `id`, `aria-describedby`, dan `aria-invalid` pada call site.
 - `Badge`, `LocationBadge`, `Card`, `StatCard`, `Progress`, `EmptyState`: komponen presentasi tanpa ketergantungan fixture.
 - `Stepper`: tahapan jadwal live/proses pesanan; `Timeline`: riwayat bale, barang, tagihan, pengiriman; `Checkbox`: checklist QC dan packing; `Alert`: rekomendasi grading, feedback sortir, atau nominal pembayaran yang tidak sesuai.
 - `Dialog`: dialog native dengan focus trap dan Escape. State open dikendalikan pemanggil.
-- `QuickSearch`: Ctrl/Cmd K, hasil hanya untuk role aktif. Menerima callback pemilihan; detail berparameter harus diselesaikan ke ID nyata sebelum navigasi. Pencarian entitas barang/pesanan/lokasi menyusul saat service pencariannya dibangun.
+- `GlobalSearch`: input pencarian langsung di header tanpa dialog atau shortcut. Hasil halaman, barang, pesanan, pelanggan, dan lokasi mengikuti akses role dan memakai ID record nyata. Enter membuka hasil pertama; Escape mengosongkan pencarian. Hasil tampil dalam alur header tanpa overlay.
 
 Copy artboard beranda adalah state search/profil, bukan route baru. Copy G05 adalah konfirmasi selesai sortir, G10 perpindahan lokasi, S03 tambah lokasi, dan Y02 alasan penolakan. Gunakan dialog/state pada halaman terkait.
 
@@ -121,7 +123,7 @@ Komponen bersama `ProgressSection`, `OwnerNotes`, dan `ActionCard` menyusun UI s
 
 Dummy data beranda adalah snapshot pelaporan yang terpisah dari fixture CRUD parsial. Persentase dengan jumlah eksplisit dihitung dari data, termasuk live Admin 6/10 = 60% (artboard menampilkan 66%). Persentase penjualan/pemasukan Owner mengikuti snapshot 48%/60% karena target bisnis belum ditentukan. Sapaan pagi dan bulan November tetap mengikuti referensi dummy.
 
-`DashboardLink` mempertahankan link Next.js biasa di luar provider. Di dalam pratinjau dashboard, provider menjaga query role serta filter URL saat berpindah Beranda/Gudang/Penjualan/Pembayaran/Pengiriman/Laporan dan menampilkan pemberitahuan untuk modul yang belum dibangun. Pencarian hanya mengindeks halaman yang boleh diakses role; hasil detail berparameter meminta pengguna memilih record dari daftar. Profil menutup dengan Escape/klik di luar, dan Keluar mengarah ke `/pratinjau` tanpa mengklaim adanya sesi autentikasi.
+`DashboardLink` mempertahankan link Next.js biasa di luar provider. Di dalam pratinjau dashboard, provider menjaga query role serta filter URL saat berpindah Beranda/Gudang/Penjualan/Pembayaran/Pengiriman/Laporan/Pengaturan dan menampilkan pemberitahuan untuk modul yang belum dibangun. Pencarian mengindeks halaman dan record demo yang boleh diakses role; template detail tidak ditampilkan sebagai hasil. Profil menutup dengan Escape/klik di luar, dan Keluar mengarah ke `/pratinjau` tanpa mengklaim adanya sesi autentikasi.
 
 Role query hanya untuk fixture demo; role tidak valid atau parameter role berulang menghasilkan 404. Saat autentikasi dibangun, ganti pemilihan query dengan sesi server yang tervalidasi sebelum menggunakan data asli.
 

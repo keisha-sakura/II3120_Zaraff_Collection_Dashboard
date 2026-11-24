@@ -11,7 +11,7 @@ import { Card } from "@/components/ui/card";
 import { Dialog } from "@/components/ui/dialog";
 import { FormField, Input, Select } from "@/components/ui/form-field";
 import { Progress } from "@/components/ui/progress";
-import { QuickSearch } from "@/components/layout/quick-search";
+import { GlobalSearch } from "@/components/layout/global-search";
 import { DataTable } from "@/components/ui/data-table";
 import { formatCurrency } from "@/lib/format";
 import type { InventoryItem } from "@/types/domain";
@@ -20,7 +20,6 @@ import type { InventoryItem } from "@/types/domain";
 export function FoundationPreview({ items }: { items: InventoryItem[] }) {
   const [role, setRole] = useState<Role>("owner");
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
   const [selectedPage, setSelectedPage] = useState("");
   return (
     <main className="mx-auto max-w-(--content-width) space-y-6 p-6 lg:p-10">
@@ -28,15 +27,13 @@ export function FoundationPreview({ items }: { items: InventoryItem[] }) {
       <PageHeader
         title="Fondasi Zaraff Collection"
         description="Katalog komponen dan akses role. Halaman operasional akan dibangun per tahap."
-        primaryAction={
-          <Button onClick={() => setSearchOpen(true)}>Pencarian cepat</Button>
-        }
         secondaryAction={
           <ButtonLink variant="secondary" href="/api/health">
             Cek API
           </ButtonLink>
         }
       />
+      <GlobalSearch key={role} role={role} />
       <Card>
         <h2 className="mb-4 text-lg font-bold">Role dan navigasi</h2>
         <FormField id="preview-role" label="Preview role">
@@ -96,9 +93,6 @@ export function FoundationPreview({ items }: { items: InventoryItem[] }) {
           <div className="flex flex-wrap gap-3">
             <Button onClick={() => setDialogOpen(true)}>
               Buka dialog contoh
-            </Button>
-            <Button variant="secondary" onClick={() => setSearchOpen(true)}>
-              Cari halaman
             </Button>
             <Button variant="text" onClick={() => setSelectedPage("")}>
               Batal
@@ -185,12 +179,6 @@ export function FoundationPreview({ items }: { items: InventoryItem[] }) {
           </Button>
         </div>
       </Dialog>
-      <QuickSearch
-        role={role}
-        open={searchOpen}
-        onOpenChange={setSearchOpen}
-        onSelect={(page) => setSelectedPage(`${page.title} (${page.path})`)}
-      />
     </main>
   );
 }

@@ -1,5 +1,12 @@
 "use client";
 import { useSyncExternalStore } from "react";
+import { createSettingsDemo } from "@/mocks/data/settings-demo";
+import { isSettingsState } from "@/features/pengaturan/persistence";
+import { applySettingsCommand } from "@/features/pengaturan/operations";
+import type {
+  SettingsState,
+  SettingsCommand,
+} from "@/features/pengaturan/model";
 import { createReportsDemo } from "@/mocks/data/reports-demo";
 import { isReportsState } from "@/features/laporan/persistence";
 import { applyReportsCommand } from "@/features/laporan/operations";
@@ -40,6 +47,7 @@ type Workspace = {
   payments: PaymentsState;
   shipping: ShippingState;
   reports: ReportsState;
+  settings: SettingsState;
 };
 type Snapshot = { data: Workspace; storageUnavailable: boolean };
 let snapshot: Snapshot | null = null;
@@ -58,6 +66,7 @@ function initial(warehouse?: WarehouseState): Workspace {
     ...prepared,
     shipping: createShippingDemo(prepared.sales),
     reports: createReportsDemo(),
+    settings: createSettingsDemo(),
   };
 }
 function restore() {
@@ -84,6 +93,10 @@ function restore() {
           warehouse: value.warehouse,
           sales: value.sales,
           payments,
+          settings:
+            "settings" in value && isSettingsState(value.settings)
+              ? value.settings
+              : createSettingsDemo(),
           reports:
             "reports" in value && isReportsState(value.reports)
               ? value.reports
@@ -233,5 +246,26 @@ export function executeDemoReportsCommand(
     new Date().toISOString(),
   );
   commit({ ...snapshot.data, reports: result.state });
+  return result.entityId;
+}
+
+export function executeDemoSettingsCommand(
+  command: SettingsCommand,
+  actor: User,
+) {
+  if (!snapshot) throw new Error("Data sedang dimuat.");
+  const result = applySettingsCommand(
+    snapshot.data.settings,
+    snapshot.data.sales,
+    snapshot.data.warehouse,
+    command,
+    actor,
+  );
+  commit({
+    ...snapshot.data,
+    settings: result.settings,
+    sales: result.sales,
+    warehouse: result.warehouse,
+  });
   return result.entityId;
 }

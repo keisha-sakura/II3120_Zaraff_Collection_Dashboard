@@ -1,4 +1,4 @@
-import type { ComponentProps, ReactNode } from "react";
+﻿import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@/lib/cn";
 export function FormField({
   id,
@@ -52,32 +52,12 @@ export function Checkbox({
     </label>
   );
 }
-export function Select({ className, ...props }: ComponentProps<"select">) {
-  return <select className={cn("control", className)} {...props} />;
-}
+export { Select, FilterSelect } from "./select";
 export function Textarea({ className, ...props }: ComponentProps<"textarea">) {
   return (
     <textarea
       className={cn("control min-h-32 resize-y", className)}
       {...props}
     />
-  );
-}
-export function FilterSelect({
-  label,
-  children,
-  className,
-  ...props
-}: ComponentProps<"select"> & { label: string }) {
-  return (
-    <label className="border-border-control bg-surface inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-sm">
-      <span className="text-muted">{label}:</span>
-      <select
-        className={cn("min-w-0 bg-transparent font-semibold", className)}
-        {...props}
-      >
-        {children}
-      </select>
-    </label>
   );
 }

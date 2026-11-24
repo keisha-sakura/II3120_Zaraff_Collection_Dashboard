@@ -3,7 +3,6 @@ import { useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { DashboardShell } from "./dashboard-shell";
 import { DashboardNavigationProvider } from "./dashboard-link";
-import { QuickSearch } from "./quick-search";
 import { Dialog } from "@/components/ui/dialog";
 import { canAccessPath, getPagesForRole, type ModuleId } from "@/config/pages";
 import type { User } from "@/types/domain";
@@ -18,7 +17,6 @@ export function DashboardExperience({
   children: ReactNode;
 }) {
   const router = useRouter();
-  const [searchOpen, setSearchOpen] = useState(false);
   const [notice, setNotice] = useState<{
     title: string;
     description: string;
@@ -51,7 +49,8 @@ export function DashboardExperience({
       path.startsWith("/penjualan/") ||
       path.startsWith("/pembayaran/") ||
       path.startsWith("/pengiriman/") ||
-      path.startsWith("/laporan/")
+      path.startsWith("/laporan/") ||
+      path.startsWith("/pengaturan/")
     ) {
       router.push(resolveHref(href));
       return;
@@ -68,20 +67,10 @@ export function DashboardExperience({
       <DashboardShell
         user={user}
         activeModule={activeModule}
-        onSearch={() => setSearchOpen(true)}
         onLogout={() => router.replace("/pratinjau")}
       >
         {children}
       </DashboardShell>
-      <QuickSearch
-        role={user.role}
-        open={searchOpen}
-        onOpenChange={setSearchOpen}
-        onSelect={(page) => {
-          setSearchOpen(false);
-          navigate(page.path);
-        }}
-      />
       <Dialog
         open={notice !== null}
         onClose={() => setNotice(null)}

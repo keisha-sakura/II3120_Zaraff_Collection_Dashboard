@@ -5,9 +5,11 @@ import type { WarehouseCommand, WarehouseState } from "../model";
 import { executeWarehouseCommand, useWarehouseSnapshot } from "../store";
 import { Alert } from "@/components/ui/alert";
 import { useDashboardNavigation } from "@/components/layout/dashboard-link";
+import type { PriceRules } from "@/features/pengaturan/model";
 
 type WarehouseContextValue = {
   state: WarehouseState;
+  priceRules: PriceRules;
   user: User;
   go: (href: string) => void;
   run: (command: WarehouseCommand) => string | null;
@@ -47,6 +49,7 @@ export function WarehouseProvider({
     <WarehouseContext.Provider
       value={{
         state: snapshot.data,
+        priceRules: snapshot.priceRules,
         user,
         go: (href) => navigation?.navigate(href),
         run,

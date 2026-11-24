@@ -2,7 +2,8 @@
 import { useState } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { DataTable } from "@/components/ui/data-table";
-import { FilterSelect, Input } from "@/components/ui/form-field";
+import { FilterSelect } from "@/components/ui/form-field";
+import { SearchInput } from "@/components/ui/search-input";
 import { formatCurrency } from "@/lib/format";
 import { itemStatuses } from "@/config/statuses";
 import { categories } from "../../model";
@@ -26,7 +27,7 @@ export function InventoryPage() {
       <PageHeader title="Inventaris" />
       <div className="mb-4 flex flex-wrap items-center gap-2.5">
         <div className="w-full sm:w-64">
-          <Input
+          <SearchInput
             aria-label="Cari kode barang"
             placeholder="Cari kode barang"
             value={query}

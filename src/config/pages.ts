@@ -1,6 +1,5 @@
 import {
   managementRoles,
-  notificationRoles,
   packingRoles,
   roles,
   warehouseRoles,
@@ -15,7 +14,6 @@ export type ModuleId =
   | "pengiriman"
   | "laporan"
   | "pengaturan"
-  | "notifikasi"
   | "auth";
 type PageSpec = readonly [
   id: string,
@@ -234,7 +232,6 @@ const definitions = [
     "pengaturan",
     managementRoles,
   ],
-  ["S05", "Log notifikasi", "/notifikasi", "notifikasi", notificationRoles],
 ] as const satisfies readonly PageSpec[];
 
 export type PageId = (typeof definitions)[number][0];

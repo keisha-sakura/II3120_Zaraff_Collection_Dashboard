@@ -11,6 +11,7 @@ export function useWarehouseSnapshot() {
   return snapshot
     ? {
         data: snapshot.data.warehouse,
+        priceRules: snapshot.data.settings.priceRules,
         storageUnavailable: snapshot.storageUnavailable,
       }
     : null;

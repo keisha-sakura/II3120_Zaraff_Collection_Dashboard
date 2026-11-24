@@ -22,8 +22,3 @@ export const packingRoles = [...managementRoles, "packing"] as const;
 export function isRole(value: unknown): value is Role {
   return typeof value === "string" && roles.some((role) => role === value);
 }
-export const notificationRoles = [
-  ...managementRoles,
-  "penyortir",
-  "packing",
-] as const;

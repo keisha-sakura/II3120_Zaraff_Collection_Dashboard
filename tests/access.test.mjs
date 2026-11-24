@@ -24,6 +24,8 @@ test("all annotated artboards match UI access, with confirmed Live Host override
     packing: "Tim Packing",
   };
   for (const screen of inventory) {
+    // Notification was explicitly removed from product scope by the user.
+    if (screen.id === "S05") continue;
     assert.ok(
       screen.accessNote,
       `Missing source access annotation: ${screen.file}`,
