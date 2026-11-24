@@ -8,6 +8,7 @@ import {
 } from "@/server/http";
 import { executeOperation } from "@/server/operations";
 import { visibleWorkspace } from "@/server/workspace";
+import { processCommentClaims } from "@/server/claim-processing";
 export const runtime = "nodejs";
 export async function POST(
   request: Request,
@@ -17,12 +18,16 @@ export async function POST(
     sameOrigin(request);
     const user = await apiUser();
     const { domain } = await params;
-    const result = executeOperation(
-      domain,
-      await jsonBody(request),
-      user,
-      request.headers.get("idempotency-key") ?? "",
-    );
+    const body = await jsonBody(request);
+    const key = request.headers.get("idempotency-key") ?? "";
+    const result =
+      domain === "sales" &&
+      body &&
+      typeof body === "object" &&
+      "type" in body &&
+      body.type === "process-claims"
+        ? await processCommentClaims(body, user, key)
+        : executeOperation(domain, body, user, key);
     return NextResponse.json(
       { ...result, state: visibleWorkspace(result.state, user) },
       { headers: noStore },

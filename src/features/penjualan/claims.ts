@@ -6,7 +6,7 @@ export function normalizeHandle(value: string) {
 export function validHandle(value: string) {
   return /^@[a-z0-9._]{2,30}$/i.test(value);
 }
-function csvCells(line: string): string[] | null {
+export function csvCells(line: string): string[] | null {
   const cells: string[] = [];
   let value = "";
   let quoted = false;

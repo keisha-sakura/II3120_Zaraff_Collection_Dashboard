@@ -5,6 +5,7 @@ import type {
   LiveContent,
   CustomerInput,
   ClaimResult,
+  ClaimRow,
   SalesCustomer,
   SalesOrder,
 } from "./model";
@@ -87,6 +88,7 @@ export function applySalesCommand(
   actor: string,
   now: string,
   hosts: readonly { id: string }[] = liveHosts,
+  preparedClaims?: ClaimRow[],
 ): { sales: SalesState; warehouse: WarehouseState; entityId: string } {
   check(Number.isFinite(Date.parse(now)), "Waktu aktivitas tidak valid.");
   const sales = structuredClone(current);
@@ -235,7 +237,7 @@ export function applySalesCommand(
     "Klaim live ini sudah diproses. Pesanan tidak dibuat ulang.",
   );
   check(command.text.length <= 1_000_000, "Ukuran input klaim maksimal 1 MB.");
-  const rows = parseClaims(command.text);
+  const rows = preparedClaims ?? parseClaims(command.text);
   check(
     rows.length > 0 && rows.length <= 1000,
     "Masukkan 1–1.000 baris klaim.",

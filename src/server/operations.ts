@@ -21,6 +21,8 @@ import { ensureInvoices } from "../features/pembayaran/invoices.ts";
 import type { SettingsCommand } from "../features/pengaturan/model";
 import * as validation from "./validation.ts";
 import * as t from "./schema.ts";
+import type { ClaimRow } from "../features/penjualan/model";
+export type PreparedClaims = { rows: ClaimRow[]; analysis: unknown };
 
 export const domainPages: Record<string, PageId> = {
   warehouse: "G01",
@@ -38,6 +40,7 @@ export function executeOperation(
   key: string,
   ctx: DatabaseContext = database(),
   now = new Date().toISOString(),
+  preparedClaims?: PreparedClaims,
 ) {
   if (!domainPages[domain] || !canAccessPage(user.role, domainPages[domain]))
     throw new HttpError(
@@ -111,6 +114,7 @@ export function executeOperation(
               user.name,
               now,
               state.directory?.filter((row) => row.role === "live-host") ?? [],
+              preparedClaims?.rows,
             );
             state.sales = result.sales;
             state.warehouse = result.warehouse;
@@ -126,6 +130,7 @@ export function executeOperation(
                   source: "text-csv-manual",
                   sourceHash,
                   rawText: command.text,
+                  extraction: preparedClaims?.analysis,
                   createdAt: now,
                   status: "processed",
                 })

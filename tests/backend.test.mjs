@@ -15,8 +15,12 @@ import {
 } from "../src/server/auth-core.ts";
 import { loadWorkspace, visibleWorkspace } from "../src/server/workspace.ts";
 import { executeOperation } from "../src/server/operations.ts";
-import { extractionCsv } from "../src/server/gemini.ts";
-import { parseClaims } from "../src/features/penjualan/claims.ts";
+import { checkedCommentDecisions } from "../src/server/gemini.ts";
+import {
+  parseCommentInput,
+  appendManualClaim,
+} from "../src/features/penjualan/comment-input.ts";
+import { processCommentClaims } from "../src/server/claim-processing.ts";
 import { reportData } from "../src/features/laporan/selectors.ts";
 import { homeDashboard } from "../src/server/home.ts";
 const now = "2026-11-24T11:00:00.000Z";
@@ -388,28 +392,30 @@ test(
     }
   },
 );
-test("Gemini extraction never supplies an inferred timestamp to winner processing", () => {
-  const csv = extractionCsv({
-    rows: [
-      {
-        handle: "@rina.thrift",
-        itemCode: "ZR-2609-0008",
-        time: "19:24:03.120",
-        uncertain: false,
-      },
-      {
-        handle: "@dodi_ootd",
-        itemCode: "ZR-2609-0008",
-        time: null,
-        uncertain: true,
-      },
-    ],
-  });
-  const rows = parseClaims(csv);
+test("Gemini cannot supply or alter buyer identity and timestamps", () => {
+  const comments = parseCommentInput(
+    "[19:24:03.120] @rina.thrift Claim ZR-2609-0008\n[WAKTU TIDAK TERLIHAT] @dodi_ootd Claim ZR-2609-0008",
+  );
+  const decisions = {
+    rows: comments.map((row) => ({
+      line: row.line,
+      itemCode: "ZR-2609-0008",
+      intent: "claim",
+    })),
+  };
+  const rows = checkedCommentDecisions(comments, decisions);
   assert.equal(rows[0].milliseconds, 69843120);
   assert.ok(rows[1].error);
   assert.equal(rows[1].milliseconds, null);
-  assert.throws(() => extractionCsv({ rows: [{ handle: "x" }] }));
+  assert.throws(() =>
+    checkedCommentDecisions(comments, {
+      rows: decisions.rows.map((row) => ({
+        ...row,
+        time: "00:00:00",
+        handle: "@fake",
+      })),
+    }),
+  );
 });
 
 test("insufficient deposit rolls back approval and zero-total orders can be paid", (t) => {
@@ -608,4 +614,312 @@ test("home aggregates share sales metrics and operational queues across month bo
     ctx,
   );
   assert.ok(host.upcoming.every((row) => row.hostId === "host-claudia"));
+});
+
+function geminiEnvironment(t) {
+  const previous = {
+    key: process.env.GEMINI_API_KEY,
+    model: process.env.GEMINI_MODEL,
+  };
+  process.env.GEMINI_API_KEY = "test-key-not-real";
+  process.env.GEMINI_MODEL = "gemini-test";
+  t.after(() => {
+    if (previous.key === undefined) delete process.env.GEMINI_API_KEY;
+    else process.env.GEMINI_API_KEY = previous.key;
+    if (previous.model === undefined) delete process.env.GEMINI_MODEL;
+    else process.env.GEMINI_MODEL = previous.model;
+  });
+}
+const commentSource = `RIWAYAT KOMENTAR — LIVE SENIN SORE
+Tanggal: 23 November 2026
+Zona waktu: WIB
+
+[19:24:02.100] @mega.preloved
+ZR-2609-0008 ukurannya apa, kak?
+
+[19:24:03.480] @dodi_ootd
+Aku ambil ZR-2609-0008, kak, fix ya!
+
+[19:24:03.120] @rina.thrift
+Claim ZR-2609-0008!
+
+[19:24:05.000] @dodi_ootd
+Aku tadi sudah claim ZR-2609-0008.
+
+[19:25:10.002] @fajarkoleksi
+Claim ZR-2609-0009.
+
+[19:25:10.001] @lalaa.style
+Aku mau ZR-2609-0009 kalau yang pertama batal.
+
+[WAKTU TIDAK TERLIHAT] @sarivintage
+Claim ZR-2609-0009.
+
+[19:25:11.000] @thrift.corner
+Ongkir ke Bandung berapa?`;
+function mockCommentModel(onRequest = () => {}) {
+  return async (url, options) => {
+    assert.match(String(url), /generativelanguage\.googleapis\.com/);
+    const body = JSON.parse(options.body);
+    assert.ok(body.systemInstruction.parts[0].text.includes("untrusted"));
+    assert.ok(!JSON.stringify(body).includes("inlineData"));
+    const comments = JSON.parse(body.contents[0].parts[0].text);
+    assert.ok(comments.every((row) => !("handle" in row) && !("time" in row)));
+    onRequest(comments);
+    const rows = comments.map((row) => ({
+      line: row.line,
+      itemCode: row.codes[0],
+      intent: row.comment.includes("ukurannya")
+        ? "question"
+        : row.comment.includes("tadi")
+          ? "follow-up"
+          : row.comment.includes("kalau")
+            ? "conditional"
+            : "claim",
+    }));
+    return Response.json({
+      candidates: [
+        { content: { parts: [{ text: JSON.stringify({ rows }) }] } },
+      ],
+    });
+  };
+}
+test("comment parser preserves source ordering, millisecond times, commas and quoted CSV", () => {
+  const rows = parseCommentInput(commentSource);
+  assert.equal(rows.length, 8);
+  assert.equal(rows[1].comment, "Aku ambil ZR-2609-0008, kak, fix ya!");
+  assert.equal(rows[2].handle, "@rina.thrift");
+  assert.equal(rows[2].time, "19:24:03.120");
+  assert.ok(rows[6].error);
+  const csv = parseCommentInput(
+    'waktu,handle,komentar\n19:24:03.120,@Rina.Thrift,"Claim ZR-2609-0008, kak!\nFix ambil"\n19:25:10.002,@fajarkoleksi,"Claim ZR-2609-0009"',
+  );
+  assert.equal(csv.length, 2);
+  assert.equal(csv[0].handle, "@rina.thrift");
+  assert.match(csv[0].comment, /\nFix/);
+  assert.equal(csv[1].line, 4);
+  const mixed = parseCommentInput(
+    '[19:24:03.120] @rina.thrift\nClaim ZR-2609-0008\n"@fajarkoleksi","ZR-2609-0009","19:25:10.002"',
+  );
+  assert.equal(mixed.length, 2);
+  assert.equal(mixed[1].structured, true);
+  const appended = parseCommentInput(
+    appendManualClaim(
+      "waktu,komentar,handle\n19:24:03.120,Claim ZR-2609-0008,@rina.thrift",
+      "@fajarkoleksi",
+      "ZR-2609-0009",
+      "19:25:10.002",
+    ),
+  );
+  assert.equal(appended[1].handle, "@fajarkoleksi");
+  assert.equal(appended[1].comment, "Claim ZR-2609-0009");
+  assert.equal(appended[1].time, "19:25:10.002");
+  assert.throws(
+    () =>
+      parseCommentInput(
+        'handle,komentar,waktu\n@rina.thrift,"Claim ZR-2609-0008,19:24:03.120',
+      ),
+    /kutip/,
+  );
+});
+test("comment checking and winner processing form one audited replay-safe transaction", async (t) => {
+  const ctx = setup(t);
+  geminiEnvironment(t);
+  let calls = 0;
+  const fetcher = mockCommentModel(() => calls++);
+  const body = {
+    type: "process-claims",
+    liveId: "live-261123",
+    text: commentSource,
+  };
+  const key = crypto.randomUUID();
+  const result = await processCommentClaims(body, owner, key, ctx, fetcher);
+  assert.equal(calls, 1);
+  const claims = result.state.sales.lives.find(
+    (row) => row.id === body.liveId,
+  ).results;
+  assert.equal(claims.length, 8);
+  assert.deepEqual(
+    claims.filter((row) => row.outcome === "won").map((row) => row.handle),
+    ["@rina.thrift", "@fajarkoleksi"],
+  );
+  assert.match(
+    claims.find((row) => row.handle === "@mega.preloved").reason,
+    /Pertanyaan/,
+  );
+  assert.match(
+    claims.find((row) => row.handle === "@lalaa.style").reason,
+    /bersyarat/,
+  );
+  assert.ok(
+    claims
+      .filter((row) => row.handle === "@dodi_ootd")
+      .some((row) => /pengulangan/.test(row.reason)),
+  );
+  assert.equal(
+    claims.find((row) => row.handle === "@sarivintage").milliseconds,
+    null,
+  );
+  const batch = ctx.sqlite
+    .prepare(
+      "select * from claim_batches where live_id=? and source='text-csv-manual'",
+    )
+    .get(body.liveId);
+  assert.equal(batch.raw_text, commentSource);
+  assert.equal(batch.status, "processed");
+  assert.equal(JSON.parse(batch.extraction).comments.length, 8);
+  assert.equal(
+    (await processCommentClaims(body, owner, key, ctx, fetcher)).replayed,
+    true,
+  );
+  assert.equal(calls, 1);
+  assert.deepEqual(ctx.sqlite.pragma("foreign_key_check"), []);
+});
+test("model failures, fabricated codes and timestamp/identity injection cannot create orders", async (t) => {
+  const ctx = setup(t);
+  geminiEnvironment(t);
+  const before = loadWorkspace(ctx, owner.id);
+  const comments = parseCommentInput(
+    "[19:24:03.120] @rina.thrift Claim ZR-2609-0008",
+  );
+  assert.throws(
+    () =>
+      checkedCommentDecisions(comments, {
+        rows: [{ line: 1, itemCode: "ZR-2609-0009", intent: "claim" }],
+      }),
+    /tidak terdapat/,
+  );
+  assert.throws(() => checkedCommentDecisions(comments, { rows: [] }));
+  const body = {
+    type: "process-claims",
+    liveId: "live-261123",
+    text: "[19:24:03.120] @rina.thrift Claim ZR-2609-0008",
+  };
+  const failing = async () =>
+    Response.json({ error: "unavailable" }, { status: 503 });
+  await assert.rejects(
+    processCommentClaims(body, owner, crypto.randomUUID(), ctx, failing),
+    (error) => error.status === 502,
+  );
+  assert.deepEqual(loadWorkspace(ctx, owner.id), before);
+  const question = {
+    ...body,
+    text: "[19:24:03.120] @rina.thrift ZR-2609-0008 ukurannya apa?",
+  };
+  await assert.rejects(
+    processCommentClaims(
+      question,
+      owner,
+      crypto.randomUUID(),
+      ctx,
+      mockCommentModel(),
+    ),
+    (error) => error.status === 400,
+  );
+  assert.deepEqual(loadWorkspace(ctx, owner.id), before);
+  await assert.rejects(
+    processCommentClaims(
+      { ...body, uploadId: crypto.randomUUID() },
+      owner,
+      crypto.randomUUID(),
+      ctx,
+      failing,
+    ),
+    (error) => error.name === "ZodError",
+  );
+  await assert.rejects(
+    processCommentClaims(
+      body,
+      { ...owner, role: "packing" },
+      crypto.randomUUID(),
+      ctx,
+      failing,
+    ),
+    (error) => error.status === 403,
+  );
+});
+test("structured CSV/manual claims need no AI and concurrent comment retries reserve stock once", async (t) => {
+  const ctx = setup(t);
+  geminiEnvironment(t);
+  const body = {
+    type: "process-claims",
+    liveId: "live-261123",
+    text: "handle,kode,waktu\n@rina.thrift,ZR-2609-0008,19:24:03.120",
+  };
+  const noNetwork = async () => {
+    throw new Error("Structured claims must not call AI");
+  };
+  const result = await processCommentClaims(
+    body,
+    owner,
+    crypto.randomUUID(),
+    ctx,
+    noNetwork,
+  );
+  assert.equal(
+    result.state.sales.lives
+      .find((row) => row.id === body.liveId)
+      .results.filter((row) => row.outcome === "won").length,
+    1,
+  );
+  const other = setup(t);
+  const raw = {
+    type: "process-claims",
+    liveId: "live-261123",
+    text: "handle,komentar,waktu\n@dodi_ootd,Claim ZR-2609-0008,19:24:03.480\n@rina.thrift,Claim ZR-2609-0008,19:24:03.120",
+  };
+  const key = crypto.randomUUID();
+  const fetcher = mockCommentModel();
+  const results = await Promise.all([
+    processCommentClaims(raw, owner, key, other, fetcher),
+    processCommentClaims(raw, owner, key, other, fetcher),
+  ]);
+  assert.equal(results.filter((row) => row.replayed).length, 1);
+  const orders = loadWorkspace(other, owner.id).sales.orders.filter((row) =>
+    row.itemIds.includes("ZR-2609-0008"),
+  );
+  assert.equal(orders.length, 1);
+  assert.equal(orders[0].customerId, "customer-rina");
+});
+
+test("available stock from another live reports its code and preserves all transactions", async (t) => {
+  const ctx = setup(t);
+  const before = loadWorkspace(ctx, owner.id);
+  assert.equal(
+    before.warehouse.items.find((row) => row.id === "ZR-2610-0014").status,
+    "available",
+  );
+  const noNetwork = async () => {
+    throw new Error("Unassigned products must not be sent to Gemini");
+  };
+  for (const text of [
+    "[19:24:03.480] @dodi_ootd\nAku ambil ZR-2610-0014 ya, kak!",
+    "handle,kode,waktu\n@dodi_ootd,ZR-2610-0014,19:24:03.480",
+  ]) {
+    await assert.rejects(
+      processCommentClaims(
+        { type: "process-claims", liveId: "live-261123", text },
+        owner,
+        crypto.randomUUID(),
+        ctx,
+        noNetwork,
+      ),
+      (error) => {
+        assert.equal(error.status, 400);
+        assert.match(error.message, /ZR-2610-0014.*tidak terdaftar/);
+        assert.match(error.message, /Live Senin Sore/);
+        assert.match(error.message, /Kode barang live ini:.*ZR-2609-0008/);
+        return true;
+      },
+    );
+    assert.deepEqual(loadWorkspace(ctx, owner.id), before);
+    assert.equal(
+      ctx.sqlite
+        .prepare(
+          "select count(*) as n from claim_batches where live_id='live-261123'",
+        )
+        .get().n,
+      0,
+    );
+  }
 });

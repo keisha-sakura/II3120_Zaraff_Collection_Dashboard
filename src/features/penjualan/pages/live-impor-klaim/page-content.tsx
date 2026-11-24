@@ -5,17 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Alert } from "@/components/ui/alert";
 import { Dialog } from "@/components/ui/dialog";
-import { DataTable } from "@/components/ui/data-table";
 import { FormField, Input, Textarea } from "@/components/ui/form-field";
 import { formatDate } from "@/lib/format";
-import { sampleClaims } from "../../model";
-import { parseClaims } from "../../claims";
 import { useSales } from "../../components/sales-provider";
 import { MissingSalesRecord, SalesLink } from "../../components/shared";
-import { ClaimExtraction } from "../../components/claim-extraction";
+import { appendManualClaim } from "../../comment-input";
 export function ImportClaimsPage({ id }: { id: string }) {
   const { state, run, go } = useSales();
-  const [text, setText] = useState(id === "live-261123" ? sampleClaims : "");
+  const [text, setText] = useState("");
+  const [busy, setBusy] = useState(false);
   const [manualOpen, setManualOpen] = useState(false);
   const [fileError, setFileError] = useState("");
   const live = state.lives.find((live) => live.id === id);
@@ -34,7 +32,6 @@ export function ImportClaimsPage({ id }: { id: string }) {
         </div>
       </>
     );
-  const rows = parseClaims(text);
   async function upload(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -52,13 +49,25 @@ export function ImportClaimsPage({ id }: { id: string }) {
   function manual(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const line = `${String(data.get("handle")).trim()},${String(data.get("code")).trim()},${data.get("time")}`;
-    setText((value) => `${value.trim()}${value.trim() ? "\n" : ""}${line}`);
+    setText((value) =>
+      appendManualClaim(
+        value,
+        String(data.get("handle")).trim(),
+        String(data.get("code")).trim(),
+        String(data.get("time")).trim(),
+      ),
+    );
     setManualOpen(false);
   }
   async function process() {
-    if (await run({ type: "process-claims", liveId: id, text }))
-      go(`/penjualan/live/${id}/klaim`);
+    if (busy) return;
+    setBusy(true);
+    try {
+      if (await run({ type: "process-claims", liveId: id, text }))
+        go(`/penjualan/live/${id}/klaim`);
+    } finally {
+      setBusy(false);
+    }
   }
   return (
     <>
@@ -68,13 +77,18 @@ export function ImportClaimsPage({ id }: { id: string }) {
         primaryAction={
           <Button
             onClick={process}
-            disabled={!rows.length || live.status !== "completed"}
+            disabled={busy || !text.trim() || live.status !== "completed"}
+            aria-busy={busy}
           >
-            Proses klaim
+            {busy ? "Memproses klaim…" : "Proses klaim"}
           </Button>
         }
         secondaryAction={
-          <Button variant="secondary" onClick={() => setManualOpen(true)}>
+          <Button
+            variant="secondary"
+            disabled={busy}
+            onClick={() => setManualOpen(true)}
+          >
             Tambah manual
           </Button>
         }
@@ -89,14 +103,18 @@ export function ImportClaimsPage({ id }: { id: string }) {
       <Card className="mb-6">
         <FormField
           id="claims-input"
-          label="Input komentar dari TikTok (handle, kode, waktu)"
-          hint="Satu klaim per baris. Waktu HH:MM:SS.mmm dalam WIB; urutan milidetik dipertahankan."
+          label="Komentar live"
+          hint={`Tempel komentar beserta handle dan waktu WIB, atau unggah CSV dengan kolom handle,komentar,waktu. Kode barang live ini: ${live.itemIds.slice(0, 6).join(", ") || "belum ada"}${live.itemIds.length > 6 ? " dan lainnya" : ""}.`}
         >
           <Textarea
             id="claims-input"
             maxLength={1000000}
             aria-describedby="claims-input-hint"
             value={text}
+            disabled={busy}
+            placeholder={
+              "[19:24:03.120] @rina.thrift\nClaim ZR-2609-0008, kak!\n\n[19:24:03.480] @dodi_ootd\nAku ambil ZR-2609-0008."
+            }
             onChange={(event) => setText(event.target.value)}
             className="min-h-40 font-mono text-sm"
           />
@@ -110,6 +128,7 @@ export function ImportClaimsPage({ id }: { id: string }) {
             type="file"
             accept=".csv,text/csv"
             onChange={upload}
+            disabled={busy}
           />
         </label>
         {fileError && (
@@ -117,38 +136,12 @@ export function ImportClaimsPage({ id }: { id: string }) {
             {fileError}
           </p>
         )}
-        <ClaimExtraction liveId={id} text={text} onExtract={setText} />
+        <p className="text-muted mt-4 text-sm">
+          Gemini memeriksa kode barang dan maksud klaim dalam komentar.
+          Pertanyaan, percakapan biasa, dan klaim bersyarat tidak dijadikan
+          pemenang. Pemenang ditentukan dari waktu komentar yang valid.
+        </p>
       </Card>
-      <h2 className="mb-3 text-base font-bold">
-        Pratinjau {rows.length} klaim
-      </h2>
-      <DataTable
-        caption="Pratinjau klaim sebelum diproses"
-        rows={rows}
-        rowKey={(row) => String(row.line)}
-        columns={[
-          { id: "handle", header: "Pembeli", cell: (row) => row.handle },
-          { id: "code", header: "Kode", cell: (row) => row.itemCode },
-          {
-            id: "time",
-            header: "Waktu",
-            cell: (row) => (
-              <span className="font-mono whitespace-nowrap">{row.time}</span>
-            ),
-          },
-          {
-            id: "validation",
-            header: "Pemeriksaan format",
-            cell: (row) =>
-              row.error ? (
-                <span className="text-danger">{row.error}</span>
-              ) : (
-                "Siap diproses"
-              ),
-          },
-        ]}
-        emptyMessage="Masukkan komentar atau unggah CSV untuk melihat pratinjau."
-      />
       <Dialog
         open={manualOpen}
         onClose={() => setManualOpen(false)}

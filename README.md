@@ -68,7 +68,7 @@ npm start
 
 ## Integrasi eksternal
 
-CSV, teks terstruktur, dan input manual klaim bekerja tanpa AI. Ekstraksi screenshot/komentar bebas opsional melalui `GEMINI_API_KEY` dan `GEMINI_MODEL` server-only. Ekstraksi harus ditinjau sebelum diproses; waktu ambigu tidak diikutkan sebagai klaim valid. Pemenang selalu ditentukan server berdasarkan timestamp milidetik, lalu nomor baris untuk waktu yang sama.
+Klaim hanya bersumber dari input komentar manual atau CSV. Tombol Proses klaim langsung memeriksa komentar dengan Gemini untuk mengenali kode barang serta membedakan klaim dari pertanyaan/percakapan biasa, kemudian server menentukan pemenang berdasarkan timestamp milidetik dan nomor baris sumber. Gemini tidak mengubah handle atau waktu. Tidak ada pratinjau klaim atau unggah screenshot. Konfigurasi `GEMINI_API_KEY` dan `GEMINI_MODEL` hanya di server; CSV klaim eksplisit `handle,kode,waktu` tetap dapat diproses tanpa AI. Contoh input dan CSV: [panduan komentar](docs/claim-comments.md).
 
 Publikasi promosi, pengingat invoice, dan distribusi strategi hanya mencatat aktivitas internal; belum mengirim ke TikTok/WhatsApp/email. Transfer divalidasi petugas berdasarkan unggahan, tanpa payment gateway. Pelacakan kurir diperbarui manual melalui **Perbarui status**; belum ada API kurir. Gemini perlu kredensial/model aktif dan belum diuji dengan akun eksternal.
 
