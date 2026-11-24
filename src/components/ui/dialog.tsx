@@ -29,7 +29,11 @@ export function Dialog({
         event.preventDefault();
         onClose();
       }}
-      onClose={onClose}
+      onClose={(event) => {
+        // Native close events are queued. Ignore an earlier close if the
+        // controlled dialog has already reopened (e.g. Escape, then Ctrl K).
+        if (!event.currentTarget.open) onClose();
+      }}
       className="dashboard-dialog"
     >
       <div className="mb-5 flex items-center justify-between gap-4">

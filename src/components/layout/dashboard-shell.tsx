@@ -1,10 +1,9 @@
 "use client";
-import Link from "next/link";
 import type { ReactNode } from "react";
 import { canAccessPage, type ModuleId } from "@/config/pages";
-import { roleLabels } from "@/config/roles";
 import type { User } from "@/types/domain";
-import { Button } from "@/components/ui/button";
+import { DashboardLink } from "./dashboard-link";
+import { ProfileMenu } from "./profile-menu";
 import { Sidebar } from "./sidebar";
 import { ModuleIcon } from "./module-icon";
 
@@ -28,48 +27,43 @@ export function DashboardShell({
       <div className="min-w-0 flex-1">
         <div className="brand-gradient h-1" />
         <header className="border-border bg-surface flex flex-wrap items-center gap-4 border-b px-5 py-3 lg:px-8">
-          <Button
-            variant="secondary"
-            className="bg-sidebar text-muted min-w-0 flex-1 justify-between sm:max-w-105"
+          <button
+            type="button"
+            aria-label="Pencarian cepat"
+            className="border-border-control bg-sidebar text-muted rounded-control flex min-w-0 flex-1 items-center gap-2 border px-3 py-2 text-left sm:max-w-105"
             onClick={onSearch}
           >
-            <span className="truncate">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              aria-hidden="true"
+              className="shrink-0"
+            >
+              <circle cx="11" cy="11" r="6.5" />
+              <path d="m20 20-4-4" />
+            </svg>
+            <span className="flex-1 truncate text-sm">
               Cari menu, kode barang, atau pesanan
             </span>
-            <kbd className="border-border-control bg-surface rounded border px-1.5 text-xs">
+            <kbd className="border-border-control bg-surface hidden shrink-0 rounded border px-1.5 text-xs whitespace-nowrap sm:inline-flex">
               Ctrl K
             </kbd>
-          </Button>
-          <div className="flex-1" />
+          </button>
+          <div className="hidden sm:block sm:flex-1" />
           {canAccessPage(user.role, "S05") && (
-            <Link
+            <DashboardLink
               href="/notifikasi"
               aria-label="Notifikasi"
               className="text-muted hover:bg-sidebar rounded-lg p-2"
             >
               <ModuleIcon module="notifikasi" />
-            </Link>
+            </DashboardLink>
           )}
-          <details className="relative">
-            <summary className="flex cursor-pointer list-none items-center gap-2.5 rounded-lg p-1">
-              <span className="bg-highlight text-primary grid size-9 place-items-center rounded-full font-bold">
-                {user.name.slice(0, 1)}
-              </span>
-              <span>
-                <span className="block text-sm font-bold">{user.name}</span>
-                <span className="text-muted block text-xs">
-                  {roleLabels[user.role]}
-                </span>
-              </span>
-            </summary>
-            <div className="rounded-card border-border bg-surface absolute right-0 z-20 mt-2 min-w-60 border p-4">
-              <p className="font-semibold">{user.name}</p>
-              <p className="text-muted mb-3 text-xs">{user.email}</p>
-              <Button variant="text" onClick={onLogout}>
-                Keluar
-              </Button>
-            </div>
-          </details>
+          <ProfileMenu user={user} onLogout={onLogout} />
         </header>
         <main className="w-full max-w-(--content-width) p-5 lg:px-8 lg:py-6">
           {children}

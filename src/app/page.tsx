@@ -1,7 +1,5 @@
-import { FoundationPreview } from "@/features/foundation/components/foundation-preview";
-import { mockWarehouseRepository } from "@/mocks/repositories/warehouse";
+import { redirect } from "next/navigation";
 
-export default async function HomePage() {
-  const items = await mockWarehouseRepository.listItems();
-  return <FoundationPreview items={items} />;
+export default function HomePage() {
+  redirect("/beranda");
 }

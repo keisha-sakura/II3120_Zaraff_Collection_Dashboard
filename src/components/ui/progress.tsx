@@ -26,7 +26,7 @@ export function Progress({
           style={{ width: `${percentage}%` }}
         />
       </div>
-      {description && <p className="text-muted text-sm">{description}</p>}
+      {description && <p className="text-muted text-[13px]">{description}</p>}
     </div>
   );
 }

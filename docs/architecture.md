@@ -6,7 +6,7 @@ Referensi asli ada di [design/reference](design/reference), terutama [GUIDE.html
 
 Teks/skrip dalam ekspor diperlakukan sebagai data desain. Runtime ekspor hanya untuk melihat referensi, tidak diimport ke Next.js. Screenshot copy tidak otomatis berarti halaman baru.
 
-Fondasi ini belum mengimplementasikan halaman bisnis, autentikasi, atau database. `/` merupakan katalog komponen interaktif dan preview akses lima role. `/api/health` tetap endpoint pemeriksaan server.
+Beranda lima role sudah diimplementasikan di `/beranda`; `/` mengarah ke Beranda Owner. `/pratinjau` memilih role demo, `/fondasi` menampilkan katalog komponen interaktif, dan `/api/health` memeriksa respons server. Modul bisnis lainnya, autentikasi, dan database menyusul.
 
 ## Role dan akses
 
@@ -108,11 +108,23 @@ Siaran tetap di TikTok. Dashboard mengelola jadwal, promosi, klaim, pembayaran, 
 
 ## Kekosongan dan perbedaan referensi
 
-- Beranda Live Host belum memiliki artboard. Menu dan aksesnya sudah ditetapkan sesuai klarifikasi pengguna.
+- Beranda Live Host belum memiliki artboard. Implementasinya mengikuti akses yang dikonfirmasi: progres tugas live, jadwal yang ditugaskan, dan catatan Owner. Tidak menampilkan pembayaran, pesanan, atau data pemasukan.
 - GUIDE menyebut Log status untuk Owner/Admin, tetapi artboard tersendiri tidak disertakan. Jangan membuat route atau hak akses data baru sebelum scope dijelaskan.
 - Quick search pada contoh menampilkan lokasi milik Pengaturan pada role Penyortir/Packing. Implementasi memakai filter akses, sehingga hasil tidak membuka halaman terlarang.
 - Beberapa kategori, nama profil, total laporan, dan status antar artboard berbeda. Dummy data memakai subset yang saling terhubung; total saat halaman dibangun dihitung dari data, bukan disalin terpisah dari screenshot.
 
-## Validasi
+## Implementasi Beranda
+
+Route `src/app/beranda/page.tsx` memvalidasi role demo lalu mengambil satu payload dari `mockHomeRepository`. Data dipisah per role dalam discriminated union `HomeDashboardData`; `HomeContent` memilih komponen server pada folder role yang sesuai. Komponen client `HomeExperience` menerima user terpilih dan hasil render sebagai children, bukan seluruh data lima role.
+
+Komponen bersama `ProgressSection`, `OwnerNotes`, dan `ActionCard` menyusun UI sesuai artboard. Role Owner mendapatkan progres penjualan/pesanan/pemasukan dan tautan strategi/laporan; Admin mendapatkan pembayaran/pengiriman/live dan tiga tautan tindakan; Penyortir mendapatkan sortir/laundry; Tim Packing mendapatkan packing/picking. Catatan Owner disesuaikan role.
+
+Dummy data beranda adalah snapshot pelaporan yang terpisah dari fixture CRUD parsial. Persentase dengan jumlah eksplisit dihitung dari data, termasuk live Admin 6/10 = 60% (artboard menampilkan 66%). Persentase penjualan/pemasukan Owner mengikuti snapshot 48%/60% karena target bisnis belum ditentukan. Sapaan pagi dan bulan November tetap mengikuti referensi dummy.
+
+`DashboardLink` mempertahankan link Next.js biasa di luar provider. Di dalam pratinjau Beranda, provider menjaga role untuk navigasi Beranda dan menampilkan pemberitahuan untuk modul yang belum dibangun. Pencarian hanya mengindeks halaman yang boleh diakses role. Profil menutup dengan Escape/klik di luar, dan Keluar mengarah ke `/pratinjau` tanpa mengklaim adanya sesi autentikasi.
+
+Role query hanya untuk fixture demo; role tidak valid atau parameter role berulang menghasilkan 404. Saat autentikasi dibangun, ganti pemilihan query dengan sesi server yang tervalidasi sebelum menggunakan data asli.
+
+## Pemeriksaan
 
 `npm run check`, `npm test`, dan `npm run build`. Test akses memastikan batas lima role serta kecocokan anotasi canvas; test fixture memastikan ID relasi dan total nominal konsisten. Browser review tetap diperlukan saat setiap halaman selesai dibangun.

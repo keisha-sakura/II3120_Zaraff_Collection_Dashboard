@@ -25,7 +25,7 @@ Untuk macOS/Linux: `cp .env.example .env.local`.
 npm run dev
 ```
 
-Buka http://localhost:3000 untuk katalog fondasi frontend dan http://localhost:3000/api/health untuk cek backend. FE dan BE berjalan di port yang sama; tidak perlu Express atau server backend terpisah.
+Buka http://localhost:3000 untuk Beranda Owner, http://localhost:3000/pratinjau untuk memilih role demo, http://localhost:3000/fondasi untuk katalog komponen, dan http://localhost:3000/api/health untuk cek backend. FE dan BE berjalan di port yang sama; tidak perlu Express atau server backend terpisah.
 
 Jika PowerShell memblokir `npm.ps1`, gunakan `npm.cmd` sebagai pengganti `npm`, misalnya `npm.cmd run dev`. Tidak perlu mengubah execution policy.
 
@@ -73,9 +73,21 @@ GitHub Actions menjalankan pemeriksaan dan build pada push serta pull request. C
 
 ## Status starter
 
-Fondasi mencakup lima role (Owner, Admin, Penyortir, Live Host, Tim Packing), registry halaman dan navigasi, token desain global, komponen reusable, folder per halaman, serta fixture dan contoh repository terpisah. Halaman `/` menampilkan katalog komponen, preview akses role, dialog, dan pencarian halaman. Pemilihan role hanya untuk preview.
+Fondasi mencakup lima role (Owner, Admin, Penyortir, Live Host, Tim Packing), registry halaman dan navigasi, token desain global, komponen reusable, folder per halaman, serta fixture dan contoh repository terpisah.
 
-Halaman bisnis dibangun pada tahap berikutnya. Database dan autentikasi belum dikonfigurasi; kebijakan akses frontend belum menjadi pengamanan server. Endpoint health memeriksa respons aplikasi, belum koneksi database.
+Beranda kelima role sudah dibangun. `/` mengarah ke `/beranda`. Gunakan `/pratinjau` atau URL berikut untuk berpindah role:
+
+| Role        | URL                       |
+| ----------- | ------------------------- |
+| Owner       | `/beranda?role=owner`     |
+| Admin       | `/beranda?role=admin`     |
+| Penyortir   | `/beranda?role=penyortir` |
+| Live Host   | `/beranda?role=live-host` |
+| Tim Packing | `/beranda?role=packing`   |
+
+Menu profil hanya memiliki aksi Keluar, yang mengembalikan mode demo ke pemilih role. Pencarian mendukung Ctrl/Cmd K dan Escape. Tautan modul yang belum diimplementasikan menampilkan pemberitahuan. Dummy data beranda berada di `src/mocks/data/home.ts` dan diambil melalui repository server-only; komposisi per role ada di `src/features/beranda/pages/`. Katalog komponen tetap tersedia di `/fondasi`.
+
+Halaman selain Beranda dibangun pada tahap berikutnya. Database dan autentikasi belum dikonfigurasi. Role pada query URL hanya memilih data dummy publik, bukan sesi pengguna atau pengamanan server. Endpoint health memeriksa respons aplikasi, belum koneksi database.
 
 ## Commit dan push pertama
 

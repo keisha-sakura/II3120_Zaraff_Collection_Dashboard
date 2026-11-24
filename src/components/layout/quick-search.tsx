@@ -23,7 +23,11 @@ export function QuickSearch({
   const [query, setQuery] = useState("");
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+      if (
+        !event.repeat &&
+        (event.ctrlKey || event.metaKey) &&
+        event.key.toLowerCase() === "k"
+      ) {
         event.preventDefault();
         onOpenChange(!open);
       }
@@ -39,11 +43,13 @@ export function QuickSearch({
       title="Pencarian cepat"
     >
       <Input
+        autoFocus
         aria-label="Cari halaman"
         placeholder="Cari halaman…"
         value={query}
         onChange={(event) => setQuery(event.target.value)}
       />
+      <p className="text-muted mt-4 text-xs font-semibold">Halaman</p>
       <ul className="mt-4 max-h-80 space-y-1 overflow-y-auto">
         {results.map((page) => (
           <li key={page.id}>

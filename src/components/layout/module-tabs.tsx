@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { DashboardLink } from "./dashboard-link";
 import { cn } from "@/lib/cn";
 export function ModuleTabs({
   items,
@@ -13,7 +13,7 @@ export function ModuleTabs({
       className="border-border mb-6 flex gap-5 overflow-x-auto border-b"
     >
       {items.map((item) => (
-        <Link
+        <DashboardLink
           key={item.id}
           href={item.path}
           aria-current={activeId === item.id ? "page" : undefined}
@@ -25,7 +25,7 @@ export function ModuleTabs({
           )}
         >
           {item.title}
-        </Link>
+        </DashboardLink>
       ))}
     </nav>
   );
