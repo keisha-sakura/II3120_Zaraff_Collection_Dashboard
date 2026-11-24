@@ -89,7 +89,7 @@ function Dropdown({
       Math.max(44, upward ? above : below),
       options.length * 40 + 14,
     );
-    const width = Math.min(Math.max(rect.width, 220), window.innerWidth - 24);
+    const width = Math.min(rect.width, window.innerWidth - 24);
     Object.assign(menu.style, {
       width: `${width}px`,
       maxHeight: `${height}px`,

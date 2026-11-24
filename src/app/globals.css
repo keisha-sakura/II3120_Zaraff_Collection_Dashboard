@@ -134,6 +134,8 @@
     opacity: 0.75;
   }
   .control:focus-visible,
+  .control[role="combobox"]:focus,
+  .control[role="combobox"][aria-expanded="true"],
   .filter-control:focus-within {
     border-color: var(--primary);
     outline: none;
