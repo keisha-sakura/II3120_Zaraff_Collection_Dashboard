@@ -12,6 +12,9 @@ type Navigation = {
   navigate: (href: string) => void;
 };
 const NavigationContext = createContext<Navigation | null>(null);
+export function useDashboardNavigation() {
+  return useContext(NavigationContext);
+}
 export function DashboardNavigationProvider({
   value,
   children,

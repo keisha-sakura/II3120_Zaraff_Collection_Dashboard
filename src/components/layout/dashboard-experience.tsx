@@ -1,18 +1,20 @@
 "use client";
 import { useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
-import { DashboardNavigationProvider } from "@/components/layout/dashboard-link";
-import { QuickSearch } from "@/components/layout/quick-search";
+import { DashboardShell } from "./dashboard-shell";
+import { DashboardNavigationProvider } from "./dashboard-link";
+import { QuickSearch } from "./quick-search";
 import { Dialog } from "@/components/ui/dialog";
-import { canAccessPath, getPagesForRole } from "@/config/pages";
+import { canAccessPath, getPagesForRole, type ModuleId } from "@/config/pages";
 import type { User } from "@/types/domain";
 
-export function HomeExperience({
+export function DashboardExperience({
   user,
+  activeModule,
   children,
 }: {
   user: User;
+  activeModule: ModuleId;
   children: ReactNode;
 }) {
   const router = useRouter();
@@ -22,8 +24,9 @@ export function HomeExperience({
     description: string;
   } | null>(null);
   function resolveHref(href: string) {
-    const [path] = href.split("?");
-    return path === "/beranda" ? `/beranda?role=${user.role}` : href;
+    const url = new URL(href, "http://preview.local");
+    url.searchParams.set("role", user.role);
+    return `${url.pathname}${url.search}${url.hash}`;
   }
   function navigate(href: string) {
     const [path] = href.split("?");
@@ -34,7 +37,15 @@ export function HomeExperience({
       });
       return;
     }
-    if (path === "/beranda") {
+    if (path.includes("[")) {
+      setNotice({
+        title: "Pilih data terlebih dahulu",
+        description:
+          "Buka daftar pada modul terkait, lalu pilih bale atau barang untuk melihat detailnya.",
+      });
+      return;
+    }
+    if (path === "/beranda" || path.startsWith("/gudang/")) {
       router.push(resolveHref(href));
       return;
     }
@@ -42,14 +53,14 @@ export function HomeExperience({
     setNotice({
       title: page?.title ?? "Halaman berikutnya",
       description:
-        "Halaman ini belum tersedia dalam pratinjau. Saat ini kamu bisa meninjau Beranda; modul lainnya akan dibangun pada tahap berikutnya.",
+        "Halaman ini belum tersedia dalam pratinjau. Modul lainnya akan dibangun pada tahap berikutnya.",
     });
   }
   return (
     <DashboardNavigationProvider value={{ resolveHref, navigate }}>
       <DashboardShell
         user={user}
-        activeModule="beranda"
+        activeModule={activeModule}
         onSearch={() => setSearchOpen(true)}
         onLogout={() => router.replace("/pratinjau")}
       >

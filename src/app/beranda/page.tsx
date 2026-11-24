@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { isRole } from "@/config/roles";
 import { PageHeader } from "@/components/layout/page-header";
 import { HomeContent } from "@/features/beranda/components/home-content";
-import { HomeExperience } from "@/features/beranda/components/home-experience";
+import { DashboardExperience } from "@/components/layout/dashboard-experience";
 import { mockHomeRepository } from "@/mocks/repositories/home";
 
 export const metadata: Metadata = { title: "Beranda" };
@@ -18,9 +18,9 @@ export default async function HomePage({
   if (!isRole(role)) notFound();
   const { user, data } = await mockHomeRepository.getDashboard(role);
   return (
-    <HomeExperience user={user}>
+    <DashboardExperience user={user} activeModule="beranda">
       <PageHeader title={`Selamat pagi, ${user.name}`} />
       <HomeContent data={data} />
-    </HomeExperience>
+    </DashboardExperience>
   );
 }

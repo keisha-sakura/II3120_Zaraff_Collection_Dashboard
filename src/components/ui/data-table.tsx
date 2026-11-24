@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { DashboardLink } from "@/components/layout/dashboard-link";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { EmptyState } from "./empty-state";
@@ -65,7 +65,7 @@ export function DataTable<T>({
                     )}
                   >
                     {href ? (
-                      <Link
+                      <DashboardLink
                         href={href}
                         tabIndex={index === 0 ? 0 : -1}
                         aria-label={
@@ -74,7 +74,7 @@ export function DataTable<T>({
                         className="block before:absolute before:inset-0"
                       >
                         {column.cell(row)}
-                      </Link>
+                      </DashboardLink>
                     ) : (
                       column.cell(row)
                     )}

@@ -6,7 +6,7 @@ Referensi asli ada di [design/reference](design/reference), terutama [GUIDE.html
 
 Teks/skrip dalam ekspor diperlakukan sebagai data desain. Runtime ekspor hanya untuk melihat referensi, tidak diimport ke Next.js. Screenshot copy tidak otomatis berarti halaman baru.
 
-Beranda lima role sudah diimplementasikan di `/beranda`; `/` mengarah ke Beranda Owner. `/pratinjau` memilih role demo, `/fondasi` menampilkan katalog komponen interaktif, dan `/api/health` memeriksa respons server. Modul bisnis lainnya, autentikasi, dan database menyusul.
+Beranda lima role dan sembilan halaman Gudang sudah diimplementasikan. `/` mengarah ke Beranda Owner, `/pratinjau` memilih role demo, `/fondasi` menampilkan katalog komponen interaktif, dan `/api/health` memeriksa respons server. Modul bisnis lainnya, autentikasi, dan database menyusul.
 
 ## Role dan akses
 
@@ -115,13 +115,13 @@ Siaran tetap di TikTok. Dashboard mengelola jadwal, promosi, klaim, pembayaran, 
 
 ## Implementasi Beranda
 
-Route `src/app/beranda/page.tsx` memvalidasi role demo lalu mengambil satu payload dari `mockHomeRepository`. Data dipisah per role dalam discriminated union `HomeDashboardData`; `HomeContent` memilih komponen server pada folder role yang sesuai. Komponen client `HomeExperience` menerima user terpilih dan hasil render sebagai children, bukan seluruh data lima role.
+Route `src/app/beranda/page.tsx` memvalidasi role demo lalu mengambil satu payload dari `mockHomeRepository`. Data dipisah per role dalam discriminated union `HomeDashboardData`; `HomeContent` memilih komponen server pada folder role yang sesuai. Komponen client bersama `DashboardExperience` menerima user terpilih dan hasil render sebagai children, bukan seluruh data lima role.
 
 Komponen bersama `ProgressSection`, `OwnerNotes`, dan `ActionCard` menyusun UI sesuai artboard. Role Owner mendapatkan progres penjualan/pesanan/pemasukan dan tautan strategi/laporan; Admin mendapatkan pembayaran/pengiriman/live dan tiga tautan tindakan; Penyortir mendapatkan sortir/laundry; Tim Packing mendapatkan packing/picking. Catatan Owner disesuaikan role.
 
 Dummy data beranda adalah snapshot pelaporan yang terpisah dari fixture CRUD parsial. Persentase dengan jumlah eksplisit dihitung dari data, termasuk live Admin 6/10 = 60% (artboard menampilkan 66%). Persentase penjualan/pemasukan Owner mengikuti snapshot 48%/60% karena target bisnis belum ditentukan. Sapaan pagi dan bulan November tetap mengikuti referensi dummy.
 
-`DashboardLink` mempertahankan link Next.js biasa di luar provider. Di dalam pratinjau Beranda, provider menjaga role untuk navigasi Beranda dan menampilkan pemberitahuan untuk modul yang belum dibangun. Pencarian hanya mengindeks halaman yang boleh diakses role. Profil menutup dengan Escape/klik di luar, dan Keluar mengarah ke `/pratinjau` tanpa mengklaim adanya sesi autentikasi.
+`DashboardLink` mempertahankan link Next.js biasa di luar provider. Di dalam pratinjau dashboard, provider menjaga query role serta filter URL saat berpindah Beranda/Gudang dan menampilkan pemberitahuan untuk modul yang belum dibangun. Pencarian hanya mengindeks halaman yang boleh diakses role; hasil detail berparameter meminta pengguna memilih record dari daftar. Profil menutup dengan Escape/klik di luar, dan Keluar mengarah ke `/pratinjau` tanpa mengklaim adanya sesi autentikasi.
 
 Role query hanya untuk fixture demo; role tidak valid atau parameter role berulang menghasilkan 404. Saat autentikasi dibangun, ganti pemilihan query dengan sesi server yang tervalidasi sebelum menggunakan data asli.
 
