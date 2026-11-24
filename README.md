@@ -1,10 +1,10 @@
-# Zaraff Collection Dashboard
+﻿# Zaraff Collection Dashboard
 
 Starter full-stack Next.js untuk frontend dan backend Zaraff Collection dalam satu repository dan satu server.
 
 ## Prasyarat
 
-- Node.js 22 LTS dan npm.
+- Node.js 22.18+ dan npm (disarankan Node.js 22 LTS terbaru).
 - Git.
 
 ## Menjalankan lokal
@@ -25,11 +25,13 @@ Untuk macOS/Linux: `cp .env.example .env.local`.
 npm run dev
 ```
 
-Buka http://localhost:3000 untuk frontend dan http://localhost:3000/api/health untuk cek backend. FE dan BE berjalan di port yang sama; tidak perlu Express atau server backend terpisah.
+Buka http://localhost:3000 untuk Beranda Owner, http://localhost:3000/pratinjau untuk memilih role demo, http://localhost:3000/api/health untuk cek backend. FE dan BE berjalan di port yang sama; tidak perlu Express atau server backend terpisah.
 
 Jika PowerShell memblokir `npm.ps1`, gunakan `npm.cmd` sebagai pengganti `npm`, misalnya `npm.cmd run dev`. Tidak perlu mengubah execution policy.
 
 ## Struktur
+
+Panduan role, token, dan komponen: [docs/architecture.md](docs/architecture.md). Pemetaan halaman ke folder: [docs/design/pages.md](docs/design/pages.md). Referensi HTML asli: [docs/design/reference](docs/design/reference).
 
 ```text
 src/
@@ -45,7 +47,7 @@ src/
 - Tambahkan halaman di `src/app/<nama>/page.tsx`.
 - Tambahkan endpoint di `src/app/api/<nama>/route.ts`, dengan fungsi HTTP seperti `GET` atau `POST`.
 - Simpan akses database, service, dan rahasia di `src/server/`. Gunakan `import "server-only"` agar modul tersebut tidak terimpor ke Client Component.
-- Buat `src/components/` untuk komponen bersama dan `src/lib/` untuk utilitas saat dibutuhkan.
+- Gunakan `src/components/` untuk komponen bersama, `src/features/<modul>/pages/<halaman>/` untuk komposisi halaman, dan `src/lib/` untuk utilitas. Route di `src/app/` cukup memanggil komponen halaman.
 - Alias `@/*` mengarah ke `src/*`.
 - Komponen App Router adalah Server Component secara default. Tambahkan `"use client"` jika komponen memerlukan state, event handler, atau browser API.
 - Client Component dapat memanggil endpoint dengan URL relatif, misalnya `fetch("/api/health")`. Server Component dapat langsung memanggil service di `src/server/`.
@@ -56,20 +58,52 @@ Daftarkan variabel baru tanpa nilai rahasia di `.env.example`. Simpan nilai loka
 
 ## Perintah
 
-| Perintah           | Fungsi                                     |
-| ------------------ | ------------------------------------------ |
-| `npm run dev`      | Development server dan hot reload          |
-| `npm run check`    | ESLint, TypeScript, dan pemeriksaan format |
-| `npm run lint:fix` | Perbaikan otomatis ESLint                  |
-| `npm run format`   | Format source dengan Prettier              |
-| `npm run build`    | Build production                           |
-| `npm start`        | Menjalankan hasil build production         |
+| Perintah                   | Fungsi                                                 |
+| -------------------------- | ------------------------------------------------------ |
+| `npm run dev`              | Development server dan hot reload                      |
+| `npm run check`            | ESLint, TypeScript, dan pemeriksaan format             |
+| `npm test`                 | Pemeriksaan akses lima role dan konsistensi dummy data |
+| `npm run design:inventory` | Regenerasi inventaris artboard dari referensi          |
+| `npm run lint:fix`         | Perbaikan otomatis ESLint                              |
+| `npm run format`           | Format source dengan Prettier                          |
+| `npm run build`            | Build production                                       |
+| `npm start`                | Menjalankan hasil build production                     |
 
 GitHub Actions menjalankan pemeriksaan dan build pada push serta pull request. Commit `package-lock.json` supaya instalasi konsisten; gunakan `npm ci` pada clone baru dan CI.
 
+## Halaman login
+
+Buka `/masuk` untuk melihat UI login sesuai referensi M01. Halaman ini berdiri sendiri dan tidak menjadi syarat membuka dashboard. Submit hanya menampilkan informasi bahwa login belum aktif; tidak ada request autentikasi atau penyimpanan kredensial/sesi. Gunakan tautan Pratinjau untuk memilih role. `/` dan semua route dashboard tetap dapat dibuka langsung.
+
 ## Status starter
 
-Halaman awal dan health endpoint sudah tersedia. Database, autentikasi, dan fitur bisnis belum dikonfigurasi. Endpoint health hanya memeriksa apakah aplikasi merespons, belum memeriksa koneksi database. Tentukan database dan kebutuhan akses sebelum mengembangkan CRUD.
+Fondasi mencakup lima role (Owner, Admin, Penyortir, Live Host, Tim Packing), registry halaman dan navigasi, token desain global, komponen reusable, folder per halaman, serta fixture dan contoh repository terpisah.
+
+Beranda kelima role sudah dibangun. `/` mengarah ke `/beranda`. Gunakan `/pratinjau` atau URL berikut untuk berpindah role:
+
+| Role        | URL                       |
+| ----------- | ------------------------- |
+| Owner       | `/beranda?role=owner`     |
+| Admin       | `/beranda?role=admin`     |
+| Penyortir   | `/beranda?role=penyortir` |
+| Live Host   | `/beranda?role=live-host` |
+| Tim Packing | `/beranda?role=packing`   |
+
+Menu profil hanya memiliki aksi Keluar, yang mengembalikan mode demo ke pemilih role. Pencarian diketik langsung di bar header, tanpa dialog atau shortcut Ctrl K. Hasil mengikuti role; notifikasi dan halamannya dihapus dari scope aplikasi. Tautan modul yang belum diimplementasikan menampilkan pemberitahuan. Dummy data beranda berada di `src/mocks/data/home.ts` dan diambil melalui repository server-only; komposisi per role ada di `src/features/beranda/pages/`.
+
+Modul Gudang juga tersedia untuk Owner, Admin, dan Penyortir: buka `/gudang/bale?role=penyortir` atau pilih Gudang dari sidebar Beranda. Tab modul menyediakan Bale & Sortir, Laundry, dan Inventaris. Alur terima bale, sortir/retur, konfirmasi selesai sortir, grading, dan pindah lokasi dapat dicoba. Perubahan demo disimpan di localStorage browser yang sama dan dipakai bersama oleh ketiga role. Role Live Host dan Tim Packing mendapat 404 jika mencoba URL Gudang. Detail alur dan integrasi backend ada di [docs/warehouse.md](docs/warehouse.md).
+
+Modul Penjualan tersedia di `/penjualan/live?role=admin`: jadwal/promosi, wizard live tiga langkah, impor/hasil klaim, daftar/detail pesanan, dan daftar/detail pelanggan. Owner dan Admin mendapat akses lengkap; Live Host hanya membaca jadwal yang ditugaskan kepadanya. Publikasi promosi merupakan simulasi lokal. Klaim membuat pesanan dan mereservasi stok Gudang dalam satu snapshot penyimpanan. Panduan lengkap: [docs/sales.md](docs/sales.md).
+
+Modul Pembayaran tersedia di `/pembayaran/validasi?role=admin` untuk Owner dan Admin. Tersedia antrean validasi, detail transfer/deposit, dialog penolakan, daftar belum dibayar, dan detail tagihan dengan pengingat demo. Persetujuan memperbarui pesanan menjadi Lunas, stok menjadi Terjual, dan saldo/riwayat deposit jika metode deposit. Transfer kurang bayar dan saldo tidak cukup tidak dapat disetujui. Panduan: [docs/payments.md](docs/payments.md).
+
+Modul Pengiriman tersedia di `/pengiriman/packing?role=packing`. Tim Packing mengerjakan antrean dan checklist pengambilan/QC/kemas. Owner dan Admin juga mengakses Siap dikirim, input resi, dan Dalam pengiriman. Hanya pesanan Lunas yang masuk antrean. Penyerahan ke kurir mengubah pesanan menjadi Dikirim dan barang menjadi Keluar Gudang serta melepas lokasi rak. Panduan: [docs/shipping.md](docs/shipping.md).
+
+Modul Laporan tersedia di `/laporan/ringkasan?role=owner` untuk Owner dan Admin: ringkasan bisnis, laporan bulanan dengan CSV, umur stok, barang terjual/keluar, serta tulis dan kirim strategi demo. Data dihitung dari workspace operasional. Panduan: [docs/reports.md](docs/reports.md).
+
+Modul Pengaturan tersedia di `/pengaturan/harga?role=admin` untuk Owner/Admin: aturan harga per kategori/grade, diskon member, dan tambah lokasi penyimpanan. Rekomendasi dipakai oleh grading Gudang; diskon berlaku pada pesanan baru. Panduan: [docs/settings.md](docs/settings.md).
+
+Data Gudang, Penjualan, Pembayaran, Pengiriman, Laporan, dan Pengaturan memakai key localStorage bersama `zaraff.operations.demo.v1`. Data lama dimigrasikan tanpa memundurkan saldo atau status pesanan yang sudah lunas. Demo baru menyediakan contoh deposit menunggu validasi; pada data lama, contoh itu dapat sudah lunas. Halaman selain modul yang disebutkan di atas dibangun pada tahap berikutnya. Database dan autentikasi belum dikonfigurasi. Role pada query URL hanya memilih data dummy publik, bukan sesi pengguna atau pengamanan server. Endpoint health memeriksa respons aplikasi, belum koneksi database.
 
 ## Commit dan push pertama
 
