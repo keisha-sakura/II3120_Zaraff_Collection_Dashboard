@@ -6,7 +6,7 @@ Referensi asli ada di [design/reference](design/reference), terutama [GUIDE.html
 
 Teks/skrip dalam ekspor diperlakukan sebagai data desain. Runtime ekspor hanya untuk melihat referensi, tidak diimport ke Next.js. Screenshot copy tidak otomatis berarti halaman baru.
 
-Beranda lima role, sembilan halaman Gudang, dan sepuluh halaman Penjualan sudah diimplementasikan. `/` mengarah ke Beranda Owner, `/pratinjau` memilih role demo, `/fondasi` menampilkan katalog komponen interaktif, dan `/api/health` memeriksa respons server. Modul bisnis lainnya, autentikasi, dan database menyusul. Detail alur: [Gudang](warehouse.md) dan [Penjualan](sales.md).
+Beranda lima role, sembilan halaman Gudang, sepuluh halaman Penjualan, dan lima halaman Pembayaran sudah diimplementasikan. `/` mengarah ke Beranda Owner, `/pratinjau` memilih role demo, `/fondasi` menampilkan katalog komponen interaktif, dan `/api/health` memeriksa respons server. Modul bisnis lainnya, autentikasi, dan database menyusul. Detail alur: [Gudang](warehouse.md), [Penjualan](sales.md), dan [Pembayaran](payments.md).
 
 ## Role dan akses
 
@@ -121,7 +121,7 @@ Komponen bersama `ProgressSection`, `OwnerNotes`, dan `ActionCard` menyusun UI s
 
 Dummy data beranda adalah snapshot pelaporan yang terpisah dari fixture CRUD parsial. Persentase dengan jumlah eksplisit dihitung dari data, termasuk live Admin 6/10 = 60% (artboard menampilkan 66%). Persentase penjualan/pemasukan Owner mengikuti snapshot 48%/60% karena target bisnis belum ditentukan. Sapaan pagi dan bulan November tetap mengikuti referensi dummy.
 
-`DashboardLink` mempertahankan link Next.js biasa di luar provider. Di dalam pratinjau dashboard, provider menjaga query role serta filter URL saat berpindah Beranda/Gudang/Penjualan dan menampilkan pemberitahuan untuk modul yang belum dibangun. Pencarian hanya mengindeks halaman yang boleh diakses role; hasil detail berparameter meminta pengguna memilih record dari daftar. Profil menutup dengan Escape/klik di luar, dan Keluar mengarah ke `/pratinjau` tanpa mengklaim adanya sesi autentikasi.
+`DashboardLink` mempertahankan link Next.js biasa di luar provider. Di dalam pratinjau dashboard, provider menjaga query role serta filter URL saat berpindah Beranda/Gudang/Penjualan/Pembayaran dan menampilkan pemberitahuan untuk modul yang belum dibangun. Pencarian hanya mengindeks halaman yang boleh diakses role; hasil detail berparameter meminta pengguna memilih record dari daftar. Profil menutup dengan Escape/klik di luar, dan Keluar mengarah ke `/pratinjau` tanpa mengklaim adanya sesi autentikasi.
 
 Role query hanya untuk fixture demo; role tidak valid atau parameter role berulang menghasilkan 404. Saat autentikasi dibangun, ganti pemilihan query dengan sesi server yang tervalidasi sebelum menggunakan data asli.
 

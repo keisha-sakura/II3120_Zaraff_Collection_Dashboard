@@ -91,7 +91,9 @@ Modul Gudang juga tersedia untuk Owner, Admin, dan Penyortir: buka `/gudang/bale
 
 Modul Penjualan tersedia di `/penjualan/live?role=admin`: jadwal/promosi, wizard live tiga langkah, impor/hasil klaim, daftar/detail pesanan, dan daftar/detail pelanggan. Owner dan Admin mendapat akses lengkap; Live Host hanya membaca jadwal yang ditugaskan kepadanya. Publikasi promosi merupakan simulasi lokal. Klaim membuat pesanan dan mereservasi stok Gudang dalam satu snapshot penyimpanan. Panduan lengkap: [docs/sales.md](docs/sales.md).
 
-Data Gudang dan Penjualan kini memakai key localStorage bersama `zaraff.operations.demo.v1`. Data Gudang lama dimigrasikan saat key baru belum ada; perubahan demo tidak dihapus. Halaman selain Beranda, Gudang, dan Penjualan dibangun pada tahap berikutnya. Database dan autentikasi belum dikonfigurasi. Role pada query URL hanya memilih data dummy publik, bukan sesi pengguna atau pengamanan server. Endpoint health memeriksa respons aplikasi, belum koneksi database.
+Modul Pembayaran tersedia di `/pembayaran/validasi?role=admin` untuk Owner dan Admin. Tersedia antrean validasi, detail transfer/deposit, dialog penolakan, daftar belum dibayar, dan detail tagihan dengan pengingat demo. Persetujuan memperbarui pesanan menjadi Lunas, stok menjadi Terjual, dan saldo/riwayat deposit jika metode deposit. Transfer kurang bayar dan saldo tidak cukup tidak dapat disetujui. Panduan: [docs/payments.md](docs/payments.md).
+
+Data Gudang, Penjualan, dan Pembayaran memakai key localStorage bersama `zaraff.operations.demo.v1`. Data lama dimigrasikan tanpa memundurkan saldo atau status pesanan yang sudah lunas. Demo baru menyediakan contoh deposit menunggu validasi; pada data lama, contoh itu dapat sudah lunas. Halaman selain modul yang disebutkan di atas dibangun pada tahap berikutnya. Database dan autentikasi belum dikonfigurasi. Role pada query URL hanya memilih data dummy publik, bukan sesi pengguna atau pengamanan server. Endpoint health memeriksa respons aplikasi, belum koneksi database.
 
 ## Commit dan push pertama
 

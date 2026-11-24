@@ -48,7 +48,8 @@ export function DashboardExperience({
     if (
       path === "/beranda" ||
       path.startsWith("/gudang/") ||
-      path.startsWith("/penjualan/")
+      path.startsWith("/penjualan/") ||
+      path.startsWith("/pembayaran/")
     ) {
       router.push(resolveHref(href));
       return;

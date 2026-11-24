@@ -2,6 +2,13 @@
 import { useSyncExternalStore } from "react";
 import { createWarehouseDemo } from "@/mocks/data/warehouse-demo";
 import { createSalesDemo } from "@/mocks/data/sales-demo";
+import { createPaymentsDemo, ensureInvoices } from "@/mocks/data/payments-demo";
+import { isPaymentsState } from "@/features/pembayaran/persistence";
+import { applyPaymentCommand } from "@/features/pembayaran/operations";
+import type {
+  PaymentsState,
+  PaymentCommand,
+} from "@/features/pembayaran/model";
 import { isWarehouseState } from "@/features/gudang/persistence";
 import { isSalesState } from "@/features/penjualan/persistence";
 import { applyWarehouseCommand } from "@/features/gudang/operations";
@@ -11,14 +18,23 @@ import type { SalesState, SalesCommand } from "@/features/penjualan/model";
 
 export const operationsStorageKey = "zaraff.operations.demo.v1";
 export const legacyWarehouseStorageKey = "zaraff.warehouse.demo.v1";
-type Workspace = { version: 1; warehouse: WarehouseState; sales: SalesState };
+type Workspace = {
+  version: 1;
+  warehouse: WarehouseState;
+  sales: SalesState;
+  payments: PaymentsState;
+};
 type Snapshot = { data: Workspace; storageUnavailable: boolean };
 let snapshot: Snapshot | null = null;
 let attached = false;
 const listeners = new Set<() => void>();
 const emit = () => listeners.forEach((listener) => listener());
-function initial(warehouse = createWarehouseDemo()): Workspace {
-  return { version: 1, ...createSalesDemo(warehouse) };
+function initial(warehouse?: WarehouseState): Workspace {
+  const seed = createSalesDemo(warehouse ?? createWarehouseDemo());
+  return {
+    version: 1,
+    ...createPaymentsDemo(seed.sales, seed.warehouse, warehouse === undefined),
+  };
 }
 function restore() {
   try {
@@ -34,7 +50,19 @@ function restore() {
       "sales" in value &&
       isSalesState(value.sales)
     ) {
-      snapshot = { data: value as Workspace, storageUnavailable: false };
+      const payments =
+        "payments" in value && isPaymentsState(value.payments)
+          ? ensureInvoices(value.payments, value.sales)
+          : createPaymentsDemo(value.sales, value.warehouse).payments;
+      snapshot = {
+        data: {
+          version: 1,
+          warehouse: value.warehouse,
+          sales: value.sales,
+          payments,
+        },
+        storageUnavailable: false,
+      };
       return;
     }
     const legacyText = localStorage.getItem(legacyWarehouseStorageKey);
@@ -108,6 +136,33 @@ export function executeDemoSalesCommand(command: SalesCommand, actor: string) {
     new Date().toISOString(),
   );
   // One storage write keeps orders, claims and reserved warehouse items together.
-  commit({ version: 1, sales: result.sales, warehouse: result.warehouse });
+  commit({
+    ...snapshot.data,
+    sales: result.sales,
+    warehouse: result.warehouse,
+    payments: ensureInvoices(snapshot.data.payments, result.sales),
+  });
+  return result.entityId;
+}
+
+export function executeDemoPaymentCommand(
+  command: PaymentCommand,
+  actor: string,
+) {
+  if (!snapshot) throw new Error("Data sedang dimuat.");
+  const result = applyPaymentCommand(
+    snapshot.data.payments,
+    snapshot.data.sales,
+    snapshot.data.warehouse,
+    command,
+    actor,
+    new Date().toISOString(),
+  );
+  commit({
+    version: 1,
+    sales: result.sales,
+    warehouse: result.warehouse,
+    payments: result.payments,
+  });
   return result.entityId;
 }
