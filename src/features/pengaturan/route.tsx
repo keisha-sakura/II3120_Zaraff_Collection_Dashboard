@@ -1,8 +1,5 @@
+import { requireRecord } from "@/server/page-access";
 import "server-only";
-import { notFound } from "next/navigation";
-import { isRole } from "@/config/roles";
-import { canAccessPage } from "@/config/pages";
-import { mockUsers } from "@/mocks/data/users";
 import { DashboardExperience } from "@/components/layout/dashboard-experience";
 import { SettingsProvider } from "./components/settings-provider";
 import { SettingsScreen } from "./components/settings-screen";
@@ -12,12 +9,16 @@ export async function renderSettingsRoute(
   view: SettingsView,
   query: SettingsQuery,
 ) {
-  const { role = "owner" } = await query;
-  if (!isRole(role) || !canAccessPage(role, view.page)) notFound();
-  const user = mockUsers.find((user) => user.role === role)!;
+  await query;
+  const user = await requireRecord(
+    view.page,
+    "entityId" in view && typeof view.entityId === "string"
+      ? view.entityId
+      : undefined,
+  );
   return (
     <DashboardExperience user={user} activeModule="pengaturan">
-      <SettingsProvider key={`${role}:${view.page}`} user={user}>
+      <SettingsProvider key={`${user.id}:${view.page}`} user={user}>
         <SettingsScreen view={view} />
       </SettingsProvider>
     </DashboardExperience>

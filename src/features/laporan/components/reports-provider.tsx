@@ -1,9 +1,6 @@
 "use client";
 import { createContext, useContext, useState, type ReactNode } from "react";
-import {
-  useDemoWorkspace,
-  executeDemoReportsCommand,
-} from "@/mocks/store/operations-store";
+import { useWorkspace, executeReportsCommand } from "@/lib/workspace-store";
 import { useDashboardNavigation } from "@/components/layout/dashboard-link";
 import { Alert } from "@/components/ui/alert";
 import type { User } from "@/types/domain";
@@ -14,9 +11,10 @@ type Value = {
   state: ReportsState;
   sales: SalesState;
   warehouse: WarehouseState;
+  directory: User[];
   month: string;
   user: User;
-  run: (command: ReportsCommand) => string | null;
+  run: (command: ReportsCommand) => Promise<string | null>;
   go: (href: string) => void;
 };
 const Context = createContext<Value | null>(null);
@@ -29,7 +27,7 @@ export function ReportsProvider({
   month: string;
   children: ReactNode;
 }) {
-  const snapshot = useDemoWorkspace();
+  const snapshot = useWorkspace();
   const navigation = useDashboardNavigation();
   const [error, setError] = useState<string | null>(null);
   if (!snapshot)
@@ -38,10 +36,10 @@ export function ReportsProvider({
         Memuat data laporan…
       </p>
     );
-  function run(command: ReportsCommand) {
+  async function run(command: ReportsCommand) {
     try {
       setError(null);
-      return executeDemoReportsCommand(command, user);
+      return await executeReportsCommand(command);
     } catch (error) {
       setError(
         error instanceof Error
@@ -57,19 +55,13 @@ export function ReportsProvider({
         state: snapshot.data.reports,
         sales: snapshot.data.sales,
         warehouse: snapshot.data.warehouse,
+        directory: snapshot.data.directory ?? [],
         user,
         month,
         run,
         go: (href) => navigation?.navigate(href),
       }}
     >
-      {snapshot.storageUnavailable && (
-        <div className="mb-4">
-          <Alert tone="warning" title="Penyimpanan browser tidak tersedia">
-            Perubahan demo hanya bertahan selama tab ini terbuka.
-          </Alert>
-        </div>
-      )}
       {error && (
         <div className="mb-4">
           <Alert tone="danger" title="Periksa strategi kembali">

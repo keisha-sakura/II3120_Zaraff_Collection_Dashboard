@@ -29,11 +29,11 @@ export function ItemDetailPage({ id }: { id: string }) {
   const history = state.movements
     .filter((movement) => movement.entityId === id)
     .sort((a, b) => b.occurredAt.localeCompare(a.occurredAt));
-  function move(event: FormEvent<HTMLFormElement>) {
+  async function move(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     if (
-      run({
+      await run({
         type: "move",
         itemId: id,
         locationId: String(data.get("location")),

@@ -1,7 +1,7 @@
 import type { WarehouseState } from "@/features/gudang/model";
 import type { SalesState } from "@/features/penjualan/model";
 import type { PaymentsState, PaymentCommand, PaymentAttempt } from "./model";
-import { ensureInvoices } from "../../mocks/data/payments-demo.ts";
+import { ensureInvoices } from "./invoices.ts";
 
 function check(value: unknown, message: string): asserts value {
   if (!value) throw new Error(message);
@@ -21,7 +21,7 @@ export function approvalIssue(
     return "Pembayaran ini sudah ditinjau atau pesanan sudah dibayar.";
   if (
     !Number.isInteger(attempt.amount) ||
-    attempt.amount <= 0 ||
+    attempt.amount < 0 ||
     attempt.amount !== order.total
   )
     return "Nominal pembayaran tidak sesuai total tagihan.";
@@ -64,6 +64,10 @@ export function applyPaymentCommand(
   now: string,
 ) {
   check(Number.isFinite(Date.parse(now)), "Waktu aktivitas tidak valid.");
+  check(
+    command.type !== "submit",
+    "Pengajuan pembayaran harus melalui service server.",
+  );
   const payments = ensureInvoices(source, salesSource);
   const sales = structuredClone(salesSource);
   const warehouse = structuredClone(warehouseSource);
@@ -119,7 +123,7 @@ export function applyPaymentCommand(
   if (command.type === "reject") {
     check(
       command.reason.trim().length >= 3 && command.reason.trim().length <= 500,
-      "Alasan penolakan wajib diisi (3–500 karakter).",
+      "Alasan penolakan wajib diisi (3â€“500 karakter).",
     );
     attempt.status = "rejected";
     attempt.rejectionReason = command.reason.trim();

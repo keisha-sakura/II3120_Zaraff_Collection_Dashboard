@@ -34,8 +34,8 @@ export function LiveItemsPage() {
   const rows = available.filter(
     (item) => category === "all" || item.category === category,
   );
-  function next() {
-    if (run({ type: "select-items", itemIds: selectedIds }))
+  async function next() {
+    if (await run({ type: "select-items", itemIds: selectedIds }))
       go("/penjualan/live/baru/publikasi");
   }
   return (

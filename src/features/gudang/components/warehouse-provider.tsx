@@ -2,20 +2,16 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 import type { User } from "@/types/domain";
 import type { WarehouseCommand, WarehouseState } from "../model";
-import {
-  executeDemoWarehouseCommand,
-  useDemoWorkspace,
-} from "@/mocks/store/operations-store";
+import { executeWarehouseCommand, useWorkspace } from "@/lib/workspace-store";
 import { Alert } from "@/components/ui/alert";
 import { useDashboardNavigation } from "@/components/layout/dashboard-link";
 import type { PriceRules } from "@/features/pengaturan/model";
-
 type WarehouseContextValue = {
   state: WarehouseState;
   priceRules: PriceRules;
   user: User;
   go: (href: string) => void;
-  run: (command: WarehouseCommand) => string | null;
+  run: (command: WarehouseCommand) => Promise<string | null>;
   error: string | null;
 };
 const WarehouseContext = createContext<WarehouseContextValue | null>(null);
@@ -26,7 +22,7 @@ export function WarehouseProvider({
   user: User;
   children: ReactNode;
 }) {
-  const snapshot = useDemoWorkspace();
+  const snapshot = useWorkspace();
   const navigation = useDashboardNavigation();
   const [error, setError] = useState<string | null>(null);
   if (!snapshot)
@@ -35,10 +31,10 @@ export function WarehouseProvider({
         Memuat data gudang…
       </p>
     );
-  function run(command: WarehouseCommand) {
+  async function run(command: WarehouseCommand) {
     try {
       setError(null);
-      return executeDemoWarehouseCommand(command, user.name);
+      return await executeWarehouseCommand(command);
     } catch (error) {
       setError(
         error instanceof Error
@@ -59,13 +55,6 @@ export function WarehouseProvider({
         error,
       }}
     >
-      {snapshot.storageUnavailable && (
-        <div className="mb-4">
-          <Alert tone="warning" title="Penyimpanan browser tidak tersedia">
-            Perubahan demo hanya tersimpan selama tab ini terbuka.
-          </Alert>
-        </div>
-      )}
       {error && (
         <div className="mb-4">
           <Alert tone="danger" title="Periksa data kembali">

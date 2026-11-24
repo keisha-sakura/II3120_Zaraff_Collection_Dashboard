@@ -1,9 +1,6 @@
 "use client";
 import { createContext, useContext, useState, type ReactNode } from "react";
-import {
-  useDemoWorkspace,
-  executeDemoSalesCommand,
-} from "@/mocks/store/operations-store";
+import { useWorkspace, executeSalesCommand } from "@/lib/workspace-store";
 import { useDashboardNavigation } from "@/components/layout/dashboard-link";
 import { Alert } from "@/components/ui/alert";
 import { canAccessPage } from "@/config/pages";
@@ -13,8 +10,9 @@ import type { SalesState, SalesCommand } from "../model";
 type SalesContext = {
   state: SalesState;
   warehouse: WarehouseState;
+  directory: User[];
   user: User;
-  run: (command: SalesCommand) => string | null;
+  run: (command: SalesCommand) => Promise<string | null>;
   go: (href: string) => void;
   error: string | null;
 };
@@ -26,7 +24,7 @@ export function SalesProvider({
   user: User;
   children: ReactNode;
 }) {
-  const snapshot = useDemoWorkspace();
+  const snapshot = useWorkspace();
   const navigation = useDashboardNavigation();
   const [error, setError] = useState<string | null>(null);
   if (!snapshot)
@@ -35,12 +33,12 @@ export function SalesProvider({
         Memuat data penjualan…
       </p>
     );
-  function run(command: SalesCommand) {
+  async function run(command: SalesCommand) {
     try {
       setError(null);
       if (!canAccessPage(user.role, "P02"))
         throw new Error("Aksi ini hanya tersedia untuk Owner dan Admin.");
-      return executeDemoSalesCommand(command, user.name);
+      return await executeSalesCommand(command);
     } catch (error) {
       setError(
         error instanceof Error
@@ -55,19 +53,13 @@ export function SalesProvider({
       value={{
         state: snapshot.data.sales,
         warehouse: snapshot.data.warehouse,
+        directory: snapshot.data.directory ?? [],
         user,
         run,
         go: (href) => navigation?.navigate(href),
         error,
       }}
     >
-      {snapshot.storageUnavailable && (
-        <div className="mb-4">
-          <Alert tone="warning" title="Penyimpanan browser tidak tersedia">
-            Perubahan demo hanya bertahan selama tab ini terbuka.
-          </Alert>
-        </div>
-      )}
       {error && (
         <div className="mb-4">
           <Alert tone="danger" title="Periksa data kembali">

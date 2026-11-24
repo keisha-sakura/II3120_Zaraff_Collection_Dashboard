@@ -12,7 +12,7 @@ export function AdminHomePage({ data }: { data: AdminHomeData }) {
         items={[
           {
             id: "payments",
-            label: `Pembayaran pesanan ${data.liveLabel}`,
+            label: "Pembayaran pesanan",
             value: progressPercentage(
               payments.paid,
               payments.paid + payments.pending + payments.unpaid,
@@ -21,7 +21,7 @@ export function AdminHomePage({ data }: { data: AdminHomeData }) {
           },
           {
             id: "shipping",
-            label: "Pengiriman minggu ini",
+            label: "Progres pengiriman",
             value: progressPercentage(
               shipping.delivered,
               shipping.delivered +
@@ -32,7 +32,7 @@ export function AdminHomePage({ data }: { data: AdminHomeData }) {
           },
           {
             id: "live",
-            label: "Live",
+            label: `Live ${data.liveLabel}`,
             value: progressPercentage(live.completed, live.scheduled),
             description: `${live.completed} / ${live.scheduled} Live terjadwal sudah terlaksana`,
           },

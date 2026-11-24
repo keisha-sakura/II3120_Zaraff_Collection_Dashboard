@@ -12,10 +12,10 @@ export function LocationsPage() {
   const { warehouse, run, error } = useSettings();
   const [open, setOpen] = useState(false);
   const [failed, setFailed] = useState(false);
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const values = new FormData(event.currentTarget);
-    const result = run({
+    const result = await run({
       type: "add-location",
       code: String(values.get("code")),
       description: String(values.get("description")),

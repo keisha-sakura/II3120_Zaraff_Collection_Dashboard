@@ -1,13 +1,6 @@
-import { redirect, notFound } from "next/navigation";
-import { isRole } from "@/config/roles";
-import { canAccessPage } from "@/config/pages";
-import type { DemoRoleQuery } from "@/features/gudang/route";
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: DemoRoleQuery;
-}) {
-  const { role = "owner" } = await searchParams;
-  if (!isRole(role) || !canAccessPage(role, "G01")) notFound();
-  redirect(`/gudang/bale?role=${role}`);
+import { redirect } from "next/navigation";
+import { requirePage } from "@/server/auth";
+export default async function Page() {
+  await requirePage("G01");
+  redirect("/gudang/bale");
 }

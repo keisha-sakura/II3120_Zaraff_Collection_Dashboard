@@ -5,7 +5,7 @@ export function SorterHomePage({ data }: { data: SorterHomeData }) {
   return (
     <div className="space-y-4">
       <ProgressSection
-        title="Progres kerja hari ini"
+        title="Progres kerja"
         headingId="sorter-progress-heading"
         items={[
           {

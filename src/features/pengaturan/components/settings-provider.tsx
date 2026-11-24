@@ -1,9 +1,6 @@
 "use client";
 import { createContext, useContext, useState, type ReactNode } from "react";
-import {
-  useDemoWorkspace,
-  executeDemoSettingsCommand,
-} from "@/mocks/store/operations-store";
+import { useWorkspace, executeSettingsCommand } from "@/lib/workspace-store";
 import { Alert } from "@/components/ui/alert";
 import type { User } from "@/types/domain";
 import type { SalesState } from "@/features/penjualan/model";
@@ -13,7 +10,7 @@ type Value = {
   state: SettingsState;
   sales: SalesState;
   warehouse: WarehouseState;
-  run: (command: SettingsCommand) => string | null;
+  run: (command: SettingsCommand) => Promise<string | null>;
   user: User;
   error: string | null;
 };
@@ -25,7 +22,7 @@ export function SettingsProvider({
   user: User;
   children: ReactNode;
 }) {
-  const snapshot = useDemoWorkspace();
+  const snapshot = useWorkspace();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   if (!snapshot)
@@ -34,11 +31,11 @@ export function SettingsProvider({
         Memuat data pengaturan…
       </p>
     );
-  function run(command: SettingsCommand) {
+  async function run(command: SettingsCommand) {
     setError(null);
     setSuccess(null);
     try {
-      const id = executeDemoSettingsCommand(command, user);
+      const id = await executeSettingsCommand(command);
       setSuccess(
         command.type === "add-location"
           ? `Lokasi ${id} berhasil ditambahkan.`
@@ -65,13 +62,6 @@ export function SettingsProvider({
         error,
       }}
     >
-      {snapshot.storageUnavailable && (
-        <div className="mb-4">
-          <Alert tone="warning" title="Penyimpanan browser tidak tersedia">
-            Perubahan demo hanya bertahan selama tab ini terbuka.
-          </Alert>
-        </div>
-      )}
       {error && (
         <div className="mb-4">
           <Alert tone="danger" title="Periksa pengaturan kembali">

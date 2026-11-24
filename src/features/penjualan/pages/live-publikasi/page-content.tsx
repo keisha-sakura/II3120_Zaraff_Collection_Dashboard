@@ -4,11 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { DetailList } from "@/components/ui/detail-list";
 import { formatCurrency, formatDate } from "@/lib/format";
-import { liveHosts } from "../../model";
 import { useSales } from "../../components/sales-provider";
 import { DraftRequired, LiveSteps, SalesLink } from "../../components/shared";
 export function LivePublishPage() {
-  const { state, warehouse, run, go } = useSales();
+  const { state, warehouse, run, go, directory } = useSales();
+  const liveHosts = directory.filter((row) => row.role === "live-host");
   const draft = state.draft;
   if (!draft?.title || !Number.isFinite(Date.parse(draft.scheduledAt)))
     return <DraftRequired />;
@@ -16,8 +16,8 @@ export function LivePublishPage() {
     warehouse.items.filter((item) => item.id === id),
   );
   const prices = items.map((item) => item.price ?? 0);
-  function save(publish: boolean) {
-    if (run({ type: "save-live", publish }))
+  async function save(publish: boolean) {
+    if (await run({ type: "save-live", publish }))
       go(`/penjualan/live?saved=${publish ? "published" : "draft"}`);
   }
   return (

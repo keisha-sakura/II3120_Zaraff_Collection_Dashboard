@@ -2,12 +2,12 @@ import type { User } from "@/types/domain";
 import type { ReportsState, ReportsCommand } from "./model";
 import { validMonth } from "./model.ts";
 import { canAccessPage } from "../../config/pages.ts";
-import { strategyRecipients } from "../../mocks/data/reports-demo.ts";
 export function applyReportsCommand(
   source: ReportsState,
   command: ReportsCommand,
   actor: User,
   now: string,
+  recipients: readonly Pick<User, "id">[] = [],
 ) {
   if (
     !canAccessPage(actor.role, command.type === "save-strategy" ? "R06" : "R07")
@@ -48,7 +48,7 @@ export function applyReportsCommand(
     !command.recipientIds.length ||
     new Set(command.recipientIds).size !== command.recipientIds.length ||
     !command.recipientIds.every((id) =>
-      strategyRecipients.some((user) => user.id === id),
+      recipients.some((user) => user.id === id),
     )
   )
     throw new Error("Pilih minimal satu staf yang valid.");

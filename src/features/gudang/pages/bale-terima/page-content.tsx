@@ -14,10 +14,10 @@ export function ReceiveBalePage() {
     month: "2-digit",
     day: "2-digit",
   }).format(new Date());
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const values = new FormData(event.currentTarget);
-    const id = run({
+    const id = await run({
       type: "receive",
       input: {
         supplier: String(values.get("supplier")),

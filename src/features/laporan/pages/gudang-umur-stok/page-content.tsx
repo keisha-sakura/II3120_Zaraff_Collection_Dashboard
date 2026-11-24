@@ -105,8 +105,8 @@ export function StockAgePage() {
         </Card>
       </div>
       <p className="text-muted mt-4 text-xs">
-        Posisi stok dan umur stok memakai acuan demo 24 November 2026. Filter
-        periode berlaku untuk barang keluar dan retur.
+        Posisi stok dan umur stok memakai data terkini. Filter periode berlaku
+        untuk barang keluar dan retur.
       </p>
     </>
   );

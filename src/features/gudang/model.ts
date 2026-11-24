@@ -46,6 +46,16 @@ export type Movement = {
   actor: string;
 };
 export type WarehouseState = {
+  history?: {
+    id: string;
+    itemId: string;
+    occurredAt: string;
+    status: string;
+    grade: string | null;
+    price: number | null;
+    locationId: string | null;
+    actorId: string | null;
+  }[];
   version: 1;
   bales: WarehouseBale[];
   items: WarehouseItem[];
@@ -88,7 +98,7 @@ export type WarehouseView = {
   entityId?: string;
 };
 export const demoReferenceDate = "2026-11-24T10:00:00+07:00";
-export function daysSince(value: string, reference = demoReferenceDate) {
+export function daysSince(value: string, reference = new Date().toISOString()) {
   const formatter = new Intl.DateTimeFormat("en-GB", {
     timeZone: "Asia/Jakarta",
     year: "numeric",

@@ -9,15 +9,11 @@ export function RolePreview({ users }: { users: readonly User[] }) {
       <div className="brand-gradient mb-8 h-1 rounded-full" />
       <PageHeader
         title="Pratinjau Beranda"
-        description="Pilih role untuk melihat contoh Beranda. Pratinjau memakai data dummy dan belum menggunakan login."
+        description="Pratinjau development mengikuti akun yang sedang login. Role tidak dapat diganti melalui URL."
       />
       <div className="grid gap-4 sm:grid-cols-2">
         {users.map((user) => (
-          <Link
-            key={user.id}
-            href={`/beranda?role=${user.role}`}
-            className="rounded-card block"
-          >
+          <Link key={user.id} href="/beranda" className="rounded-card block">
             <Card className="hover:border-border-secondary flex items-center gap-4 transition-colors">
               <span className="bg-highlight text-primary grid size-11 place-items-center rounded-full text-lg font-bold">
                 {user.name[0]}

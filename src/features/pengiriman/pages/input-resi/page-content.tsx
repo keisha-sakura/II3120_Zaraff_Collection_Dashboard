@@ -45,11 +45,11 @@ export function TrackingInputPage({ id }: { id: string }) {
     (customer) => customer.id === order.customerId,
   );
   const issue = shippingStockIssue(order, warehouse);
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const values = new FormData(event.currentTarget);
     if (
-      run({
+      await run({
         type: "dispatch",
         orderId: id,
         courier: String(values.get("courier")),

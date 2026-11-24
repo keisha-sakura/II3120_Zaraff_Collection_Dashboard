@@ -1,6 +1,7 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { clearWorkspace } from "@/lib/workspace-store";
 import { useState, type FormEvent } from "react";
 import { Card } from "@/components/ui/card";
 import { FormField, Input } from "@/components/ui/form-field";
@@ -9,15 +10,46 @@ import { Alert } from "@/components/ui/alert";
 
 export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+  const router = useRouter();
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    // UI preview only: no credentials, tokens, or sessions are persisted.
-    const password = event.currentTarget.elements.namedItem("password");
-    if (password instanceof HTMLInputElement) password.value = "";
-    setShowPassword(false);
-    setSubmitted(true);
+    const form = event.currentTarget;
+    const values = new FormData(form);
+    setPending(true);
+    setError(null);
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Zaraff-Request": "1",
+        },
+        body: JSON.stringify({
+          username: values.get("username"),
+          password: values.get("password"),
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok)
+        throw new Error(result.error ?? "Login belum berhasil.");
+      clearWorkspace();
+      router.replace("/beranda");
+      router.refresh();
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Tidak dapat terhubung ke server.",
+      );
+    } finally {
+      const password = form.elements.namedItem("password");
+      if (password instanceof HTMLInputElement) password.value = "";
+      setShowPassword(false);
+      setPending(false);
+    }
   }
 
   return (
@@ -97,30 +129,18 @@ export function LoginPage() {
               </button>
             </div>
           </FormField>
-          {submitted && (
-            <Alert title="Login belum diaktifkan">
-              Untuk mencoba dashboard, buka pratinjau dan pilih role.
+          {error && (
+            <Alert tone="danger" title="Tidak dapat masuk">
+              {error}
             </Alert>
           )}
-          <Button type="submit" className="w-full py-3">
-            Masuk
+          <Button type="submit" disabled={pending} className="w-full py-3">
+            {pending ? "Memeriksa…" : "Masuk"}
           </Button>
           <p className="text-muted text-center text-[13px]">
             Lupa kata sandi? Hubungi Owner.
           </p>
         </form>
-
-        <div className="border-border mt-6 border-t pt-5 text-center">
-          <p className="text-muted mb-2 text-xs">
-            Dashboard dapat dicoba tanpa login.
-          </p>
-          <Link
-            href="/pratinjau"
-            className="text-primary text-sm font-semibold hover:underline"
-          >
-            Buka pratinjau dashboard
-          </Link>
-        </div>
       </Card>
     </main>
   );

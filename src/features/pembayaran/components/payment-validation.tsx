@@ -39,9 +39,9 @@ export function PaymentValidation({
   const mismatch =
     method === "transfer" &&
     (attempt.amount !== order.total || attempt.proof?.amount !== order.total);
-  function reject(event: FormEvent<HTMLFormElement>) {
+  async function reject(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (run({ type: "reject", paymentId: id, reason })) setOpen(false);
+    if (await run({ type: "reject", paymentId: id, reason })) setOpen(false);
   }
   return (
     <>
@@ -53,7 +53,9 @@ export function PaymentValidation({
             <Button
               disabled={!!issue}
               title={issue ?? undefined}
-              onClick={() => run({ type: "approve", paymentId: id })}
+              onClick={async () =>
+                await run({ type: "approve", paymentId: id })
+              }
             >
               Setujui pembayaran
             </Button>
@@ -93,6 +95,16 @@ export function PaymentValidation({
             <>
               <h2 className="mb-4 text-base font-bold">
                 Bukti transfer: {attempt.proof?.fileName ?? "Belum tersedia"}
+                {attempt.proof?.uploadId && (
+                  <a
+                    href={`/api/uploads/${attempt.proof.uploadId}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-primary ml-2 font-semibold hover:underline"
+                  >
+                    Lihat bukti
+                  </a>
+                )}
               </h2>
               <div className="border-border bg-sidebar rounded-control mb-4 grid min-h-52 place-content-center gap-3 border border-dashed p-6 text-center">
                 <span className="text-muted text-xs">

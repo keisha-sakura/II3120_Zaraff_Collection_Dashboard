@@ -16,8 +16,11 @@ export function BaleDetailPage({ id }: { id: string }) {
   const { state, run, go } = useWarehouse();
   const bale = state.bales.find((bale) => bale.id === id);
   if (!bale) return <MissingRecord kind="Bale" href="/gudang/bale" />;
-  function start() {
-    if (bale!.status === "sorting" || run({ type: "start-sort", baleId: id }))
+  async function start() {
+    if (
+      bale!.status === "sorting" ||
+      (await run({ type: "start-sort", baleId: id }))
+    )
       go(`/gudang/bale/${id}/sortir`);
   }
   const history = state.movements

@@ -201,3 +201,24 @@ test("sales fixture expands missing stock without overwriting warehouse edits", 
       assert.ok(data.warehouse.items.some((item) => item.id === id));
   }
 });
+
+test("equal claim timestamps use original source line and explain both decisions", () => {
+  const data = fresh();
+  const result = apply(data, {
+    type: "process-claims",
+    liveId: "live-261123",
+    text: "@dodi_ootd,ZR-2609-0008,19:24:03.120\n@rina.thrift,ZR-2609-0008,19:24:03.120",
+  });
+  const claims = result.sales.lives.find(
+    (row) => row.id === "live-261123",
+  ).results;
+  assert.equal(
+    claims.find((row) => row.outcome === "won").handle,
+    "@dodi_ootd",
+  );
+  assert.match(claims.find((row) => row.outcome === "won").reason, /baris 1/);
+  assert.match(
+    claims.find((row) => row.outcome === "rejected").reason,
+    /Waktu sama.*baris 1/,
+  );
+});

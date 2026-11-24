@@ -12,6 +12,12 @@ export type PackingRecord = {
 };
 export type ShippingState = { version: 1; packing: PackingRecord[] };
 export type ShippingCommand =
+  | {
+      type: "update-tracking";
+      orderId: string;
+      status: "in-transit" | "delivered";
+      description: string;
+    }
   | { type: "save-checklist"; orderId: string; checklist: PackingChecklist }
   | { type: "mark-packed"; orderId: string }
   | {

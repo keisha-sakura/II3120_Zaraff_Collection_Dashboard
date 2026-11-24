@@ -23,8 +23,8 @@ export function CustomersPage() {
         .toLowerCase()
         .includes(query.trim().toLowerCase()),
   );
-  function create(input: CustomerInput) {
-    const id = run({ type: "add-customer", input });
+  async function create(input: CustomerInput) {
+    const id = await run({ type: "add-customer", input });
     if (id) {
       setOpen(false);
       go(`/penjualan/pelanggan/${id}`);

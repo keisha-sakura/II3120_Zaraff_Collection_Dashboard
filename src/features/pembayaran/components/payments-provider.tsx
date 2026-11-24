@@ -1,9 +1,6 @@
 "use client";
 import { createContext, useContext, useState, type ReactNode } from "react";
-import {
-  useDemoWorkspace,
-  executeDemoPaymentCommand,
-} from "@/mocks/store/operations-store";
+import { useWorkspace, executePaymentCommand } from "@/lib/workspace-store";
 import { useDashboardNavigation } from "@/components/layout/dashboard-link";
 import { Alert } from "@/components/ui/alert";
 import { canAccessPage } from "@/config/pages";
@@ -16,7 +13,7 @@ type Value = {
   sales: SalesState;
   warehouse: WarehouseState;
   user: User;
-  run: (command: PaymentCommand) => string | null;
+  run: (command: PaymentCommand) => Promise<string | null>;
   error: string | null;
   go: (href: string) => void;
 };
@@ -28,7 +25,7 @@ export function PaymentsProvider({
   user: User;
   children: ReactNode;
 }) {
-  const snapshot = useDemoWorkspace();
+  const snapshot = useWorkspace();
   const navigation = useDashboardNavigation();
   const [error, setError] = useState<string | null>(null);
   if (!snapshot)
@@ -37,14 +34,14 @@ export function PaymentsProvider({
         Memuat data pembayaran…
       </p>
     );
-  function run(command: PaymentCommand) {
+  async function run(command: PaymentCommand) {
     try {
       setError(null);
       if (!canAccessPage(user.role, "Y01"))
         throw new Error(
           "Aksi pembayaran hanya tersedia untuk Owner dan Admin.",
         );
-      return executeDemoPaymentCommand(command, user.name);
+      return await executePaymentCommand(command);
     } catch (error) {
       setError(
         error instanceof Error
@@ -66,13 +63,6 @@ export function PaymentsProvider({
         go: (href) => navigation?.navigate(href),
       }}
     >
-      {snapshot.storageUnavailable && (
-        <div className="mb-4">
-          <Alert tone="warning" title="Penyimpanan browser tidak tersedia">
-            Perubahan demo hanya bertahan selama tab ini terbuka.
-          </Alert>
-        </div>
-      )}
       {error && (
         <div className="mb-4">
           <Alert tone="danger" title="Periksa pembayaran kembali">

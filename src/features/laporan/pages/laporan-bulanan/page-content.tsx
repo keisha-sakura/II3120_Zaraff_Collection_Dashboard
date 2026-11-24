@@ -98,9 +98,8 @@ export function MonthlyReportPage() {
         </Card>
       </div>
       <p className="text-muted mt-4 text-xs">
-        Stok akhir bulan direkonstruksi dari tanggal tersedia dan terjual yang
-        tercatat pada data demo. Bulan berjalan menampilkan data sampai saat
-        ini.
+        Stok akhir bulan mengikuti riwayat status dan nilai barang sebelum
+        pergantian bulan WIB. Bulan berjalan menampilkan data sampai saat ini.
       </p>
     </>
   );

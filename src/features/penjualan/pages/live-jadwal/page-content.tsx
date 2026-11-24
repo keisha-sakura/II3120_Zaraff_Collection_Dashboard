@@ -19,8 +19,8 @@ export function LiveSchedulePage() {
   const completed = lives
     .filter((live) => live.status === "completed")
     .sort((a, b) => b.scheduledAt.localeCompare(a.scheduledAt));
-  function start() {
-    if (run({ type: "start-draft" })) go("/penjualan/live/baru/konten");
+  async function start() {
+    if (await run({ type: "start-draft" })) go("/penjualan/live/baru/konten");
   }
   return (
     <>
@@ -33,7 +33,7 @@ export function LiveSchedulePage() {
       {notice && (
         <p role="status" className="text-success mb-4 text-sm">
           {notice === "published"
-            ? "Promosi ditandai dipublikasikan dalam demo."
+            ? "Promosi ditandai dipublikasikan."
             : "Draf live berhasil disimpan."}
         </p>
       )}
@@ -46,8 +46,8 @@ export function LiveSchedulePage() {
           rows={upcoming}
           rowKey={(live) => live.id}
           rowHref={hostOnly ? undefined : () => "/penjualan/live/baru/konten"}
-          beforeRowNavigate={(live) =>
-            !!run({ type: "start-draft", liveId: live.id })
+          beforeRowNavigate={async (live) =>
+            !!(await run({ type: "start-draft", liveId: live.id }))
           }
           columns={[
             {

@@ -1,121 +1,85 @@
 ﻿# Zaraff Collection Dashboard
 
-Starter full-stack Next.js untuk frontend dan backend Zaraff Collection dalam satu repository dan satu server.
-
-## Prasyarat
-
-- Node.js 22.18+ dan npm (disarankan Node.js 22 LTS terbaru).
-- Git.
+Dashboard operasional full-stack Next.js: frontend dan API satu server, SQLite persisten dengan Drizzle ORM. Modul Beranda, Gudang, Penjualan, Pembayaran, Pengiriman, Laporan/Strategi, dan Pengaturan memakai database; login wajib untuk semua dashboard.
 
 ## Menjalankan lokal
+
+Prasyarat: Node.js 22.18+ dan npm. Di PowerShell gunakan `npm.cmd` jika `npm.ps1` diblokir.
 
 ```bash
 npm ci
 ```
 
-Salin `.env.example` ke `.env.local` (opsional; nilai default sudah tersedia):
-
-```powershell
-Copy-Item .env.example .env.local
-```
-
-Untuk macOS/Linux: `cp .env.example .env.local`.
+Salin `.env.example` ke `.env.local`, lalu:
 
 ```bash
+npm run db:setup
 npm run dev
 ```
 
-Buka http://localhost:3000 untuk Beranda Owner, http://localhost:3000/pratinjau untuk memilih role demo, http://localhost:3000/api/health untuk cek backend. FE dan BE berjalan di port yang sama; tidak perlu Express atau server backend terpisah.
+Buka http://localhost:3000/masuk. `db:setup` menjalankan migration dan seed. Database default `data/zaraff.sqlite`; semua browser pada server yang sama menggunakan data yang sama. Seed aman diulang dan tidak menimpa transaksi pengguna. Data contoh mencakup September–November 2026; pilih periode tersebut pada laporan bila bulan berjalan berbeda.
 
-Jika PowerShell memblokir `npm.ps1`, gunakan `npm.cmd` sebagai pengganti `npm`, misalnya `npm.cmd run dev`. Tidak perlu mengubah execution policy.
+## Akun development
+
+| Role        | Username | Password awal    |
+| ----------- | -------- | ---------------- |
+| Owner       | zahra    | OwnerDemo!2026   |
+| Admin       | keisha   | AdminDemo!2026   |
+| Penyortir   | jojo     | SortirDemo!2026  |
+| Live Host   | nadia    | HostDemo!2026    |
+| Tim Packing | rizky    | PackingDemo!2026 |
+
+Host pembanding `claudia` / `HostClaudia!2026` memiliki penugasan live terpisah untuk menguji isolasi data. Password ini khusus data contoh lokal. Override melalui `SEED_PASSWORD_*` sebelum seed pertama; menjalankan seed ulang tidak mengubah password akun yang sudah ada.
+
+Owner/Admin mengakses modul manajemen sesuai registry. Penyortir hanya Beranda/Gudang; Live Host hanya Beranda/jadwal miliknya; Tim Packing hanya Beranda/antrean dan detail packing. Query `?role=` tidak mengganti sesi. Pratinjau hanya development, wajib login, dan menampilkan pengguna saat ini. Fondasi dan notifikasi tidak termasuk scope.
+
+## Database dan backup
+
+```bash
+npm run db:migrate
+npm run db:seed
+npm run db:backup
+```
+
+Perubahan schema: edit `src/server/schema.ts`, jalankan `npm run db:generate`, tinjau SQL di `drizzle/`, lalu `npm run db:migrate`. Migration SQL dan metadata harus disertakan ke Git. SQLite, backup, file upload, dan `.env.local` diabaikan Git.
+
+Backup memakai SQLite backup API, aman untuk database WAL yang sedang aktif. File tersimpan di `backups/`. Backup folder `uploads/` secara terpisah karena bukti gambar tidak disimpan di SQLite. Untuk restore, hentikan seluruh proses aplikasi, simpan salinan database lama, lalu ganti file database dengan hasil backup pada volume yang sama. Pastikan tidak memakai file `-wal`/`-shm` dari database sebelumnya. Jika memindahkan folder upload, sesuaikan path metadata upload karena path saat ini absolut.
+
+Reset hanya bila sengaja ingin menghapus seluruh data development:
+
+```bash
+npm run db:backup
+npm run db:reset -- --confirm-reset
+npm run db:seed
+```
+
+Reset ditolak dalam `NODE_ENV=production`; seed demo produksi juga ditolak secara default. Tidak ada reset otomatis saat aplikasi berjalan.
+
+## Pemeriksaan dan build
+
+```bash
+npm run check
+npm test
+npm run build
+npm start
+```
+
+`GET /api/health` memeriksa kesiapan tabel database; status 503 berarti migration/database belum siap. Untuk produksi jalankan migration sebelum start, gunakan disk persisten dan HTTPS, set `APP_URL` ke origin publik dan `SESSION_COOKIE_SECURE=true`. Sesuaikan `APP_URL` jika memakai port berbeda. `TRUST_PROXY=true` hanya jika proxy tepercaya mengganti header IP klien. Akun demo bukan provisioning pengguna produksi.
+
+## Integrasi eksternal
+
+CSV, teks terstruktur, dan input manual klaim bekerja tanpa AI. Ekstraksi screenshot/komentar bebas opsional melalui `GEMINI_API_KEY` dan `GEMINI_MODEL` server-only. Ekstraksi harus ditinjau sebelum diproses; waktu ambigu tidak diikutkan sebagai klaim valid. Pemenang selalu ditentukan server berdasarkan timestamp milidetik, lalu nomor baris untuk waktu yang sama.
+
+Publikasi promosi, pengingat invoice, dan distribusi strategi hanya mencatat aktivitas internal; belum mengirim ke TikTok/WhatsApp/email. Transfer divalidasi petugas berdasarkan unggahan, tanpa payment gateway. Pelacakan kurir diperbarui manual melalui **Perbarui status**; belum ada API kurir. Gemini perlu kredensial/model aktif dan belum diuji dengan akun eksternal.
 
 ## Struktur
 
-Panduan role, token, dan komponen: [docs/architecture.md](docs/architecture.md). Pemetaan halaman ke folder: [docs/design/pages.md](docs/design/pages.md). Referensi HTML asli: [docs/design/reference](docs/design/reference).
+- `src/app/`: route tipis, pemeriksaan sesi/record, API.
+- `src/features/`: halaman, komponen khusus modul, model dan aturan bisnis murni.
+- `src/components/`: komponen UI/layout bersama; warna memakai `globals.css`.
+- `src/server/`: schema, akses SQLite, auth, validasi, transaksi, seed, upload, Gemini.
+- `src/lib/workspace-store.tsx`: cache API di memori, loading/error, antrean mutasi dan refresh lintas browser setiap 15 detik/fokus.
+- `src/mocks/data/`: fixture seed/test; bukan penyimpanan runtime.
+- `drizzle/`: migration yang ditinjau dan dibagikan bersama source.
 
-```text
-src/
-  app/
-    api/health/route.ts  # Contoh endpoint backend GET /api/health
-    globals.css         # Tailwind dan style global
-    layout.tsx          # Root layout dan metadata
-    page.tsx            # Halaman awal frontend
-  server/
-    config.ts           # Konfigurasi khusus server
-```
-
-- Tambahkan halaman di `src/app/<nama>/page.tsx`.
-- Tambahkan endpoint di `src/app/api/<nama>/route.ts`, dengan fungsi HTTP seperti `GET` atau `POST`.
-- Simpan akses database, service, dan rahasia di `src/server/`. Gunakan `import "server-only"` agar modul tersebut tidak terimpor ke Client Component.
-- Gunakan `src/components/` untuk komponen bersama, `src/features/<modul>/pages/<halaman>/` untuk komposisi halaman, dan `src/lib/` untuk utilitas. Route di `src/app/` cukup memanggil komponen halaman.
-- Alias `@/*` mengarah ke `src/*`.
-- Komponen App Router adalah Server Component secara default. Tambahkan `"use client"` jika komponen memerlukan state, event handler, atau browser API.
-- Client Component dapat memanggil endpoint dengan URL relatif, misalnya `fetch("/api/health")`. Server Component dapat langsung memanggil service di `src/server/`.
-
-## Environment
-
-Daftarkan variabel baru tanpa nilai rahasia di `.env.example`. Simpan nilai lokal di `.env.local`, yang diabaikan Git. Variabel dengan awalan `NEXT_PUBLIC_` terlihat oleh browser; jangan gunakan awalan tersebut untuk secret atau URL database. Restart dev server setelah mengubah environment.
-
-## Perintah
-
-| Perintah                   | Fungsi                                                 |
-| -------------------------- | ------------------------------------------------------ |
-| `npm run dev`              | Development server dan hot reload                      |
-| `npm run check`            | ESLint, TypeScript, dan pemeriksaan format             |
-| `npm test`                 | Pemeriksaan akses lima role dan konsistensi dummy data |
-| `npm run design:inventory` | Regenerasi inventaris artboard dari referensi          |
-| `npm run lint:fix`         | Perbaikan otomatis ESLint                              |
-| `npm run format`           | Format source dengan Prettier                          |
-| `npm run build`            | Build production                                       |
-| `npm start`                | Menjalankan hasil build production                     |
-
-GitHub Actions menjalankan pemeriksaan dan build pada push serta pull request. Commit `package-lock.json` supaya instalasi konsisten; gunakan `npm ci` pada clone baru dan CI.
-
-## Halaman login
-
-Buka `/masuk` untuk melihat UI login sesuai referensi M01. Halaman ini berdiri sendiri dan tidak menjadi syarat membuka dashboard. Submit hanya menampilkan informasi bahwa login belum aktif; tidak ada request autentikasi atau penyimpanan kredensial/sesi. Gunakan tautan Pratinjau untuk memilih role. `/` dan semua route dashboard tetap dapat dibuka langsung.
-
-## Status starter
-
-Fondasi mencakup lima role (Owner, Admin, Penyortir, Live Host, Tim Packing), registry halaman dan navigasi, token desain global, komponen reusable, folder per halaman, serta fixture dan contoh repository terpisah.
-
-Beranda kelima role sudah dibangun. `/` mengarah ke `/beranda`. Gunakan `/pratinjau` atau URL berikut untuk berpindah role:
-
-| Role        | URL                       |
-| ----------- | ------------------------- |
-| Owner       | `/beranda?role=owner`     |
-| Admin       | `/beranda?role=admin`     |
-| Penyortir   | `/beranda?role=penyortir` |
-| Live Host   | `/beranda?role=live-host` |
-| Tim Packing | `/beranda?role=packing`   |
-
-Menu profil hanya memiliki aksi Keluar, yang mengembalikan mode demo ke pemilih role. Pencarian diketik langsung di bar header, tanpa dialog atau shortcut Ctrl K. Hasil mengikuti role; notifikasi dan halamannya dihapus dari scope aplikasi. Tautan modul yang belum diimplementasikan menampilkan pemberitahuan. Dummy data beranda berada di `src/mocks/data/home.ts` dan diambil melalui repository server-only; komposisi per role ada di `src/features/beranda/pages/`.
-
-Modul Gudang juga tersedia untuk Owner, Admin, dan Penyortir: buka `/gudang/bale?role=penyortir` atau pilih Gudang dari sidebar Beranda. Tab modul menyediakan Bale & Sortir, Laundry, dan Inventaris. Alur terima bale, sortir/retur, konfirmasi selesai sortir, grading, dan pindah lokasi dapat dicoba. Perubahan demo disimpan di localStorage browser yang sama dan dipakai bersama oleh ketiga role. Role Live Host dan Tim Packing mendapat 404 jika mencoba URL Gudang. Detail alur dan integrasi backend ada di [docs/warehouse.md](docs/warehouse.md).
-
-Modul Penjualan tersedia di `/penjualan/live?role=admin`: jadwal/promosi, wizard live tiga langkah, impor/hasil klaim, daftar/detail pesanan, dan daftar/detail pelanggan. Owner dan Admin mendapat akses lengkap; Live Host hanya membaca jadwal yang ditugaskan kepadanya. Publikasi promosi merupakan simulasi lokal. Klaim membuat pesanan dan mereservasi stok Gudang dalam satu snapshot penyimpanan. Panduan lengkap: [docs/sales.md](docs/sales.md).
-
-Modul Pembayaran tersedia di `/pembayaran/validasi?role=admin` untuk Owner dan Admin. Tersedia antrean validasi, detail transfer/deposit, dialog penolakan, daftar belum dibayar, dan detail tagihan dengan pengingat demo. Persetujuan memperbarui pesanan menjadi Lunas, stok menjadi Terjual, dan saldo/riwayat deposit jika metode deposit. Transfer kurang bayar dan saldo tidak cukup tidak dapat disetujui. Panduan: [docs/payments.md](docs/payments.md).
-
-Modul Pengiriman tersedia di `/pengiriman/packing?role=packing`. Tim Packing mengerjakan antrean dan checklist pengambilan/QC/kemas. Owner dan Admin juga mengakses Siap dikirim, input resi, dan Dalam pengiriman. Hanya pesanan Lunas yang masuk antrean. Penyerahan ke kurir mengubah pesanan menjadi Dikirim dan barang menjadi Keluar Gudang serta melepas lokasi rak. Panduan: [docs/shipping.md](docs/shipping.md).
-
-Modul Laporan tersedia di `/laporan/ringkasan?role=owner` untuk Owner dan Admin: ringkasan bisnis, laporan bulanan dengan CSV, umur stok, barang terjual/keluar, serta tulis dan kirim strategi demo. Data dihitung dari workspace operasional. Panduan: [docs/reports.md](docs/reports.md).
-
-Modul Pengaturan tersedia di `/pengaturan/harga?role=admin` untuk Owner/Admin: aturan harga per kategori/grade, diskon member, dan tambah lokasi penyimpanan. Rekomendasi dipakai oleh grading Gudang; diskon berlaku pada pesanan baru. Panduan: [docs/settings.md](docs/settings.md).
-
-Data Gudang, Penjualan, Pembayaran, Pengiriman, Laporan, dan Pengaturan memakai key localStorage bersama `zaraff.operations.demo.v1`. Data lama dimigrasikan tanpa memundurkan saldo atau status pesanan yang sudah lunas. Demo baru menyediakan contoh deposit menunggu validasi; pada data lama, contoh itu dapat sudah lunas. Halaman selain modul yang disebutkan di atas dibangun pada tahap berikutnya. Database dan autentikasi belum dikonfigurasi. Role pada query URL hanya memilih data dummy publik, bukan sesi pengguna atau pengamanan server. Endpoint health memeriksa respons aplikasi, belum koneksi database.
-
-## Commit dan push pertama
-
-Repository Git sudah tersedia. Setelah memeriksa perubahan, jalankan sendiri:
-
-```bash
-git add .
-git commit -m "chore: initialize full-stack Next.js project"
-git remote -v
-git push -u origin main
-```
-
-Jika remote `origin` belum tersedia, tambahkan dengan `git remote add origin <URL_REPOSITORY>` sebelum push. Setup ini tidak membuat commit atau melakukan push.
-
-Dokumentasi: [Next.js App Router](https://nextjs.org/docs/app), [Route Handlers](https://nextjs.org/docs/app/api-reference/file-conventions/route).
+Panduan teknis: [backend](docs/backend.md), [arsitektur dan design system](docs/architecture.md), serta dokumentasi alur per modul di `docs/`. Tidak ada commit atau push otomatis.

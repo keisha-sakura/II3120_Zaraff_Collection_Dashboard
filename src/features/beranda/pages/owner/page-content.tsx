@@ -25,9 +25,10 @@ export function OwnerHomePage({ data }: { data: OwnerHomeData }) {
               orders.completed +
                 orders.shipped +
                 orders.packed +
+                (orders.paid ?? 0) +
                 orders.awaitingPayment,
             ),
-            description: `${orders.completed} selesai · ${orders.shipped} dikirim · ${orders.packed} dikemas · ${orders.awaitingPayment} menunggu pembayaran`,
+            description: `${orders.completed} selesai · ${orders.shipped} dikirim · ${orders.packed} dikemas · ${orders.paid ?? 0} lunas · ${orders.awaitingPayment} menunggu pembayaran`,
           },
           {
             id: "income",
@@ -45,7 +46,7 @@ export function OwnerHomePage({ data }: { data: OwnerHomeData }) {
           description={`Data ${data.monthLabel} sudah lengkap`}
         />
         <ActionCard
-          href={`/laporan/bulanan?bulan=${data.previousReportMonth}`}
+          href={`/laporan/bulanan?month=${data.previousReportMonth}`}
           icon={<ModuleIcon module="laporan" />}
           title="Lihat laporan bulanan"
           description={data.previousReportLabel}

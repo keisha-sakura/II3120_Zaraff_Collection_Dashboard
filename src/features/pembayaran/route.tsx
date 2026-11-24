@@ -1,8 +1,5 @@
+import { requireRecord } from "@/server/page-access";
 import "server-only";
-import { notFound } from "next/navigation";
-import { isRole } from "@/config/roles";
-import { canAccessPage } from "@/config/pages";
-import { mockUsers } from "@/mocks/data/users";
 import { DashboardExperience } from "@/components/layout/dashboard-experience";
 import { PaymentsProvider } from "./components/payments-provider";
 import { PaymentsScreen } from "./components/payments-screen";
@@ -12,13 +9,17 @@ export async function renderPaymentsRoute(
   view: PaymentsView,
   query: PaymentsRoleQuery,
 ) {
-  const { role = "owner" } = await query;
-  if (!isRole(role) || !canAccessPage(role, view.page)) notFound();
-  const user = mockUsers.find((user) => user.role === role)!;
+  await query;
+  const user = await requireRecord(
+    view.page,
+    "entityId" in view && typeof view.entityId === "string"
+      ? view.entityId
+      : undefined,
+  );
   return (
     <DashboardExperience user={user} activeModule="pembayaran">
       <PaymentsProvider
-        key={`${role}:${view.page}:${view.entityId ?? "list"}`}
+        key={`${user.id}:${view.page}:${view.entityId ?? "list"}`}
         user={user}
       >
         <PaymentsScreen view={view} />

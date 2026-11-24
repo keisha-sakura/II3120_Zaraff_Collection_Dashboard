@@ -7,14 +7,18 @@ import { FormField, Input, Textarea } from "@/components/ui/form-field";
 import { monthLabel, validMonth } from "../../model";
 import { useReports } from "../../components/reports-provider";
 import { ReportsLink, StrategyData } from "../../components/shared";
-import { strategySuggestion } from "@/mocks/data/reports-demo";
+import { monthOf } from "../../selectors";
 export function WriteStrategyPage() {
   const { run, go } = useReports();
-  const [month, setMonth] = useState("2026-12");
-  function submit(event: FormEvent<HTMLFormElement>) {
+  const [month, setMonth] = useState(() => {
+    const next = new Date(`${monthOf(new Date().toISOString())}-01T00:00:00Z`);
+    next.setUTCMonth(next.getUTCMonth() + 1);
+    return next.toISOString().slice(0, 7);
+  });
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const id = run({
+    const id = await run({
       type: "save-strategy",
       month,
       content: String(data.get("content")),
@@ -23,7 +27,7 @@ export function WriteStrategyPage() {
   }
   const previous = validMonth(month)
     ? new Date(`${month}-01T00:00:00Z`)
-    : new Date("2026-12-01T00:00:00Z");
+    : new Date();
   previous.setUTCMonth(previous.getUTCMonth() - 1);
   return (
     <>
@@ -51,7 +55,7 @@ export function WriteStrategyPage() {
                 rows={7}
                 required
                 maxLength={10000}
-                defaultValue={strategySuggestion}
+                placeholder="Tulis arahan berdasarkan data penjualan dan stok di samping."
               />
             </FormField>
             <div className="border-border flex flex-wrap items-center justify-end gap-4 border-t pt-4">

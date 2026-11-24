@@ -12,6 +12,7 @@ import { sampleClaims } from "../../model";
 import { parseClaims } from "../../claims";
 import { useSales } from "../../components/sales-provider";
 import { MissingSalesRecord, SalesLink } from "../../components/shared";
+import { ClaimExtraction } from "../../components/claim-extraction";
 export function ImportClaimsPage({ id }: { id: string }) {
   const { state, run, go } = useSales();
   const [text, setText] = useState(id === "live-261123" ? sampleClaims : "");
@@ -38,7 +39,7 @@ export function ImportClaimsPage({ id }: { id: string }) {
     const file = event.target.files?.[0];
     if (!file) return;
     try {
-      if (file.size > 1_000_000) throw new Error("File CSV maksimal 1 MB.");
+      if (file.size > 1000000) throw new Error("File CSV maksimal 1 MB.");
       setText(await file.text());
       setFileError("");
     } catch (error) {
@@ -55,8 +56,8 @@ export function ImportClaimsPage({ id }: { id: string }) {
     setText((value) => `${value.trim()}${value.trim() ? "\n" : ""}${line}`);
     setManualOpen(false);
   }
-  function process() {
-    if (run({ type: "process-claims", liveId: id, text }))
+  async function process() {
+    if (await run({ type: "process-claims", liveId: id, text }))
       go(`/penjualan/live/${id}/klaim`);
   }
   return (
@@ -116,6 +117,7 @@ export function ImportClaimsPage({ id }: { id: string }) {
             {fileError}
           </p>
         )}
+        <ClaimExtraction liveId={id} text={text} onExtract={setText} />
       </Card>
       <h2 className="mb-3 text-base font-bold">
         Pratinjau {rows.length} klaim

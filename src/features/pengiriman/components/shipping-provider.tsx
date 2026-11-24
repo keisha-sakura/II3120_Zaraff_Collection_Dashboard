@@ -1,9 +1,6 @@
 "use client";
 import { createContext, useContext, useState, type ReactNode } from "react";
-import {
-  useDemoWorkspace,
-  executeDemoShippingCommand,
-} from "@/mocks/store/operations-store";
+import { useWorkspace, executeShippingCommand } from "@/lib/workspace-store";
 import { useDashboardNavigation } from "@/components/layout/dashboard-link";
 import { Alert } from "@/components/ui/alert";
 import type { User } from "@/types/domain";
@@ -15,7 +12,7 @@ type Value = {
   sales: SalesState;
   warehouse: WarehouseState;
   user: User;
-  run: (command: ShippingCommand) => string | null;
+  run: (command: ShippingCommand) => Promise<string | null>;
   go: (href: string) => void;
   error: string | null;
 };
@@ -27,7 +24,7 @@ export function ShippingProvider({
   user: User;
   children: ReactNode;
 }) {
-  const snapshot = useDemoWorkspace();
+  const snapshot = useWorkspace();
   const navigation = useDashboardNavigation();
   const [error, setError] = useState<string | null>(null);
   if (!snapshot)
@@ -36,10 +33,10 @@ export function ShippingProvider({
         Memuat data pengiriman…
       </p>
     );
-  function run(command: ShippingCommand) {
+  async function run(command: ShippingCommand) {
     try {
       setError(null);
-      return executeDemoShippingCommand(command, user);
+      return await executeShippingCommand(command);
     } catch (error) {
       setError(
         error instanceof Error
@@ -61,13 +58,6 @@ export function ShippingProvider({
         go: (href) => navigation?.navigate(href),
       }}
     >
-      {snapshot.storageUnavailable && (
-        <div className="mb-4">
-          <Alert tone="warning" title="Penyimpanan browser tidak tersedia">
-            Perubahan demo hanya bertahan selama tab ini terbuka.
-          </Alert>
-        </div>
-      )}
       {error && (
         <div className="mb-4">
           <Alert tone="danger" title="Periksa pengiriman kembali">

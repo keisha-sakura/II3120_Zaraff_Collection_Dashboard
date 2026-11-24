@@ -37,8 +37,6 @@ export function MonthFilter({ label = "Periode" }: { label?: string }) {
   const pathname = usePathname();
   const months = [
     ...new Set([
-      "2026-10",
-      "2026-11",
       month,
       ...warehouse.items.flatMap((item) =>
         [item.availableAt, item.soldAt, item.outboundAt]
@@ -100,7 +98,7 @@ export function StrategyData({ month }: { month: string }) {
         ]}
       />
       <p className="text-muted mt-4 text-xs">
-        Data demo operasional. Umur stok dan bale memakai posisi saat ini.
+        Data operasional tersimpan. Umur stok dan bale memakai posisi saat ini.
       </p>
     </Card>
   );

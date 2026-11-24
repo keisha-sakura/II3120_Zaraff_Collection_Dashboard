@@ -34,7 +34,11 @@ function nextCode(prefix: string, ids: string[], now: string) {
   );
   return `${start}${String(last + 1).padStart(3, "0")}`;
 }
-function validateContent(input: LiveContent, now: string) {
+function validateContent(
+  input: LiveContent,
+  now: string,
+  hosts: readonly { id: string }[],
+) {
   check(
     input.title.trim().length >= 3 && input.title.trim().length <= 150,
     "Judul live harus berisi 3–150 karakter.",
@@ -49,7 +53,7 @@ function validateContent(input: LiveContent, now: string) {
     "Jadwal live harus berada di masa depan (WIB).",
   );
   check(
-    liveHosts.some((host) => host.id === input.hostId),
+    hosts.some((host) => host.id === input.hostId),
     "Pilih host yang valid.",
   );
   check(
@@ -82,6 +86,7 @@ export function applySalesCommand(
   command: SalesCommand,
   actor: string,
   now: string,
+  hosts: readonly { id: string }[] = liveHosts,
 ): { sales: SalesState; warehouse: WarehouseState; entityId: string } {
   check(Number.isFinite(Date.parse(now)), "Waktu aktivitas tidak valid.");
   const sales = structuredClone(current);
@@ -113,7 +118,7 @@ export function applySalesCommand(
           title: "",
           content: "",
           scheduledAt: "",
-          hostId: liveHosts[0].id,
+          hostId: hosts[0]?.id ?? "",
           promotionChannels: [],
           itemIds: [],
           editingId: null,
@@ -121,7 +126,7 @@ export function applySalesCommand(
     return { sales, warehouse, entityId: "draft" };
   }
   if (command.type === "save-content") {
-    validateContent(command.input, now);
+    validateContent(command.input, now, hosts);
     sales.draft = {
       ...command.input,
       title: command.input.title.trim(),
@@ -157,7 +162,7 @@ export function applySalesCommand(
       sales.draft.itemIds = [...itemIds];
       return { sales, warehouse, entityId: "draft" };
     }
-    validateContent(sales.draft, now);
+    validateContent(sales.draft, now, hosts);
     const id =
       sales.draft.editingId ??
       nextCode(
@@ -216,6 +221,10 @@ export function applySalesCommand(
     return { sales, warehouse, entityId: id };
   }
   const live = sales.lives.find((live) => live.id === command.liveId);
+  check(
+    command.type !== "complete-live",
+    "Penyelesaian live harus melalui service server.",
+  );
   check(live, "Live tidak ditemukan.");
   check(
     live.status === "completed",
@@ -276,7 +285,10 @@ export function applySalesCommand(
     const winner = winners.get(item.id);
     if (winner) {
       result.outcome = "rejected";
-      result.reason = `Kalah cepat dari ${winner.handle}`;
+      if (winner.milliseconds === row.milliseconds) {
+        winner.reason = `Waktu sama; baris ${winner.line} lebih awal daripada baris ${row.line}`;
+        result.reason = `Waktu sama; didahului ${winner.handle} pada baris ${winner.line}`;
+      } else result.reason = `Kalah cepat dari ${winner.handle}`;
       continue;
     }
     result.outcome = "won";

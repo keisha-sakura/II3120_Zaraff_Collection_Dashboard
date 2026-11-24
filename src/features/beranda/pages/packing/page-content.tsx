@@ -5,12 +5,12 @@ export function PackingHomePage({ data }: { data: PackingHomeData }) {
   return (
     <div className="space-y-4">
       <ProgressSection
-        title="Progres kerja hari ini"
+        title="Progres kerja"
         headingId="packing-progress-heading"
         items={[
           {
             id: "packing",
-            label: "Antrean packing hari ini",
+            label: "Antrean packing",
             value: progressPercentage(data.packedOrders, data.paidOrders),
             description: `${data.packedOrders} / ${data.paidOrders} pesanan lunas sudah dikemas`,
           },

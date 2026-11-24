@@ -64,8 +64,8 @@ export function CancelDraft() {
   return (
     <Button
       variant="text"
-      onClick={() => {
-        if (run({ type: "discard-draft" })) go("/penjualan/live");
+      onClick={async () => {
+        if (await run({ type: "discard-draft" })) go("/penjualan/live");
       }}
     >
       Batal

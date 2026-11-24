@@ -29,7 +29,7 @@ export function DashboardNavigationProvider({
   );
 }
 
-/** Keeps standard links outside the demo; preview navigation preserves its role. */
+/** Uses dashboard navigation when available and a normal Next link otherwise. */
 export function DashboardLink({
   href,
   onClick,

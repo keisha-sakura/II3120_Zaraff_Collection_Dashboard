@@ -36,10 +36,12 @@ export function applyShippingCommand(
   now: string,
 ) {
   check(Number.isFinite(Date.parse(now)), "Waktu aktivitas tidak valid.");
+  const managementOnly =
+    command.type === "dispatch" || command.type === "update-tracking";
   check(
-    canAccessPage(actor.role, command.type === "dispatch" ? "D04" : "D02"),
-    command.type === "dispatch"
-      ? "Input resi hanya tersedia untuk Owner dan Admin."
+    canAccessPage(actor.role, managementOnly ? "D04" : "D02"),
+    managementOnly
+      ? "Resi dan pelacakan hanya tersedia untuk Owner dan Admin."
       : "Peran ini tidak memiliki akses packing.",
   );
   const shipping = structuredClone(source);
@@ -51,6 +53,28 @@ export function applyShippingCommand(
     order.paymentStatus === "approved",
     "Pesanan harus Lunas sebelum diproses untuk pengiriman.",
   );
+  if (command.type === "update-tracking") {
+    check(
+      order.status === "shipped" && order.shipment,
+      "Hanya paket dalam pengiriman yang dapat diperbarui.",
+    );
+    check(
+      ["in-transit", "delivered"].includes(command.status),
+      "Status pelacakan tidak valid.",
+    );
+    check(command.description.trim().length >= 3, "Isi keterangan pelacakan.");
+    order.shipment.status = command.status;
+    order.shipment.events.push({
+      title:
+        command.status === "delivered"
+          ? "Paket Diterima"
+          : "Pembaruan Pengiriman",
+      description: `${command.description.trim()} · ${actor.name}`,
+      dateTime: now,
+    });
+    if (command.status === "delivered") order.status = "completed";
+    return { shipping, sales, warehouse, entityId: order.id };
+  }
   check(
     order.status === (command.type === "dispatch" ? "packed" : "paid"),
     command.type === "dispatch"

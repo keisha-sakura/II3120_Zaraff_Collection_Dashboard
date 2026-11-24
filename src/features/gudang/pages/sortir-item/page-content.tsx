@@ -17,7 +17,6 @@ import {
   MissingRecord,
 } from "../../components/shared";
 import type { ItemCategory } from "@/types/domain";
-
 export function SortItemPage({
   id,
   initialReturn = false,
@@ -77,9 +76,9 @@ export function SortItemPage({
       : state.returns.map((item) => item.id),
     new Date().toISOString(),
   );
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const savedId = run({
+    const savedId = await run({
       type: "record-item",
       input: { baleId: id, category, condition, outcome, reason },
     });
@@ -92,8 +91,8 @@ export function SortItemPage({
       setReason("");
     }
   }
-  function finish() {
-    if (run({ type: "finish-sort", baleId: id })) {
+  async function finish() {
+    if (await run({ type: "finish-sort", baleId: id })) {
       setConfirmOpen(false);
       go(`/gudang/bale/${id}`);
     }

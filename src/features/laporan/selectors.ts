@@ -1,7 +1,6 @@
 import type { SalesState } from "@/features/penjualan/model";
 import type { WarehouseState } from "@/features/gudang/model";
 import { daysSince } from "../gudang/model.ts";
-import { reportReferenceDate } from "./model.ts";
 const monthFormatter = new Intl.DateTimeFormat("en-CA", {
   year: "numeric",
   month: "2-digit",
@@ -49,7 +48,7 @@ export function soldRows(
 }
 export function ageBuckets(
   warehouse: WarehouseState,
-  reference = reportReferenceDate,
+  reference = new Date().toISOString(),
 ) {
   const counts = [0, 0, 0, 0];
   for (const item of warehouse.items.filter(
@@ -78,13 +77,35 @@ export function reportData(
         .reduce((sum, item) => sum + item.netPrice, 0),
     }));
   // Available + reserved at month end reconstructed from recorded availability and sale dates.
-  const closing = warehouse.items.filter(
-    (item) =>
-      item.availableAt &&
-      monthOf(item.availableAt) <= month &&
-      (!item.soldAt || monthOf(item.soldAt) > month) &&
-      !["returned", "written-off"].includes(item.status),
-  );
+  const closing = warehouse.history
+    ? warehouse.items.flatMap((item) => {
+        const [year, number] = month.split("-").map(Number);
+        const cutoff = Date.UTC(year, number, 1) - 7 * 3600000;
+        const latest = warehouse
+          .history!.filter(
+            (row) =>
+              row.itemId === item.id && Date.parse(row.occurredAt) < cutoff,
+          )
+          .sort(
+            (a, b) => Date.parse(b.occurredAt) - Date.parse(a.occurredAt),
+          )[0];
+        return latest && ["available", "reserved"].includes(latest.status)
+          ? [
+              {
+                ...item,
+                grade: latest.grade as typeof item.grade,
+                price: latest.price,
+              },
+            ]
+          : [];
+      })
+    : warehouse.items.filter(
+        (item) =>
+          item.availableAt &&
+          monthOf(item.availableAt) <= month &&
+          (!item.soldAt || monthOf(item.soldAt) > month) &&
+          !["returned", "written-off"].includes(item.status),
+      );
   return {
     sold,
     categories,

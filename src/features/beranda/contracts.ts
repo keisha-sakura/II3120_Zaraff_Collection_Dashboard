@@ -1,4 +1,3 @@
-import type { Role } from "@/config/roles";
 import type { LiveSession, User } from "@/types/domain";
 
 export type OwnerNote = {
@@ -15,6 +14,7 @@ export type OwnerHomeData = {
     completed: number;
     shipped: number;
     packed: number;
+    paid?: number;
     awaitingPayment: number;
   };
   income: number;
@@ -63,9 +63,6 @@ export type HomeDashboardData =
   | PackingHomeData
   | HostHomeData;
 export type HomeDashboard = { user: User; data: HomeDashboardData };
-export interface HomeRepository {
-  getDashboard(role: Role): Promise<HomeDashboard>;
-}
 
 export function progressPercentage(completed: number, total: number) {
   return total > 0

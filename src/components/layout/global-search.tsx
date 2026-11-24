@@ -2,7 +2,7 @@
 import { useId, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { SearchInput } from "@/components/ui/search-input";
-import { useDemoWorkspace } from "@/mocks/store/operations-store";
+import { useWorkspace } from "@/lib/workspace-store";
 import type { Role } from "@/config/roles";
 import { DashboardLink, useDashboardNavigation } from "./dashboard-link";
 import { findSearchResults } from "./search-results";
@@ -11,13 +11,13 @@ export function GlobalSearch({ role }: { role: Role }) {
   const resultsId = useId();
   const navigation = useDashboardNavigation();
   const router = useRouter();
-  const snapshot = useDemoWorkspace();
+  const snapshot = useWorkspace();
   const results = findSearchResults(role, query, snapshot?.data);
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (results[0]) {
       if (navigation) navigation.navigate(results[0].href);
-      else router.push(`${results[0].href}?role=${role}`);
+      else router.push(results[0].href);
       setQuery("");
     }
   }
@@ -50,7 +50,7 @@ export function GlobalSearch({ role }: { role: Role }) {
             {results.map((result) => (
               <li key={result.id}>
                 <DashboardLink
-                  href={`${result.href}?role=${role}`}
+                  href={result.href}
                   onClick={() => setQuery("")}
                   className="hover:bg-sidebar focus-visible:bg-sidebar rounded-control block px-3 py-2"
                 >

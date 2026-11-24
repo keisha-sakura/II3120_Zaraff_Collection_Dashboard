@@ -1,38 +1,8 @@
 import type { SalesState } from "@/features/penjualan/model";
 import type { WarehouseState } from "@/features/gudang/model";
-import type {
-  PaymentAttempt,
-  PaymentsState,
-} from "@/features/pembayaran/model";
-import { invoiceIdForOrder } from "../../features/pembayaran/model.ts";
-
-export function ensureInvoices(
-  source: PaymentsState,
-  sales: SalesState,
-): PaymentsState {
-  const payments = structuredClone(source);
-  for (const order of sales.orders) {
-    if (!payments.invoices.some((invoice) => invoice.orderId === order.id)) {
-      const id = invoiceIdForOrder(order.id);
-      payments.invoices.push({
-        id,
-        orderId: order.id,
-        createdAt: order.createdAt,
-        events: [
-          {
-            id: `issued-${id}`,
-            type: "issued",
-            title: "Tagihan dikirim",
-            message: `Tagihan ${id}: Rp ${order.total.toLocaleString("id-ID")}.`,
-            occurredAt: order.createdAt,
-            actor: "Sistem",
-          },
-        ],
-      });
-    }
-  }
-  return payments;
-}
+import type { PaymentAttempt } from "@/features/pembayaran/model";
+import { ensureInvoices } from "../../features/pembayaran/invoices.ts";
+export { ensureInvoices } from "../../features/pembayaran/invoices.ts";
 
 /** Fresh demos show the pending-deposit artboard. Migration never rewinds saved balances. */
 export function createPaymentsDemo(

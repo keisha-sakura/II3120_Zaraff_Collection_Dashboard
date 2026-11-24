@@ -1,4 +1,8 @@
-import { DashboardLink } from "@/components/layout/dashboard-link";
+"use client";
+import {
+  DashboardLink,
+  useDashboardNavigation,
+} from "@/components/layout/dashboard-link";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { EmptyState } from "./empty-state";
@@ -24,9 +28,10 @@ export function DataTable<T>({
   rowKey: (row: T) => string;
   /** Linked rows must contain non-interactive cells; use selection tables separately. */
   rowHref?: (row: T) => string;
-  beforeRowNavigate?: (row: T) => boolean | void;
+  beforeRowNavigate?: (row: T) => boolean | void | Promise<boolean | void>;
   emptyMessage?: string;
 }) {
+  const navigation = useDashboardNavigation();
   return (
     <div className="rounded-card border-border bg-surface overflow-x-auto border">
       <table className="w-full border-collapse text-left text-sm">
@@ -69,9 +74,20 @@ export function DataTable<T>({
                     {href ? (
                       <DashboardLink
                         href={href}
-                        onClick={(event) => {
-                          if (beforeRowNavigate?.(row) === false)
+                        onClick={async (event) => {
+                          if (
+                            beforeRowNavigate &&
+                            !event.ctrlKey &&
+                            !event.metaKey &&
+                            !event.shiftKey &&
+                            !event.altKey
+                          ) {
                             event.preventDefault();
+                            if ((await beforeRowNavigate(row)) !== false) {
+                              if (navigation) navigation.navigate(href);
+                              else window.location.assign(href);
+                            }
+                          }
                         }}
                         tabIndex={index === 0 ? 0 : -1}
                         aria-label={

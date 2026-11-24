@@ -49,6 +49,10 @@ export function ClaimResultsPage({ id }: { id: string }) {
           }
         />
       </div>
+      <p className="text-muted mb-3 text-sm">
+        Klaim valid dengan waktu paling awal hingga milidetik menang. Jika
+        waktunya sama, nomor baris sumber yang lebih awal didahulukan.
+      </p>
       <DataTable
         caption="Hasil pemrosesan klaim"
         rows={live.results}

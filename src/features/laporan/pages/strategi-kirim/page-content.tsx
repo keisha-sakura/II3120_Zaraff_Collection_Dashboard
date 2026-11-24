@@ -7,11 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/form-field";
 import { formatDate } from "@/lib/format";
 import { monthLabel } from "../../model";
-import { strategyRecipients } from "@/mocks/data/reports-demo";
+import { roleLabels } from "@/config/roles";
 import { useReports } from "../../components/reports-provider";
 import { ReportsLink } from "../../components/shared";
 export function SendStrategyPage({ id }: { id: string }) {
-  const { state, run } = useReports();
+  const { state, run, directory } = useReports();
+  const strategyRecipients = directory.filter((row) => row.role !== "owner");
   const [recipients, setRecipients] = useState<string[]>(
     strategyRecipients.map((user) => user.id),
   );
@@ -49,7 +50,7 @@ export function SendStrategyPage({ id }: { id: string }) {
                 .filter((user) => strategy.recipientIds.includes(user.id))
                 .map((user) => (
                   <li key={user.id}>
-                    {user.name} · {user.role}
+                    {user.name} · {roleLabels[user.role]}
                   </li>
                 ))}
             </ul>
@@ -63,7 +64,7 @@ export function SendStrategyPage({ id }: { id: string }) {
               {strategyRecipients.map((user) => (
                 <Checkbox
                   key={user.id}
-                  label={`${user.name} · ${user.role}`}
+                  label={`${user.name} · ${roleLabels[user.role]}`}
                   checked={recipients.includes(user.id)}
                   onChange={(event) =>
                     setRecipients(
@@ -82,8 +83,8 @@ export function SendStrategyPage({ id }: { id: string }) {
               <ReportsLink href="/laporan/strategi">Nanti saja</ReportsLink>
               <Button
                 disabled={!recipients.length}
-                onClick={() =>
-                  run({
+                onClick={async () =>
+                  await run({
                     type: "send-strategy",
                     strategyId: id,
                     recipientIds: recipients,

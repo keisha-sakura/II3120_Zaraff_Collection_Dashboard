@@ -1,8 +1,5 @@
+import { requireRecord } from "@/server/page-access";
 import "server-only";
-import { notFound } from "next/navigation";
-import { isRole } from "@/config/roles";
-import { canAccessPage } from "@/config/pages";
-import { mockUsers } from "@/mocks/data/users";
 import { DashboardExperience } from "@/components/layout/dashboard-experience";
 import { ShippingProvider } from "./components/shipping-provider";
 import { ShippingScreen } from "./components/shipping-screen";
@@ -12,13 +9,17 @@ export async function renderShippingRoute(
   view: ShippingView,
   query: ShippingRoleQuery,
 ) {
-  const { role = "owner" } = await query;
-  if (!isRole(role) || !canAccessPage(role, view.page)) notFound();
-  const user = mockUsers.find((user) => user.role === role)!;
+  await query;
+  const user = await requireRecord(
+    view.page,
+    "entityId" in view && typeof view.entityId === "string"
+      ? view.entityId
+      : undefined,
+  );
   return (
     <DashboardExperience user={user} activeModule="pengiriman">
       <ShippingProvider
-        key={`${role}:${view.page}:${view.entityId ?? "list"}`}
+        key={`${user.id}:${view.page}:${view.entityId ?? "list"}`}
         user={user}
       >
         <ShippingScreen view={view} />

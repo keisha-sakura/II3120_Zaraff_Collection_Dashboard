@@ -6,6 +6,7 @@ import { DashboardNavigationProvider } from "./dashboard-link";
 import { Dialog } from "@/components/ui/dialog";
 import { canAccessPath, getPagesForRole, type ModuleId } from "@/config/pages";
 import type { User } from "@/types/domain";
+import { WorkspaceGate, clearWorkspace } from "@/lib/workspace-store";
 
 export function DashboardExperience({
   user,
@@ -23,7 +24,7 @@ export function DashboardExperience({
   } | null>(null);
   function resolveHref(href: string) {
     const url = new URL(href, "http://preview.local");
-    url.searchParams.set("role", user.role);
+    url.searchParams.delete("role");
     return `${url.pathname}${url.search}${url.hash}`;
   }
   function navigate(href: string) {
@@ -67,9 +68,23 @@ export function DashboardExperience({
       <DashboardShell
         user={user}
         activeModule={activeModule}
-        onLogout={() => router.replace("/pratinjau")}
+        onLogout={async () => {
+          const response = await fetch("/api/auth/logout", {
+            method: "POST",
+            headers: { "X-Zaraff-Request": "1" },
+          });
+          if (response.ok) {
+            clearWorkspace();
+            router.replace("/masuk");
+            router.refresh();
+          } else
+            setNotice({
+              title: "Keluar belum berhasil",
+              description: "Coba kembali untuk mengakhiri sesi.",
+            });
+        }}
       >
-        {children}
+        <WorkspaceGate>{children}</WorkspaceGate>
       </DashboardShell>
       <Dialog
         open={notice !== null}

@@ -76,6 +76,7 @@ export type SalesState = {
   memberDiscountPercent: number;
 };
 export type SalesCommand =
+  | { type: "complete-live"; liveId: string }
   | { type: "discard-draft" }
   | { type: "start-draft"; liveId?: string }
   | { type: "save-content"; input: LiveContent }

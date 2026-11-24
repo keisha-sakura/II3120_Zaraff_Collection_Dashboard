@@ -46,7 +46,7 @@ function PricingForm({
         ]),
       ) as Record<ItemCategory, Record<(typeof grades)[number], string>>,
   );
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const priceRules = Object.fromEntries(
       categories.map((category) => [
@@ -56,7 +56,7 @@ function PricingForm({
         ),
       ]),
     ) as PriceRules;
-    run({ type: "save-prices", priceRules });
+    await run({ type: "save-prices", priceRules });
   }
   return (
     <form onSubmit={submit}>

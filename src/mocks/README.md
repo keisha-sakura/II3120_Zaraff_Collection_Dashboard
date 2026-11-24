@@ -1,7 +1,7 @@
-﻿# Dummy data
+﻿# Fixture seed dan test
 
-`data/` berisi fixture demo per domain. File `*-demo.ts` menginisialisasi data operasional; fixture dasar Gudang dan snapshot Beranda tetap terpisah. `repositories/home.ts` menyediakan payload Beranda melalui kontrak server. Repository katalog Fondasi dan fixture transaksi lama sudah dihapus.
+`data/` berisi fixture per domain yang dipakai `src/server/seed.ts` untuk mengisi tabel relasional serta unit test operasi. Data awal mencakup beberapa periode dan status; bukan penyimpanan runtime.
 
-Fixture merupakan subset konsisten dari referensi, bukan seed database. Total laporan interaktif dihitung dari data operasional. Nominal IDR berupa angka rupiah dan tanggal berformat ISO. Acuan dummy tetap November 2026.
+Beranda memakai agregat database di `src/server/home.ts`. Provider interaktif memakai `src/lib/workspace-store.tsx` untuk cache API di memori; seluruh mutasi diteruskan ke transaksi server. Repository mock Beranda dan store localStorage lama sudah dihapus. Data localStorage demo lama tidak otomatis diimpor karena tidak mempunyai identitas/otorisasi yang dapat dipercaya.
 
-Provider modul interaktif langsung memakai `store/operations-store.ts` untuk snapshot bersama di localStorage. Operasi dan validasi domain terpisah dari UI agar nanti dapat dipindahkan ke service/API server. Lihat panduan Gudang, Penjualan, Pembayaran, Pengiriman, Laporan, dan Pengaturan pada folder `docs/`.
+Lihat [README](../../README.md) untuk akun, setup/seed dan reset eksplisit; [backend](../../docs/backend.md) untuk schema dan aturan bisnis.

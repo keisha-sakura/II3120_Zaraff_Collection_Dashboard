@@ -36,7 +36,9 @@ export function PackingDetailPage({ id }: { id: string }) {
           active && (
             <Button
               disabled={!complete || !!issue}
-              onClick={() => run({ type: "mark-packed", orderId: id })}
+              onClick={async () =>
+                await run({ type: "mark-packed", orderId: id })
+              }
             >
               Tandai dikemas
             </Button>
@@ -79,8 +81,8 @@ export function PackingDetailPage({ id }: { id: string }) {
         )}
         checklist={checklist}
         disabled={!active || !!issue}
-        onChange={(value) =>
-          run({ type: "save-checklist", orderId: id, checklist: value })
+        onChange={async (value) =>
+          await run({ type: "save-checklist", orderId: id, checklist: value })
         }
       />
       {active && !complete && (

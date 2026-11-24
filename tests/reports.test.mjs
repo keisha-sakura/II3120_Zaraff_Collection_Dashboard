@@ -3,14 +3,19 @@ import test from "node:test";
 import { createWarehouseDemo } from "../src/mocks/data/warehouse-demo.ts";
 import { createSalesDemo } from "../src/mocks/data/sales-demo.ts";
 import { createPaymentsDemo } from "../src/mocks/data/payments-demo.ts";
-import { createReportsDemo } from "../src/mocks/data/reports-demo.ts";
+import {
+  createReportsDemo,
+  strategyRecipients,
+} from "../src/mocks/data/reports-demo.ts";
 import {
   reportData,
   soldRows,
   ageBuckets,
   monthOf,
 } from "../src/features/laporan/selectors.ts";
-import { applyReportsCommand } from "../src/features/laporan/operations.ts";
+import { applyReportsCommand as applyCommand } from "../src/features/laporan/operations.ts";
+const applyReportsCommand = (...args) =>
+  applyCommand(...args, strategyRecipients);
 import { isReportsState } from "../src/features/laporan/persistence.ts";
 import { csvText } from "../src/features/laporan/csv.ts";
 const actor = {

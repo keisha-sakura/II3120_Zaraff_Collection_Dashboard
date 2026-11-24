@@ -37,11 +37,11 @@ function GradingForm({ item }: { item: WarehouseItem }) {
     String(priceRules[item.category][suggested]),
   );
   const [clean, setClean] = useState(false);
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const values = new FormData(event.currentTarget);
     if (
-      run({
+      await run({
         type: "grade",
         itemId: item.id,
         grade,

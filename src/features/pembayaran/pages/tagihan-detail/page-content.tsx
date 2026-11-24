@@ -11,6 +11,7 @@ import { formatCurrency, formatDate } from "@/lib/format";
 import { daysSince } from "@/features/gudang/model";
 import { usePayments } from "../../components/payments-provider";
 import { MissingPaymentRecord, PaymentLink } from "../../components/shared";
+import { PaymentSubmission } from "../../components/payment-submission";
 export function InvoiceDetailPage({ id }: { id: string }) {
   const { state, sales, run } = usePayments();
   const [requestId] = useState(() => crypto.randomUUID());
@@ -30,8 +31,8 @@ export function InvoiceDetailPage({ id }: { id: string }) {
       : order.paymentStatus === "pending"
         ? "Menunggu Validasi"
         : "Belum Dibayar";
-  function remind() {
-    if (run({ type: "remind", invoiceId: id, requestId })) setSent(true);
+  async function remind() {
+    if (await run({ type: "remind", invoiceId: id, requestId })) setSent(true);
   }
   return (
     <>
@@ -48,7 +49,7 @@ export function InvoiceDetailPage({ id }: { id: string }) {
       />
       {sent && (
         <div className="mb-4">
-          <Alert tone="success" title="Pengingat tercatat dalam demo." />
+          <Alert tone="success" title="Pengingat berhasil dicatat." />
         </div>
       )}
       <div className="grid items-start gap-5 lg:grid-cols-2">
@@ -105,6 +106,7 @@ export function InvoiceDetailPage({ id }: { id: string }) {
           />
         </Card>
       </div>
+      {unpaid && <PaymentSubmission orderId={order.id} total={order.total} />}
       <div className="mt-5 flex flex-wrap gap-5">
         <PaymentLink href="/pembayaran/tagihan">
           Kembali ke daftar tagihan

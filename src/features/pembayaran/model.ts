@@ -5,7 +5,7 @@ export type PaymentAttempt = {
   amount: number;
   submittedAt: string;
   status: "pending" | "approved" | "rejected";
-  proof: { fileName: string; amount: number } | null;
+  proof: { fileName: string; amount: number; uploadId?: string } | null;
   reviewedAt: string | null;
   reviewedBy: string | null;
   rejectionReason: string | null;
@@ -32,6 +32,13 @@ export type PaymentsState = {
   invoices: Invoice[];
 };
 export type PaymentCommand =
+  | {
+      type: "submit";
+      orderId: string;
+      method: "transfer" | "deposit";
+      amount: number;
+      proofId?: string;
+    }
   | { type: "approve"; paymentId: string }
   | { type: "reject"; paymentId: string; reason: string }
   | { type: "remind"; invoiceId: string; requestId: string };

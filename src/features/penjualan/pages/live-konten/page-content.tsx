@@ -10,20 +10,22 @@ import {
   Select,
   Checkbox,
 } from "@/components/ui/form-field";
-import { liveHosts, promotionChannels } from "../../model";
+import { promotionChannels } from "../../model";
 import { useSales } from "../../components/sales-provider";
 import { LiveSteps, CancelDraft, toWibInput } from "../../components/shared";
 export function LiveContentPage() {
-  const { state, run, go } = useSales();
+  const { state, run, go, directory } = useSales();
+  const liveHosts = directory.filter((row) => row.role === "live-host");
   const draft = state.draft;
+  const editing = state.lives.find((live) => live.id === draft?.editingId);
   const [channels, setChannels] = useState<string[]>(
     draft?.promotionChannels ?? [],
   );
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const values = new FormData(event.currentTarget);
     if (
-      run({
+      await run({
         type: "save-content",
         input: {
           title: String(values.get("title")),
@@ -38,7 +40,22 @@ export function LiveContentPage() {
   }
   return (
     <>
-      <PageHeader title="Jadwalkan live" />
+      <PageHeader
+        title="Jadwalkan live"
+        secondaryAction={
+          editing?.status === "published" && (
+            <Button
+              variant="secondary"
+              onClick={async () => {
+                if (await run({ type: "complete-live", liveId: editing.id }))
+                  go(`/penjualan/live/${editing.id}/klaim/impor`);
+              }}
+            >
+              Selesaikan live
+            </Button>
+          )
+        }
+      />
       <LiveSteps step="content" />
       <Card className="max-w-4xl">
         <form onSubmit={submit} className="space-y-5">
@@ -82,7 +99,7 @@ export function LiveContentPage() {
             <Select
               id="live-host"
               name="host"
-              defaultValue={draft?.hostId ?? liveHosts[0].id}
+              defaultValue={draft?.hostId || liveHosts[0]?.id || ""}
             >
               {liveHosts.map((host) => (
                 <option key={host.id} value={host.id}>

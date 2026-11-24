@@ -17,9 +17,9 @@ export function DiscountPage() {
 function DiscountForm({ saved }: { saved: number }) {
   const { run } = useSettings();
   const [value, setValue] = useState(String(saved));
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    run({ type: "save-discount", percent: Number(value) });
+    await run({ type: "save-discount", percent: Number(value) });
   }
   return (
     <>

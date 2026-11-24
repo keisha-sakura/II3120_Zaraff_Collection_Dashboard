@@ -5,7 +5,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { Badge } from "@/components/ui/badge";
 import { FilterSelect } from "@/components/ui/form-field";
 import { orderStatuses } from "@/config/statuses";
-import { demoReferenceDate } from "@/features/gudang/model";
+import { monthOf } from "@/features/laporan/selectors";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { useSales } from "../../components/sales-provider";
 export function OrdersPage() {
@@ -18,7 +18,7 @@ export function OrdersPage() {
         (status === "active" && order.status !== "completed") ||
         order.status === status) &&
       (period === "all" ||
-        order.createdAt.startsWith(demoReferenceDate.slice(0, 7))),
+        monthOf(order.createdAt) === monthOf(new Date().toISOString())),
   );
   return (
     <>

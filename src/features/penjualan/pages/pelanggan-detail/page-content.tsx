@@ -9,14 +9,16 @@ import type { CustomerInput } from "../../model";
 import { useSales } from "../../components/sales-provider";
 import { CustomerForm } from "../../components/customer-form";
 import { MissingSalesRecord, SalesLink } from "../../components/shared";
+import { DepositTopUp } from "../../components/deposit-top-up";
 export function CustomerDetailPage({ id }: { id: string }) {
   const { state, run } = useSales();
   const [saved, setSaved] = useState(false);
   const customer = state.customers.find((customer) => customer.id === id);
   if (!customer)
     return <MissingSalesRecord label="Pelanggan" href="/penjualan/pelanggan" />;
-  function save(input: CustomerInput) {
-    if (run({ type: "update-customer", customerId: id, input })) setSaved(true);
+  async function save(input: CustomerInput) {
+    if (await run({ type: "update-customer", customerId: id, input }))
+      setSaved(true);
   }
   const joined = new Intl.DateTimeFormat("id-ID", {
     month: "long",
@@ -51,6 +53,7 @@ export function CustomerDetailPage({ id }: { id: string }) {
             <p className="mt-2 text-3xl font-extrabold">
               {formatCurrency(customer.depositBalance)}
             </p>
+            <DepositTopUp customerId={id} />
           </Card>
           <DataTable
             caption={`Riwayat deposit ${customer.name}`}
