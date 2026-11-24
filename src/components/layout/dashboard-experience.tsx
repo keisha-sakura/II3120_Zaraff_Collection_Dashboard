@@ -41,11 +41,15 @@ export function DashboardExperience({
       setNotice({
         title: "Pilih data terlebih dahulu",
         description:
-          "Buka daftar pada modul terkait, lalu pilih bale atau barang untuk melihat detailnya.",
+          "Buka daftar pada modul terkait, lalu pilih data untuk melihat detailnya.",
       });
       return;
     }
-    if (path === "/beranda" || path.startsWith("/gudang/")) {
+    if (
+      path === "/beranda" ||
+      path.startsWith("/gudang/") ||
+      path.startsWith("/penjualan/")
+    ) {
       router.push(resolveHref(href));
       return;
     }

@@ -89,7 +89,9 @@ Menu profil hanya memiliki aksi Keluar, yang mengembalikan mode demo ke pemilih 
 
 Modul Gudang juga tersedia untuk Owner, Admin, dan Penyortir: buka `/gudang/bale?role=penyortir` atau pilih Gudang dari sidebar Beranda. Tab modul menyediakan Bale & Sortir, Laundry, dan Inventaris. Alur terima bale, sortir/retur, konfirmasi selesai sortir, grading, dan pindah lokasi dapat dicoba. Perubahan demo disimpan di localStorage browser yang sama dan dipakai bersama oleh ketiga role. Role Live Host dan Tim Packing mendapat 404 jika mencoba URL Gudang. Detail alur dan integrasi backend ada di [docs/warehouse.md](docs/warehouse.md).
 
-Halaman selain Beranda dan Gudang dibangun pada tahap berikutnya. Database dan autentikasi belum dikonfigurasi. Role pada query URL hanya memilih data dummy publik, bukan sesi pengguna atau pengamanan server. Endpoint health memeriksa respons aplikasi, belum koneksi database.
+Modul Penjualan tersedia di `/penjualan/live?role=admin`: jadwal/promosi, wizard live tiga langkah, impor/hasil klaim, daftar/detail pesanan, dan daftar/detail pelanggan. Owner dan Admin mendapat akses lengkap; Live Host hanya membaca jadwal yang ditugaskan kepadanya. Publikasi promosi merupakan simulasi lokal. Klaim membuat pesanan dan mereservasi stok Gudang dalam satu snapshot penyimpanan. Panduan lengkap: [docs/sales.md](docs/sales.md).
+
+Data Gudang dan Penjualan kini memakai key localStorage bersama `zaraff.operations.demo.v1`. Data Gudang lama dimigrasikan saat key baru belum ada; perubahan demo tidak dihapus. Halaman selain Beranda, Gudang, dan Penjualan dibangun pada tahap berikutnya. Database dan autentikasi belum dikonfigurasi. Role pada query URL hanya memilih data dummy publik, bukan sesi pengguna atau pengamanan server. Endpoint health memeriksa respons aplikasi, belum koneksi database.
 
 ## Commit dan push pertama
 

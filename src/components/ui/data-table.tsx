@@ -15,6 +15,7 @@ export function DataTable<T>({
   rows,
   rowKey,
   rowHref,
+  beforeRowNavigate,
   emptyMessage,
 }: {
   caption: string;
@@ -23,6 +24,7 @@ export function DataTable<T>({
   rowKey: (row: T) => string;
   /** Linked rows must contain non-interactive cells; use selection tables separately. */
   rowHref?: (row: T) => string;
+  beforeRowNavigate?: (row: T) => boolean | void;
   emptyMessage?: string;
 }) {
   return (
@@ -67,6 +69,10 @@ export function DataTable<T>({
                     {href ? (
                       <DashboardLink
                         href={href}
+                        onClick={(event) => {
+                          if (beforeRowNavigate?.(row) === false)
+                            event.preventDefault();
+                        }}
                         tabIndex={index === 0 ? 0 : -1}
                         aria-label={
                           index === 0 ? `Buka detail ${rowKey(row)}` : undefined
