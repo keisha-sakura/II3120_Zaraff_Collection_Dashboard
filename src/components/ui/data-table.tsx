@@ -38,13 +38,14 @@ export function DataTable<T>({
         <caption className="sr-only">{caption}</caption>
         <thead className="bg-table-header text-surface">
           <tr>
-            {columns.map((column) => (
+            {columns.map((column, index) => (
               <th
                 key={column.id}
                 scope="col"
                 className={cn(
                   "px-3.5 py-2.5 text-xs font-semibold whitespace-nowrap",
                   column.className,
+                  rowHref && index === columns.length - 1 && "pr-12",
                 )}
               >
                 {column.header}
@@ -69,6 +70,7 @@ export function DataTable<T>({
                     className={cn(
                       "relative px-3.5 py-3 align-middle",
                       column.className,
+                      href && index === columns.length - 1 && "pr-12",
                     )}
                   >
                     {href ? (
@@ -96,6 +98,20 @@ export function DataTable<T>({
                         className="block before:absolute before:inset-0"
                       >
                         {column.cell(row)}
+                        {index === columns.length - 1 && (
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden="true"
+                            className="text-muted group-hover:text-primary group-focus-within:text-primary pointer-events-none absolute top-1/2 right-3.5 size-4 -translate-y-1/2 transition-[color,translate] group-focus-within:translate-x-0.5 group-hover:translate-x-0.5 motion-reduce:transition-none"
+                          >
+                            <path d="m9 5 7 7-7 7" />
+                          </svg>
+                        )}
                       </DashboardLink>
                     ) : (
                       column.cell(row)
