@@ -1,10 +1,25 @@
 "use client";
 import { useSyncExternalStore } from "react";
+import { createReportsDemo } from "@/mocks/data/reports-demo";
+import { isReportsState } from "@/features/laporan/persistence";
+import { applyReportsCommand } from "@/features/laporan/operations";
+import type { ReportsState, ReportsCommand } from "@/features/laporan/model";
 import { createWarehouseDemo } from "@/mocks/data/warehouse-demo";
 import { createSalesDemo } from "@/mocks/data/sales-demo";
 import { createPaymentsDemo, ensureInvoices } from "@/mocks/data/payments-demo";
 import { isPaymentsState } from "@/features/pembayaran/persistence";
 import { applyPaymentCommand } from "@/features/pembayaran/operations";
+import {
+  createShippingDemo,
+  ensureShippingRecords,
+} from "@/mocks/data/shipping-demo";
+import { isShippingState } from "@/features/pengiriman/persistence";
+import { applyShippingCommand } from "@/features/pengiriman/operations";
+import type {
+  ShippingState,
+  ShippingCommand,
+} from "@/features/pengiriman/model";
+import type { User } from "@/types/domain";
 import type {
   PaymentsState,
   PaymentCommand,
@@ -23,6 +38,8 @@ type Workspace = {
   warehouse: WarehouseState;
   sales: SalesState;
   payments: PaymentsState;
+  shipping: ShippingState;
+  reports: ReportsState;
 };
 type Snapshot = { data: Workspace; storageUnavailable: boolean };
 let snapshot: Snapshot | null = null;
@@ -31,9 +48,16 @@ const listeners = new Set<() => void>();
 const emit = () => listeners.forEach((listener) => listener());
 function initial(warehouse?: WarehouseState): Workspace {
   const seed = createSalesDemo(warehouse ?? createWarehouseDemo());
+  const prepared = createPaymentsDemo(
+    seed.sales,
+    seed.warehouse,
+    warehouse === undefined,
+  );
   return {
     version: 1,
-    ...createPaymentsDemo(seed.sales, seed.warehouse, warehouse === undefined),
+    ...prepared,
+    shipping: createShippingDemo(prepared.sales),
+    reports: createReportsDemo(),
   };
 }
 function restore() {
@@ -60,6 +84,14 @@ function restore() {
           warehouse: value.warehouse,
           sales: value.sales,
           payments,
+          reports:
+            "reports" in value && isReportsState(value.reports)
+              ? value.reports
+              : createReportsDemo(),
+          shipping:
+            "shipping" in value && isShippingState(value.shipping)
+              ? ensureShippingRecords(value.shipping, value.sales)
+              : createShippingDemo(value.sales),
         },
         storageUnavailable: false,
       };
@@ -159,10 +191,47 @@ export function executeDemoPaymentCommand(
     new Date().toISOString(),
   );
   commit({
-    version: 1,
+    ...snapshot.data,
     sales: result.sales,
     warehouse: result.warehouse,
     payments: result.payments,
   });
+  return result.entityId;
+}
+
+export function executeDemoShippingCommand(
+  command: ShippingCommand,
+  actor: Pick<User, "name" | "role">,
+) {
+  if (!snapshot) throw new Error("Data sedang dimuat.");
+  const result = applyShippingCommand(
+    snapshot.data.shipping,
+    snapshot.data.sales,
+    snapshot.data.warehouse,
+    command,
+    actor,
+    new Date().toISOString(),
+  );
+  commit({
+    ...snapshot.data,
+    shipping: result.shipping,
+    sales: result.sales,
+    warehouse: result.warehouse,
+  });
+  return result.entityId;
+}
+
+export function executeDemoReportsCommand(
+  command: ReportsCommand,
+  actor: User,
+) {
+  if (!snapshot) throw new Error("Data sedang dimuat.");
+  const result = applyReportsCommand(
+    snapshot.data.reports,
+    command,
+    actor,
+    new Date().toISOString(),
+  );
+  commit({ ...snapshot.data, reports: result.state });
   return result.entityId;
 }

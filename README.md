@@ -1,4 +1,4 @@
-# Zaraff Collection Dashboard
+﻿# Zaraff Collection Dashboard
 
 Starter full-stack Next.js untuk frontend dan backend Zaraff Collection dalam satu repository dan satu server.
 
@@ -93,7 +93,11 @@ Modul Penjualan tersedia di `/penjualan/live?role=admin`: jadwal/promosi, wizard
 
 Modul Pembayaran tersedia di `/pembayaran/validasi?role=admin` untuk Owner dan Admin. Tersedia antrean validasi, detail transfer/deposit, dialog penolakan, daftar belum dibayar, dan detail tagihan dengan pengingat demo. Persetujuan memperbarui pesanan menjadi Lunas, stok menjadi Terjual, dan saldo/riwayat deposit jika metode deposit. Transfer kurang bayar dan saldo tidak cukup tidak dapat disetujui. Panduan: [docs/payments.md](docs/payments.md).
 
-Data Gudang, Penjualan, dan Pembayaran memakai key localStorage bersama `zaraff.operations.demo.v1`. Data lama dimigrasikan tanpa memundurkan saldo atau status pesanan yang sudah lunas. Demo baru menyediakan contoh deposit menunggu validasi; pada data lama, contoh itu dapat sudah lunas. Halaman selain modul yang disebutkan di atas dibangun pada tahap berikutnya. Database dan autentikasi belum dikonfigurasi. Role pada query URL hanya memilih data dummy publik, bukan sesi pengguna atau pengamanan server. Endpoint health memeriksa respons aplikasi, belum koneksi database.
+Modul Pengiriman tersedia di `/pengiriman/packing?role=packing`. Tim Packing mengerjakan antrean dan checklist pengambilan/QC/kemas. Owner dan Admin juga mengakses Siap dikirim, input resi, dan Dalam pengiriman. Hanya pesanan Lunas yang masuk antrean. Penyerahan ke kurir mengubah pesanan menjadi Dikirim dan barang menjadi Keluar Gudang serta melepas lokasi rak. Panduan: [docs/shipping.md](docs/shipping.md).
+
+Modul Laporan tersedia di `/laporan/ringkasan?role=owner` untuk Owner dan Admin: ringkasan bisnis, laporan bulanan dengan CSV, umur stok, barang terjual/keluar, serta tulis dan kirim strategi demo. Data dihitung dari workspace operasional. Panduan: [docs/reports.md](docs/reports.md).
+
+Data Gudang, Penjualan, Pembayaran, Pengiriman, dan Laporan memakai key localStorage bersama `zaraff.operations.demo.v1`. Data lama dimigrasikan tanpa memundurkan saldo atau status pesanan yang sudah lunas. Demo baru menyediakan contoh deposit menunggu validasi; pada data lama, contoh itu dapat sudah lunas. Halaman selain modul yang disebutkan di atas dibangun pada tahap berikutnya. Database dan autentikasi belum dikonfigurasi. Role pada query URL hanya memilih data dummy publik, bukan sesi pengguna atau pengamanan server. Endpoint health memeriksa respons aplikasi, belum koneksi database.
 
 ## Commit dan push pertama
 

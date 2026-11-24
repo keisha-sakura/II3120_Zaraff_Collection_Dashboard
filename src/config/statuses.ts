@@ -4,6 +4,7 @@ import type {
   ItemStatus,
   OrderStatus,
   PaymentStatus,
+  Shipment,
 } from "@/types/domain";
 type StatusDefinition = { label: string; tone: BadgeTone };
 export const itemStatuses: Record<ItemStatus, StatusDefinition> = {
@@ -31,4 +32,10 @@ export const paymentStatuses: Record<PaymentStatus, StatusDefinition> = {
   pending: { label: "Menunggu Validasi", tone: "warning" },
   approved: { label: "Disetujui", tone: "success" },
   rejected: { label: "Ditolak", tone: "danger" },
+};
+
+export const shippingStatuses: Record<Shipment["status"], StatusDefinition> = {
+  "in-transit": { label: "Dalam Perjalanan", tone: "info" },
+  "out-for-delivery": { label: "Sedang Diantar", tone: "info" },
+  delivered: { label: "Diterima Pembeli", tone: "success" },
 };
