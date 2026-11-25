@@ -7,7 +7,7 @@
     "node": ">=22.18.0"
   },
   "scripts": {
-    "test": "prisma db push --skip-generate && prisma db seed && vitest run",
+    "test": "vitest run",
     "test:legacy": "node --experimental-strip-types --test tests/*.test.mjs",
     "design:inventory": "node scripts/design-inventory.mjs",
     "dev": "next dev",

@@ -1,4 +1,3 @@
-import { db } from "@backend/lib/db";
 import { errors } from "@backend/lib/errors";
 import { inventoryService } from "@backend/services/s1-inventory/service";
 import { notificationService } from "@backend/services/s7-notification/service";
@@ -7,7 +6,13 @@ import { promotionRepository } from "./repository";
 export const promotionService = {
   list: () => promotionRepository.list(),
 
-  async create(input: { judul: string; isi: string; kanal: string; jadwalLive: Date; itemIds?: string[] }) {
+  async create(input: {
+    judul: string;
+    isi: string;
+    kanal: string;
+    jadwalLive: Date;
+    itemIds?: string[];
+  }) {
     const promotion = await promotionRepository.create({
       judul: input.judul,
       isi: input.isi,
@@ -18,15 +23,32 @@ export const promotionService = {
     if (input.itemIds?.length) {
       for (const itemId of input.itemIds) {
         // Verify item exists via S1 (read-only cross-service lookup)
-        const item = await db.item.findUnique({ where: { id: itemId } });
-        if (!item) throw errors.tidakDitemukan(`Item ${itemId} tidak ditemukan`);
-        await promotionRepository.addItem({ promotionId: promotion.id, itemId, kode: item.kode });
+        const item = await inventoryService.findItemById(itemId);
+        if (!item)
+          throw errors.tidakDitemukan(`Item ${itemId} tidak ditemukan`);
+        if (item.status !== "tersedia")
+          throw errors.konflik(
+            `Item ${item.kode} tidak tersedia untuk promosi`,
+          );
+        await promotionRepository.addItem({
+          promotionId: promotion.id,
+          itemId,
+          kode: item.kode,
+        });
       }
     }
     return promotionRepository.findById(promotion.id);
   },
 
-  async update(id: string, input: Partial<{ judul: string; isi: string; kanal: string; jadwalLive: Date }>) {
+  async update(
+    id: string,
+    input: Partial<{
+      judul: string;
+      isi: string;
+      kanal: string;
+      jadwalLive: Date;
+    }>,
+  ) {
     const promo = await promotionRepository.findById(id);
     if (!promo) throw errors.tidakDitemukan("Promosi tidak ditemukan");
     return promotionRepository.update(id, input);

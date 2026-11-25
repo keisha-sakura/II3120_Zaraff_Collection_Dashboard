@@ -2,27 +2,54 @@
 
 Dashboard operasional full-stack Next.js: frontend dan API satu server, SQLite persisten dengan Drizzle ORM. Modul Beranda, Gudang, Penjualan, Pembayaran, Pengiriman, Laporan/Strategi, dan Pengaturan memakai database; login wajib untuk semua dashboard.
 
-## Backend prototype (Phase 1)
+## Backend prototype Prisma (fase 1–8)
 
-The Prisma-backed backend prototype is introduced alongside the existing dashboard. It uses `DATABASE_URL="file:./dev.db?connection_limit=1"`; create `.env` from `.env.example`, then run:
+Backend modular monolith S1–S12 berada di `services/`, dengan route di `src/app/api/`. Prototype memakai Prisma + SQLite, Zod, JWT, dan Vitest. Dashboard lama memakai Drizzle melalui API operasionalnya sendiri; akun dan data kedua backend berbeda.
+
+Prasyarat: Node.js 22.18+ dan npm. Pada Windows, build native `better-sqlite3` untuk dashboard lama memerlukan Visual Studio C++ Build Tools beserta Windows SDK. Salin `.env.example` ke `.env` untuk CLI Prisma dan pastikan `DATABASE_URL="file:./dev.db?connection_limit=1"` serta `JWT_SECRET` terisi.
 
 ```bash
+npm ci
 npm run db:generate
 npm run db:push
 npm run seed
 npm test
+npm run dev
 ```
 
-`npm test` pushes the schema, resets the prototype seed safely, and runs Vitest. The five prototype accounts are `pemilik`, `admin`, `penyortir`, `host`, and `pengemas`, all with password `password123`.
+`npm run seed` **menghapus dan mengisi ulang data prototype pada DATABASE_URL yang dipilih**; gunakan hanya untuk database development. Vitest membuat skema dan seed sekali di `prisma/test.db`, menjalankan file test berurutan, serta tidak mengubah `dev.db`. Suite mencakup 20 klaim paralel, pembayaran/deposit, rollback transaksi, QC/pengiriman sampai selesai, laporan, strategi, arsitektur, dan traceability 40 FR. Jalankan `npm run test:legacy` untuk suite dashboard Drizzle secara terpisah.
 
-| Method | Endpoint | Purpose |
-|---|---|---|
-| POST | `/api/auth/login` | Obtain JWT for a dashboard role |
-| GET | `/api/auth/me` | Read the authenticated JWT identity |
+Akun seed prototype: `pemilik`, `admin`, `penyortir`, `host`, `pengemas`; password semuanya `password123`. Seed juga menyediakan 3 lokasi, 2 bale, 30 item, 5 pelanggan, aturan harga, dan diskon member 10%.
 
-The bearer format is `Authorization: Bearer <token>`; login also sets an HTTP-only `zaraff_token` cookie. Errors use `{ "error": { "kode", "pesan" } }`.
+Login mengembalikan JWT dan mengatur cookie HTTP-only `zaraff_token`. Klien API dapat memakai `Authorization: Bearer <token>`. Respons umumnya `{ "data": ... }`; error selalu `{ "error": { "kode": "...", "pesan": "..." } }` dengan HTTP 400/401/403/404/409. Matriks role tersedia di [ARCHITECTURE.md](ARCHITECTURE.md).
 
-## Menjalankan lokal
+Pembayaran transfer memerlukan `buktiBayar`; nominal ditentukan invoice, dan `jumlah` opsional harus sama dengan tagihan. PaymentContract mencatat `menunggu validasi`; `payConfirmed` baru dicatat setelah admin menyetujui. Saldo deposit, status pembayaran/invoice/order/item, audit, dan callback persetujuan berada dalam satu transaksi.
+
+Antrean packing memuat kode serta lokasi tiap item lunas. QC harus cocok persis tanpa kode hilang/tambahan/duplikat. Pengemas mengonfirmasi `pack`, lalu admin mengonfirmasi `handover`; item baru `keluar gudang` saat handover. Kurir simulasi memperbarui `diserahkan → dalam perjalanan → diterima`, dan order menjadi `selesai`.
+
+Laporan bulanan memakai kalender WIB; penjualan dihitung saat persetujuan pembayaran dan pendapatan memakai total setelah diskon. Jumlah keluar gudang memakai tanggal handover. Stok dan grade menunjukkan kondisi saat ini. Semua notifikasi hanya tersimpan sebagai `terkirim (simulasi)`; tidak ada pengiriman pesan eksternal.
+
+Kontrak frontend dan contoh body fase 6–8 tersedia di [openapi.yaml](openapi.yaml); pemetaan kebutuhan ada di [docs/traceability.md](docs/traceability.md). Tabel endpoint prototype:
+
+| Service   | Endpoint                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Auth      | `POST /api/auth/login`<br>`GET /api/auth/me`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| S1        | `GET /api/locations`<br>`POST /api/locations`<br>`PATCH /api/locations/:id`<br>`GET /api/bales`<br>`POST /api/bales`<br>`GET /api/bales/:id`<br>`POST /api/bales/:id/start-sorting`<br>`GET /api/items`<br>`POST /api/items`<br>`GET /api/items/:kode`<br>`PATCH /api/items/:id/grade-price`<br>`PATCH /api/items/:id/ready`<br>`GET /api/laundry`<br>`POST /api/stock/move`<br>`GET /api/stock/movements`<br>`POST /api/stock-counts`<br>`POST /api/stock-counts/:id/items`<br>`POST /api/stock-counts/:id/submit`<br>`GET /api/stock-counts/:id/reconcile`<br>`POST /api/stock-counts/:id/approve`<br>`GET /api/warehouse/summary`<br>`GET /api/warehouse/aging`<br>`GET /api/warehouse/shipped-out` |
+| S6        | `GET /api/pricing/suggest`<br>`GET /api/pricing/rules`<br>`PUT /api/pricing/rules`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| S3        | `GET /api/customers`<br>`POST /api/customers`<br>`PATCH /api/customers/:id`<br>`GET /api/customers/:id/member-status`<br>`POST /api/customers/:id/deposit`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| S2/S12    | `GET /api/orders`<br>`GET /api/orders/:id`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| S9        | `GET /api/promotions`<br>`POST /api/promotions`<br>`PATCH /api/promotions/:id`<br>`POST /api/promotions/:id/publish`<br>`POST /api/promotions/:id/reminder`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| S7        | `GET /api/notifications`<br>`GET /api/notifications/me`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| S10       | `GET /api/live/sessions`<br>`POST /api/live/sessions`<br>`PATCH /api/live/sessions/:id/close`<br>`POST /api/live/sessions/:id/claims`<br>`GET /api/live/sessions/:id/claims`<br>`POST /api/live/sessions/:id/claims/import`                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| S12       | `POST /api/orders/:id/invoice`<br>`POST /api/invoices/:id/payments`<br>`POST /api/payments/:id/validate`<br>`POST /api/orders/:id/payment-reminder`<br>`GET /api/packing/queue`<br>`POST /api/orders/:id/quality-check`<br>`POST /api/orders/:id/pack`<br>`POST /api/orders/:id/handover`<br>`POST /api/shipments/:orderId/status`<br>`GET /api/shipments/:orderId/tracking`                                                                                                                                                                                                                                                                                                                           |
+| S8        | `GET /api/reports/overview`<br>`GET /api/reports/sales`<br>`GET /api/reports/stock`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| S11       | `POST /api/strategies`<br>`GET /api/strategies`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| Audit     | `GET /api/audit`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| Contracts | `POST /api/contracts/live-claim/claim`<br>`POST /api/contracts/payment/pay`<br>`POST /api/contracts/delivery/status-update`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+
+Prototype dan dashboard Drizzle memakai nama environment `DATABASE_URL` yang sama dengan format berbeda. Jalankan dalam proses terpisah dengan nilai environment yang sesuai. Saat menjalankan prototype, pastikan server memakai URL Prisma di atas; `.env.local` milik dashboard lama dapat menimpa `.env`.
+
+## Menjalankan dashboard Drizzle lokal
 
 Prasyarat: Node.js 22.18+ dan npm. Di PowerShell gunakan `npm.cmd` jika `npm.ps1` diblokir.
 
@@ -30,7 +57,7 @@ Prasyarat: Node.js 22.18+ dan npm. Di PowerShell gunakan `npm.cmd` jika `npm.ps1
 npm ci
 ```
 
-Salin `.env.example` ke `.env.local`, lalu:
+Untuk alur dashboard lama, salin `.env.example` ke `.env.local` dan ubah `DATABASE_URL="./data/zaraff.sqlite"`, lalu:
 
 ```bash
 npm run db:setup
@@ -61,7 +88,7 @@ npm run db:seed
 npm run db:backup
 ```
 
-Perubahan schema: edit `src/server/schema.ts`, jalankan `npm run db:generate`, tinjau SQL di `drizzle/`, lalu `npm run db:migrate`. Migration SQL dan metadata harus disertakan ke Git. SQLite, backup, file upload, dan `.env.local` diabaikan Git.
+Perubahan schema dashboard Drizzle: edit `src/server/schema.ts`, jalankan `npx drizzle-kit generate`, tinjau SQL di `drizzle/`, lalu `npm run db:migrate`. `npm run db:generate` khusus client Prisma. Migration SQL dan metadata harus disertakan ke Git. SQLite, backup, file upload, dan `.env.local` diabaikan Git.
 
 Backup memakai SQLite backup API, aman untuk database WAL yang sedang aktif. File tersimpan di `backups/`. Backup folder `uploads/` secara terpisah karena bukti gambar tidak disimpan di SQLite. Untuk restore, hentikan seluruh proses aplikasi, simpan salinan database lama, lalu ganti file database dengan hasil backup pada volume yang sama. Pastikan tidak memakai file `-wal`/`-shm` dari database sebelumnya. Jika memindahkan folder upload, sesuaikan path metadata upload karena path saat ini absolut.
 

@@ -1,11 +1,30 @@
-import { db } from "@backend/lib/db";
-import { errors } from "@backend/lib/errors";
+import { db, type DbTransaction } from "@backend/lib/db";
+import { AppError, errors } from "@backend/lib/errors";
 import { catatStatus } from "@backend/services/audit/service";
-import { itemRepository } from "@backend/services/s1-inventory/repository";
+import { inventoryService } from "@backend/services/s1-inventory/service";
 import { orderService } from "@backend/services/s2-order/service";
 import { notificationService } from "@backend/services/s7-notification/service";
 import { claimRepository, liveSessionRepository } from "./repository";
 import type { ClaimResult } from "./types";
+import type { Claim } from "@prisma/client";
+
+async function createClaim(
+  input: Parameters<typeof claimRepository.create>[0],
+  tx?: DbTransaction,
+): Promise<Claim> {
+  if (!tx)
+    return db.$transaction((transaction) => createClaim(input, transaction));
+  const claim = await claimRepository.create(input, tx);
+  await catatStatus(
+    "Claim",
+    claim.id,
+    undefined,
+    claim.status,
+    input.customerId,
+    tx,
+  );
+  return claim;
+}
 
 // ─── internal helper ─────────────────────────────────────────────────────────
 
@@ -43,13 +62,15 @@ async function processClaim(input: {
 
       // 2. Atomic reserve: updateMany where status='tersedia'
       //    If count === 0 → item was taken concurrently → throw → tx rolls back
-      const reserved = await claimRepository.atomicReserveItem(input.itemId, order.id, tx);
-      if (reserved.count === 0) {
-        throw new Error("RACE_LOST");
-      }
+      await inventoryService.reserveItem(
+        input.itemId,
+        order.id,
+        input.customerId,
+        tx,
+      );
 
       // 3. Create winning claim
-      const claim = await claimRepository.create(
+      const claim = await createClaim(
         {
           sessionId: input.sessionId,
           kodeItem: input.kodeItem,
@@ -63,18 +84,20 @@ async function processClaim(input: {
       );
 
       // 4. Audit StatusLog for claim
-      await catatStatus("Claim", claim.id, undefined, "menang", input.customerId, tx);
 
-      return { diterima: true, alasan: "Klaim berhasil", idPesanan: order.id, claimId: claim.id };
+      return {
+        diterima: true,
+        alasan: "Klaim berhasil",
+        idPesanan: order.id,
+        claimId: claim.id,
+      };
     });
   } catch (err: unknown) {
+    if (!(err instanceof AppError) || err.status !== 409) throw err;
     // Race lost or any other error → create a rejected claim (outside transaction, which rolled back)
-    const alasan =
-      err instanceof Error && err.message === "RACE_LOST"
-        ? "Produk sudah dipesan"
-        : "Klaim gagal diproses";
+    const alasan = "Produk sudah dipesan";
 
-    const claim = await claimRepository.create({
+    const claim = await createClaim({
       sessionId: input.sessionId,
       kodeItem: input.kodeItem,
       customerId: input.customerId,
@@ -84,7 +107,6 @@ async function processClaim(input: {
       status: "ditolak",
       alasan,
     });
-    await catatStatus("Claim", claim.id, undefined, "ditolak", input.customerId);
 
     return { diterima: false, alasan, claimId: claim.id };
   }
@@ -96,14 +118,16 @@ export const liveSellingService = {
   // ── Sessions ──────────────────────────────────────────────────────────────
   async openSession(judul: string) {
     const existing = await liveSessionRepository.findActive();
-    if (existing) throw errors.konflik("Sudah ada sesi live yang sedang berjalan");
+    if (existing)
+      throw errors.konflik("Sudah ada sesi live yang sedang berjalan");
     return liveSessionRepository.create(judul);
   },
 
   async closeSession(id: string) {
     const session = await liveSessionRepository.findById(id);
     if (!session) throw errors.tidakDitemukan("Sesi live tidak ditemukan");
-    if (session.status !== "berjalan") throw errors.konflik("Sesi live tidak dalam status berjalan");
+    if (session.status !== "berjalan")
+      throw errors.konflik("Sesi live tidak dalam status berjalan");
     return liveSessionRepository.updateStatus(id, "selesai");
   },
 
@@ -112,16 +136,22 @@ export const liveSellingService = {
   // ── Single claim (host input) ─────────────────────────────────────────────
   async inputClaim(
     sessionId: string,
-    input: { kodeProduk: string; idPembeli: string; handle: string; waktuKomentar: Date },
-  ) {
+    input: {
+      kodeProduk: string;
+      idPembeli: string;
+      handle: string;
+      waktuKomentar: Date;
+    },
+  ): Promise<ClaimResult & { claimId: string }> {
     const session = await liveSessionRepository.findById(sessionId);
     if (!session) throw errors.tidakDitemukan("Sesi live tidak ditemukan");
-    if (session.status !== "berjalan") throw errors.konflik("Sesi live tidak dalam status berjalan");
+    if (session.status !== "berjalan")
+      throw errors.konflik("Sesi live tidak dalam status berjalan");
 
     // Check item exists and is available
-    const item = await itemRepository.findByKode(input.kodeProduk);
+    const item = await inventoryService.findItem(input.kodeProduk);
     if (!item || item.status !== "tersedia") {
-      const claim = await claimRepository.create({
+      const claim = await createClaim({
         sessionId,
         kodeItem: input.kodeProduk,
         customerId: input.idPembeli,
@@ -131,8 +161,12 @@ export const liveSellingService = {
         status: "tidak valid",
         alasan: item ? "Item tidak tersedia" : "Kode produk tidak ditemukan",
       });
-      await catatStatus("Claim", claim.id, undefined, "tidak valid", input.idPembeli);
-      return { diterima: false, alasan: claim.alasan, claimId: claim.id };
+      await notificationService.send({
+        tipe: "claimResult",
+        tujuan: input.idPembeli,
+        isi: `Klaim ${input.kodeProduk}: ${claim.alasan}`,
+      });
+      return { diterima: false, alasan: claim.alasan!, claimId: claim.id };
     }
 
     const result = await processClaim({
@@ -162,33 +196,49 @@ export const liveSellingService = {
   async importCsv(sessionId: string, csvText: string) {
     const session = await liveSessionRepository.findById(sessionId);
     if (!session) throw errors.tidakDitemukan("Sesi live tidak ditemukan");
-    if (session.status !== "berjalan") throw errors.konflik("Sesi live tidak dalam status berjalan");
+    if (session.status !== "berjalan")
+      throw errors.konflik("Sesi live tidak dalam status berjalan");
 
     // Parse CSV manually — header: kode,id_pembeli,handle,waktu
     const lines = csvText.split(/\r?\n/).filter((l) => l.trim());
     const [header, ...rows] = lines;
     if (!header?.toLowerCase().startsWith("kode")) {
-      throw errors.validasi("CSV harus memiliki header: kode,id_pembeli,handle,waktu");
+      throw errors.validasi(
+        "CSV harus memiliki header: kode,id_pembeli,handle,waktu",
+      );
     }
 
     const parsed = rows
       .map((row) => {
-        const [kode, id_pembeli, handle, waktu] = row.split(",").map((s) => s.trim());
+        const [kode, id_pembeli, handle, waktu] = row
+          .split(",")
+          .map((s) => s.trim());
         const waktuKomentar = new Date(waktu ?? "");
-        if (!kode || !id_pembeli || !handle || isNaN(waktuKomentar.getTime())) return null;
-        return { kodeProduk: kode, idPembeli: id_pembeli, handle, waktuKomentar };
+        if (!kode || !id_pembeli || !handle || isNaN(waktuKomentar.getTime()))
+          return null;
+        return {
+          kodeProduk: kode,
+          idPembeli: id_pembeli,
+          handle,
+          waktuKomentar,
+        };
       })
       .filter((r): r is NonNullable<typeof r> => r !== null);
 
     // Sort by waktuKomentar ascending before processing
-    parsed.sort((a, b) => a.waktuKomentar.getTime() - b.waktuKomentar.getTime());
+    parsed.sort(
+      (a, b) => a.waktuKomentar.getTime() - b.waktuKomentar.getTime(),
+    );
 
-    const results: Array<{ row: (typeof parsed)[number]; result: ClaimResult }> = [];
+    const results: Array<{
+      row: (typeof parsed)[number];
+      result: ClaimResult;
+    }> = [];
 
     for (const row of parsed) {
-      const item = await itemRepository.findByKode(row.kodeProduk);
+      const item = await inventoryService.findItem(row.kodeProduk);
       if (!item || item.status !== "tersedia") {
-        const claim = await claimRepository.create({
+        const claim = await createClaim({
           sessionId,
           kodeItem: row.kodeProduk,
           customerId: row.idPembeli,
@@ -198,8 +248,15 @@ export const liveSellingService = {
           status: "tidak valid",
           alasan: item ? "Item tidak tersedia" : "Kode produk tidak ditemukan",
         });
-        await catatStatus("Claim", claim.id, undefined, "tidak valid", row.idPembeli);
-        results.push({ row, result: { diterima: false, alasan: claim.alasan! } });
+        await notificationService.send({
+          tipe: "claimResult",
+          tujuan: row.idPembeli,
+          isi: `Klaim ${row.kodeProduk}: ${claim.alasan}`,
+        });
+        results.push({
+          row,
+          result: { diterima: false, alasan: claim.alasan! },
+        });
         continue;
       }
 
@@ -240,13 +297,18 @@ export const liveSellingService = {
     // Check active session
     const session = await liveSessionRepository.findActive();
     if (!session) {
+      await notificationService.send({
+        tipe: "claimResult",
+        tujuan: input.idPembeli,
+        isi: "Sesi live tidak aktif",
+      });
       return { diterima: false, alasan: "Sesi live tidak aktif" };
     }
 
     // Check item
-    const item = await itemRepository.findByKode(input.kodeProduk);
+    const item = await inventoryService.findItem(input.kodeProduk);
     if (!item || item.status !== "tersedia") {
-      const claim = await claimRepository.create({
+      const claim = await createClaim({
         sessionId: session.id,
         kodeItem: input.kodeProduk,
         customerId: input.idPembeli,
@@ -256,7 +318,6 @@ export const liveSellingService = {
         status: "tidak valid",
         alasan: item ? "Item tidak tersedia" : "Kode produk tidak ditemukan",
       });
-      await catatStatus("Claim", claim.id, undefined, "tidak valid", input.idPembeli);
       await notificationService.send({
         tipe: "claimResult",
         tujuan: input.idPembeli,

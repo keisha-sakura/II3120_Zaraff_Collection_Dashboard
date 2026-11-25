@@ -1,4 +1,4 @@
-import { beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { db } from "../lib/db";
 import { inventoryService } from "../services/s1-inventory/service";
 import { liveSellingService } from "../services/s10-live-selling/service";
@@ -7,15 +7,28 @@ import { liveSellingService } from "../services/s10-live-selling/service";
 
 /** Force-close all active sessions to avoid "sesi sudah berjalan" conflicts */
 async function closeActiveSessions() {
-  await db.liveSession.updateMany({ where: { status: "berjalan" }, data: { status: "selesai", selesai: new Date() } });
+  await db.liveSession.updateMany({
+    where: { status: "berjalan" },
+    data: { status: "selesai", selesai: new Date() },
+  });
 }
 
-async function makeReadyItem(locationId: string, actor: { id: string; role: string }) {
+async function makeReadyItem(
+  locationId: string,
+  actor: { id: string; role: string },
+) {
   // Find any existing disortir bale or create a fresh one
   let bale = await db.bale.findFirst({ where: { status: "disortir" } });
   if (!bale) {
     const newBale = await inventoryService.createBale(
-      { supplier: "Live Test", jenis: "kaos", beratKg: 1, jumlahItem: 1, tanggalTerima: new Date(), locationId },
+      {
+        supplier: "Live Test",
+        jenis: "kaos",
+        beratKg: 1,
+        jumlahItem: 1,
+        tanggalTerima: new Date(),
+        locationId,
+      },
       actor,
     );
     await inventoryService.startSorting(newBale.id, actor);
@@ -38,8 +51,12 @@ describe("Fase 5: S10 Live Selling & LiveClaimContract", () => {
 
   beforeAll(async () => {
     await closeActiveSessions();
-    const host = await db.appUser.findUniqueOrThrow({ where: { username: "host" } });
-    const loc = await db.location.findUniqueOrThrow({ where: { kode: "R01-S01" } });
+    const host = await db.appUser.findUniqueOrThrow({
+      where: { username: "host" },
+    });
+    const loc = await db.location.findUniqueOrThrow({
+      where: { kode: "R01-S01" },
+    });
     hostActor = host;
     locationId = loc.id;
   });
@@ -51,7 +68,9 @@ describe("Fase 5: S10 Live Selling & LiveClaimContract", () => {
       expect(session.status).toBe("berjalan");
 
       // Cannot open a second session while one is active
-      await expect(liveSellingService.openSession("Sesi Duplikat")).rejects.toMatchObject({ status: 409 });
+      await expect(
+        liveSellingService.openSession("Sesi Duplikat"),
+      ).rejects.toMatchObject({ status: 409 });
 
       const closed = await liveSellingService.closeSession(session.id);
       expect(closed.status).toBe("selesai");
@@ -60,7 +79,9 @@ describe("Fase 5: S10 Live Selling & LiveClaimContract", () => {
     it("cannot close a session that is already closed", async () => {
       const session = await liveSellingService.openSession("Sesi Tutup Test");
       await liveSellingService.closeSession(session.id);
-      await expect(liveSellingService.closeSession(session.id)).rejects.toMatchObject({ status: 409 });
+      await expect(
+        liveSellingService.closeSession(session.id),
+      ).rejects.toMatchObject({ status: 409 });
     });
   });
 
@@ -68,7 +89,8 @@ describe("Fase 5: S10 Live Selling & LiveClaimContract", () => {
   describe("Single claim", () => {
     it("valid claim wins and creates an order", async () => {
       const item = await makeReadyItem(locationId, hostActor);
-      const session = await liveSellingService.openSession("Sesi Klaim Tunggal");
+      const session =
+        await liveSellingService.openSession("Sesi Klaim Tunggal");
 
       const result = await liveSellingService.inputClaim(session.id, {
         kodeProduk: item.kode,
@@ -81,23 +103,30 @@ describe("Fase 5: S10 Live Selling & LiveClaimContract", () => {
       expect(result.idPesanan).toBeDefined();
 
       // Item must now be "dipesan"
-      const updated = await db.item.findUniqueOrThrow({ where: { kode: item.kode } });
+      const updated = await db.item.findUniqueOrThrow({
+        where: { kode: item.kode },
+      });
       expect(updated.status).toBe("dipesan");
 
       // Order must exist
-      const order = await db.order.findUniqueOrThrow({ where: { id: result.idPesanan } });
+      const order = await db.order.findUniqueOrThrow({
+        where: { id: result.idPesanan },
+      });
       expect(order.sumber).toBe("live");
       expect(order.status).toBe("menunggu pembayaran");
 
       // StatusLog for claim must exist
-      const log = await db.statusLog.findFirst({ where: { entitas: "Claim", keStatus: "menang" } });
+      const log = await db.statusLog.findFirst({
+        where: { entitas: "Claim", keStatus: "menang" },
+      });
       expect(log).not.toBeNull();
 
       await liveSellingService.closeSession(session.id);
     });
 
     it("claim on non-existent item is 'tidak valid'", async () => {
-      const session = await liveSellingService.openSession("Sesi Invalid Klaim");
+      const session =
+        await liveSellingService.openSession("Sesi Invalid Klaim");
       const result = await liveSellingService.inputClaim(session.id, {
         kodeProduk: "ZRF-9999",
         idPembeli: "cust-002",
@@ -106,14 +135,18 @@ describe("Fase 5: S10 Live Selling & LiveClaimContract", () => {
       });
       expect(result.diterima).toBe(false);
 
-      const claim = await db.claim.findFirst({ where: { kodeItem: "ZRF-9999", status: "tidak valid" } });
+      const claim = await db.claim.findFirst({
+        where: { kodeItem: "ZRF-9999", status: "tidak valid" },
+      });
       expect(claim).not.toBeNull();
       await liveSellingService.closeSession(session.id);
     });
 
     it("claim on item that is not 'tersedia' is 'tidak valid'", async () => {
       const item = await makeReadyItem(locationId, hostActor);
-      const session = await liveSellingService.openSession("Sesi Tidak Tersedia");
+      const session = await liveSellingService.openSession(
+        "Sesi Tidak Tersedia",
+      );
 
       // First claim wins
       await liveSellingService.inputClaim(session.id, {
@@ -162,9 +195,13 @@ describe("Fase 5: S10 Live Selling & LiveClaimContract", () => {
       // Exactly 1 unique order
       expect(new Set(orderIds).size).toBe(1);
       // No double-selling: item has exactly one order
-      const finalItem = await db.item.findUniqueOrThrow({ where: { kode: item.kode } });
+      const finalItem = await db.item.findUniqueOrThrow({
+        where: { kode: item.kode },
+      });
       expect(finalItem.status).toBe("dipesan");
-      const ordersForItem = await db.orderItem.count({ where: { kode: item.kode } });
+      const ordersForItem = await db.orderItem.count({
+        where: { kode: item.kode },
+      });
       expect(ordersForItem).toBe(1);
 
       // StatusLog recorded for winner
@@ -199,7 +236,9 @@ describe("Fase 5: S10 Live Selling & LiveClaimContract", () => {
       expect(winner).toBeDefined();
       expect(winner!.row.idPembeli).toBe("cust-csv-early");
 
-      const loser = results.find((r) => !r.result.diterima && r.row.idPembeli === "cust-csv-late");
+      const loser = results.find(
+        (r) => !r.result.diterima && r.row.idPembeli === "cust-csv-late",
+      );
       expect(loser).toBeDefined();
 
       await liveSellingService.closeSession(session.id);

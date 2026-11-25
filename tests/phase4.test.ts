@@ -10,7 +10,9 @@ describe("Fase 4: Member, Order, Notification, Promotion", () => {
   let customerId: string;
 
   beforeAll(async () => {
-    const admin = await db.appUser.findUniqueOrThrow({ where: { username: "admin" } });
+    const admin = await db.appUser.findUniqueOrThrow({
+      where: { username: "admin" },
+    });
     adminId = admin.id;
   });
 
@@ -26,7 +28,9 @@ describe("Fase 4: Member, Order, Notification, Promotion", () => {
       expect(customer.nama).toBe("Test Pelanggan");
       customerId = customer.id;
 
-      const updated = await memberService.update(customerId, { isMember: true });
+      const updated = await memberService.update(customerId, {
+        isMember: true,
+      });
       expect(updated.isMember).toBe(true);
     });
 
@@ -41,12 +45,18 @@ describe("Fase 4: Member, Order, Notification, Promotion", () => {
       const status = await memberService.memberStatus(customerId);
       expect(status.saldoDeposit).toBeGreaterThanOrEqual(100000);
 
-      await expect(memberService.deductDeposit(customerId, 9999999)).rejects.toMatchObject({ status: 409 });
+      await expect(
+        memberService.deductDeposit(customerId, 9999999),
+      ).rejects.toMatchObject({ status: 409 });
     });
 
     it("rejects duplicate handleSosmed", async () => {
       await expect(
-        memberService.create({ nama: "Duplikat", noWa: "081299999002", handleSosmed: "@test_pelanggan_fase4" }),
+        memberService.create({
+          nama: "Duplikat",
+          noWa: "081299999002",
+          handleSosmed: "@test_pelanggan_fase4",
+        }),
       ).rejects.toMatchObject({ status: 409 });
     });
   });
@@ -54,7 +64,9 @@ describe("Fase 4: Member, Order, Notification, Promotion", () => {
   // ─── S2 Order ────────────────────────────────────────────────────────────────
   describe("S2 Order", () => {
     it("creates an order and transitions status legally", async () => {
-      const item = await db.item.findFirstOrThrow({ where: { status: "tersedia" } });
+      const item = await db.item.findFirstOrThrow({
+        where: { status: "tersedia" },
+      });
       const order = await orderService.createOrder({
         customerId,
         subtotal: item.harga!,
@@ -70,10 +82,14 @@ describe("Fase 4: Member, Order, Notification, Promotion", () => {
       await orderService.updateStatus(order.id, "lunas", adminId);
       const after = await orderService.findById(order.id);
       expect(after.status).toBe("lunas");
+      // This entity-only fixture has no stock reservation or payment; keep it out of the packing queue.
+      await db.order.delete({ where: { id: order.id } });
     });
 
     it("rejects an illegal order status transition", async () => {
-      const item2 = await db.item.findFirstOrThrow({ where: { status: "tersedia" } });
+      const item2 = await db.item.findFirstOrThrow({
+        where: { status: "tersedia" },
+      });
       const order2 = await orderService.createOrder({
         customerId,
         subtotal: item2.harga!,
@@ -93,13 +109,21 @@ describe("Fase 4: Member, Order, Notification, Promotion", () => {
   // ─── S7 Notification ─────────────────────────────────────────────────────────
   describe("S7 Notification", () => {
     it("sends a notification and lists it", async () => {
-      await notificationService.send({ tipe: "broadcast", tujuan: "semua pelanggan", isi: "Test broadcast fase 4" });
+      await notificationService.send({
+        tipe: "broadcast",
+        tujuan: "semua pelanggan",
+        isi: "Test broadcast fase 4",
+      });
       const list = await notificationService.listAll();
       expect(list.some((n) => n.isi === "Test broadcast fase 4")).toBe(true);
     });
 
     it("lists notifications per user", async () => {
-      await notificationService.send({ tipe: "strategi", tujuan: "admin", isi: "Notif untuk admin" });
+      await notificationService.send({
+        tipe: "strategi",
+        tujuan: "admin",
+        isi: "Notif untuk admin",
+      });
       const mine = await notificationService.listForUser("admin");
       expect(mine.some((n) => n.isi === "Notif untuk admin")).toBe(true);
     });
@@ -108,7 +132,9 @@ describe("Fase 4: Member, Order, Notification, Promotion", () => {
   // ─── S9 Promotion ────────────────────────────────────────────────────────────
   describe("S9 Promotion", () => {
     it("creates a promotion with items, publishes it, and sends reminder", async () => {
-      const item = await db.item.findFirstOrThrow({ where: { status: "tersedia" } });
+      const item = await db.item.findFirstOrThrow({
+        where: { status: "tersedia" },
+      });
       const promo = await promotionService.create({
         judul: "Flash Sale Fase 4",
         isi: "Diskon gede-gedean!",
@@ -124,7 +150,11 @@ describe("Fase 4: Member, Order, Notification, Promotion", () => {
 
       // Should create a broadcast notification
       const notifs = await notificationService.listAll();
-      expect(notifs.some((n) => n.tipe === "broadcast" && n.isi.includes("Flash Sale Fase 4"))).toBe(true);
+      expect(
+        notifs.some(
+          (n) => n.tipe === "broadcast" && n.isi.includes("Flash Sale Fase 4"),
+        ),
+      ).toBe(true);
 
       const reminder = await promotionService.sendReminder(promo!.id);
       expect(reminder.pesan).toContain("Reminder berhasil dikirim");
@@ -137,7 +167,9 @@ describe("Fase 4: Member, Order, Notification, Promotion", () => {
         kanal: "Instagram",
         jadwalLive: new Date(Date.now() + 86_400_000),
       });
-      const updated = await promotionService.update(promo!.id, { judul: "Promo Updated" });
+      const updated = await promotionService.update(promo!.id, {
+        judul: "Promo Updated",
+      });
       expect(updated?.judul).toBe("Promo Updated");
     });
   });
@@ -146,7 +178,10 @@ describe("Fase 4: Member, Order, Notification, Promotion", () => {
   describe("RBAC Fase 4 — API level (HTTP 401/403)", () => {
     const base = "http://localhost";
     const makeReq = (path: string, role?: string) =>
-      new Request(`${base}${path}`, role ? { headers: { authorization: `Bearer bad-token-${role}` } } : {});
+      new Request(
+        `${base}${path}`,
+        role ? { headers: { authorization: `Bearer bad-token-${role}` } } : {},
+      );
 
     it("GET /api/customers requires auth", async () => {
       const { GET } = await import("../src/app/api/customers/route");

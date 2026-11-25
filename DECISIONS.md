@@ -9,4 +9,10 @@
 - **PENDING — payment deadline:** no deadline is enforced yet.
 - **PENDING — order scope:** one item per live-claim order is the default.
 - **PENDING — bale cost:** no bale cost is stored.
-- The existing frontend is located under `src/app`, not `app/(dashboard)`. Phase 1 adds backend infrastructure only and does not modify dashboard pages.
+- Prototype routes follow the existing Next.js source root: `src/app/api`. Dashboard pages and the legacy Drizzle workflow remain separate from the Prisma prototype.
+- Payment amounts are derived from the invoice. Optional `jumlah` must equal the complete invoice amount; partial payments are outside this prototype. Member discount is rounded down to integer rupiah. Deposit is deducted only during approval in the same transaction as the paid statuses and stock movements.
+- Shipment transitions are sequential: `diserahkan` → `dalam perjalanan` → `diterima`. Duplicate or skipped transitions return 409. Public delivery updates use actor `contract`; all callbacks are simulation logs.
+- Monthly reporting uses WIB calendar boundaries. Sales are recognized at `Item.terjualPada` (payment approval), revenue uses the corresponding order total after discount, and shipped-out totals use `keluarGudangPada`. Stock/grade counts describe current inventory; overview date filters apply to sales, order creation, payment submission, and the last shipment update.
+- Strategy periods are unique. Recipient IDs must exist in AppUser; duplicate recipient IDs produce one notification per staff member. Saving and distributing the strategy is atomic.
+- Vitest uses a dedicated `prisma/test.db`, seeds once, and runs test files sequentially because fixtures share SQLite and the single active live session. `npm test` never seeds `dev.db`. Prototype `npm run seed` still resets its configured database and is intended only for development.
+- Next.js uses a single dynamic folder name `items/[id]` for item detail and actions. The detail endpoint still interprets its value as the product code, preserving `GET /items/:kode`.

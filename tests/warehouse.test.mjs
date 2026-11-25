@@ -180,8 +180,8 @@ test("invalid transitions and wrong location types cannot change warehouse data"
   assert.equal(moved.price, 65000);
 });
 test("codes avoid duplicates and use Jakarta dates; persistence rejects malformed snapshots", () => {
-  assert.equal(daysSince("2026-11-03T14:08:00+07:00"), 21);
-  assert.equal(daysSince("2026-11-23T18:00:00Z"), 0);
+  assert.equal(daysSince("2026-11-03T14:08:00+07:00", now), 21);
+  assert.equal(daysSince("2026-11-23T18:00:00Z", now), 0);
   assert.equal(
     nextWarehouseCode("ZR", ["ZR-2611-0024", "ZR-2610-9999"], now),
     "ZR-2611-0025",

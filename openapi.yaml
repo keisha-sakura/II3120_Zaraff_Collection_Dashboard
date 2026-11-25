@@ -1,0 +1,1429 @@
+openapi: 3.0.3
+info:
+  title: Zaraff Collection Backend Prototype
+  version: 1.0.0
+  description: "Prisma prototype API. Uang integer rupiah; waktu UTC, bulan laporan WIB. Kontrak publik menyimulasikan integrasi. RBAC tercantum dalam ARCHITECTURE.md."
+servers:
+  - url: http://localhost:3000
+security:
+  - bearerAuth: []
+  - cookieAuth: []
+paths:
+  /api/auth/login:
+    post:
+      tags: ["Auth"]
+      summary: "POST /auth/login"
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        "201":
+          description: Data dibuat
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/auth/me:
+    get:
+      tags: ["Auth"]
+      summary: "GET /auth/me"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/locations:
+    get:
+      tags: ["S1"]
+      summary: "GET /locations"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+    post:
+      tags: ["S1"]
+      summary: "POST /locations"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        "201":
+          description: Data dibuat
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/locations/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+    patch:
+      tags: ["S1"]
+      summary: "PATCH /locations/:id"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/bales:
+    get:
+      tags: ["S1"]
+      summary: "GET /bales"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+    post:
+      tags: ["S1"]
+      summary: "POST /bales"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        "201":
+          description: Data dibuat
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/bales/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+    get:
+      tags: ["S1"]
+      summary: "GET /bales/:id"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/bales/{id}/start-sorting:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+    post:
+      tags: ["S1"]
+      summary: "POST /bales/:id/start-sorting"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        "201":
+          description: Data dibuat
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/items:
+    get:
+      tags: ["S1"]
+      summary: "GET /items"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+    post:
+      tags: ["S1"]
+      summary: "POST /items"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        "201":
+          description: Data dibuat
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/items/{kode}:
+    parameters:
+      - name: kode
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+    get:
+      tags: ["S1"]
+      summary: "GET /items/:kode"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/items/{id}/grade-price:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+    patch:
+      tags: ["S1"]
+      summary: "PATCH /items/:id/grade-price"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/items/{id}/ready:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+    patch:
+      tags: ["S1"]
+      summary: "PATCH /items/:id/ready"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/laundry:
+    get:
+      tags: ["S1"]
+      summary: "GET /laundry"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/stock/move:
+    post:
+      tags: ["S1"]
+      summary: "POST /stock/move"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        "201":
+          description: Data dibuat
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/stock/movements:
+    get:
+      tags: ["S1"]
+      summary: "GET /stock/movements"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/stock-counts:
+    post:
+      tags: ["S1"]
+      summary: "POST /stock-counts"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        "201":
+          description: Data dibuat
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/stock-counts/{id}/items:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+    post:
+      tags: ["S1"]
+      summary: "POST /stock-counts/:id/items"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        "201":
+          description: Data dibuat
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/stock-counts/{id}/submit:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+    post:
+      tags: ["S1"]
+      summary: "POST /stock-counts/:id/submit"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        "201":
+          description: Data dibuat
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/stock-counts/{id}/reconcile:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+    get:
+      tags: ["S1"]
+      summary: "GET /stock-counts/:id/reconcile"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/stock-counts/{id}/approve:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+    post:
+      tags: ["S1"]
+      summary: "POST /stock-counts/:id/approve"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        "201":
+          description: Data dibuat
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/warehouse/summary:
+    get:
+      tags: ["S1"]
+      summary: "GET /warehouse/summary"
+      parameters:
+        - name: dari
+          in: query
+          required: false
+          description: "Tanggal UTC ISO 8601"
+          schema: { type: string }
+        - name: sampai
+          in: query
+          required: false
+          description: "Tanggal UTC ISO 8601"
+          schema: { type: string }
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/warehouse/aging:
+    get:
+      tags: ["S1"]
+      summary: "GET /warehouse/aging"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/warehouse/shipped-out:
+    get:
+      tags: ["S1"]
+      summary: "GET /warehouse/shipped-out"
+      parameters:
+        - name: dari
+          in: query
+          required: false
+          description: "Tanggal UTC ISO 8601"
+          schema: { type: string }
+        - name: sampai
+          in: query
+          required: false
+          description: "Tanggal UTC ISO 8601"
+          schema: { type: string }
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/pricing/suggest:
+    get:
+      tags: ["S6"]
+      summary: "GET /pricing/suggest"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/pricing/rules:
+    get:
+      tags: ["S6"]
+      summary: "GET /pricing/rules"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+    put:
+      tags: ["S6"]
+      summary: "PUT /pricing/rules"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/customers:
+    get:
+      tags: ["S3"]
+      summary: "GET /customers"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+    post:
+      tags: ["S3"]
+      summary: "POST /customers"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        "201":
+          description: Data dibuat
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/customers/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+    patch:
+      tags: ["S3"]
+      summary: "PATCH /customers/:id"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/customers/{id}/member-status:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+    get:
+      tags: ["S3"]
+      summary: "GET /customers/:id/member-status"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/customers/{id}/deposit:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+    post:
+      tags: ["S3"]
+      summary: "POST /customers/:id/deposit"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        "201":
+          description: Data dibuat
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/orders:
+    get:
+      tags: ["S2/S12"]
+      summary: "GET /orders"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/orders/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+    get:
+      tags: ["S2/S12"]
+      summary: "GET /orders/:id"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/promotions:
+    get:
+      tags: ["S9"]
+      summary: "GET /promotions"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+    post:
+      tags: ["S9"]
+      summary: "POST /promotions"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        "201":
+          description: Data dibuat
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/promotions/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+    patch:
+      tags: ["S9"]
+      summary: "PATCH /promotions/:id"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/promotions/{id}/publish:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+    post:
+      tags: ["S9"]
+      summary: "POST /promotions/:id/publish"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        "201":
+          description: Data dibuat
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/promotions/{id}/reminder:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+    post:
+      tags: ["S9"]
+      summary: "POST /promotions/:id/reminder"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        "201":
+          description: Data dibuat
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/notifications:
+    get:
+      tags: ["S7"]
+      summary: "GET /notifications"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/notifications/me:
+    get:
+      tags: ["S7"]
+      summary: "GET /notifications/me"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/live/sessions:
+    get:
+      tags: ["S10"]
+      summary: "GET /live/sessions"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+    post:
+      tags: ["S10"]
+      summary: "POST /live/sessions"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        "201":
+          description: Data dibuat
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/live/sessions/{id}/close:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+    patch:
+      tags: ["S10"]
+      summary: "PATCH /live/sessions/:id/close"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/live/sessions/{id}/claims:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+    post:
+      tags: ["S10"]
+      summary: "POST /live/sessions/:id/claims"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        "201":
+          description: Data dibuat
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+    get:
+      tags: ["S10"]
+      summary: "GET /live/sessions/:id/claims"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/live/sessions/{id}/claims/import:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+    post:
+      tags: ["S10"]
+      summary: "POST /live/sessions/:id/claims/import"
+      requestBody:
+        required: true
+        content:
+          text/csv:
+            schema:
+              {
+                type: string,
+                example: "kode,id_pembeli,handle,waktu\nZRF-0001,CUSTOMER_ID,@ayu,2026-11-01T10:00:00Z",
+              }
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        "201":
+          description: Data dibuat
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/orders/{id}/invoice:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+    post:
+      tags: ["S12"]
+      summary: "POST /orders/:id/invoice"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        "201":
+          description: Data dibuat
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/invoices/{id}/payments:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+    post:
+      tags: ["S12"]
+      summary: "POST /invoices/:id/payments"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentInput"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        "201":
+          description: Data dibuat
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/payments/{id}/validate:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+    post:
+      tags: ["S12"]
+      summary: "POST /payments/:id/validate"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ValidatePaymentInput"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        "201":
+          description: Data dibuat
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/orders/{id}/payment-reminder:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+    post:
+      tags: ["S12"]
+      summary: "POST /orders/:id/payment-reminder"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        "201":
+          description: Data dibuat
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/packing/queue:
+    get:
+      tags: ["S12"]
+      summary: "GET /packing/queue"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/orders/{id}/quality-check:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+    post:
+      tags: ["S12"]
+      summary: "POST /orders/:id/quality-check"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QualityCheckInput"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        "201":
+          description: Data dibuat
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/orders/{id}/pack:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+    post:
+      tags: ["S12"]
+      summary: "POST /orders/:id/pack"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        "201":
+          description: Data dibuat
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/orders/{id}/handover:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+    post:
+      tags: ["S12"]
+      summary: "POST /orders/:id/handover"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HandoverInput"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        "201":
+          description: Data dibuat
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/shipments/{orderId}/status:
+    parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+    post:
+      tags: ["S12"]
+      summary: "POST /shipments/:orderId/status"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ShipmentStatusInput"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        "201":
+          description: Data dibuat
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/shipments/{orderId}/tracking:
+    parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+    get:
+      tags: ["S12"]
+      summary: "GET /shipments/:orderId/tracking"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/reports/overview:
+    get:
+      tags: ["S8"]
+      summary: "GET /reports/overview"
+      parameters:
+        - name: dari
+          in: query
+          required: false
+          description: "Tanggal UTC ISO 8601"
+          schema: { type: string }
+        - name: sampai
+          in: query
+          required: false
+          description: "Tanggal UTC ISO 8601"
+          schema: { type: string }
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/reports/sales:
+    get:
+      tags: ["S8"]
+      summary: "GET /reports/sales"
+      parameters:
+        - name: bulan
+          in: query
+          required: true
+          description: "YYYY-MM"
+          schema: { type: string }
+        - name: format
+          in: query
+          required: false
+          description: "json atau csv"
+          schema: { type: string }
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+            text/csv:
+              schema: { type: string }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/reports/stock:
+    get:
+      tags: ["S8"]
+      summary: "GET /reports/stock"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/strategies:
+    post:
+      tags: ["S11"]
+      summary: "POST /strategies"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StrategyInput"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        "201":
+          description: Data dibuat
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+    get:
+      tags: ["S11"]
+      summary: "GET /strategies"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/audit:
+    get:
+      tags: ["Audit"]
+      summary: "GET /audit"
+      parameters:
+        - name: entitas
+          in: query
+          required: false
+          description: "Order, Invoice, Payment, Shipment, Claim"
+          schema: { type: string }
+        - name: entitasId
+          in: query
+          required: false
+          description: "ID entitas"
+          schema: { type: string }
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/contracts/live-claim/claim:
+    post:
+      tags: ["Contracts"]
+      summary: "POST /contracts/live-claim/claim"
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClaimInput"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/contracts/payment/pay:
+    post:
+      tags: ["Contracts"]
+      summary: "POST /contracts/payment/pay"
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentContractInput"
+      responses:
+        "200":
+          description: "Pembayaran menunggu validasi. payConfirmed hanya setelah persetujuan admin."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/contracts/delivery/status-update:
+    post:
+      tags: ["Contracts"]
+      summary: "POST /contracts/delivery/status-update"
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeliveryInput"
+      responses:
+        "200":
+          description: "Berhasil; respons JSON memakai data kecuali login dan hasil klaim."
+          content:
+            application/json:
+              schema: { type: object }
+        default:
+          description: Error 400, 401, 403, 404, 409, atau 500
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
+    cookieAuth: { type: apiKey, in: cookie, name: zaraff_token }
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [kode, pesan]
+          properties:
+            kode: { type: string }
+            pesan: { type: string }
+    LoginInput:
+      type: object
+      required: [username, password]
+      properties:
+        username: { type: string }
+        password: { type: string }
+    PaymentInput:
+      type: object
+      additionalProperties: false
+      required: [metode]
+      description: "Transfer wajib buktiBayar. Jumlah berasal dari invoice; jika dikirim harus sama dengan jumlah invoice."
+      properties:
+        metode: { type: string, enum: [transfer, deposit] }
+        buktiBayar: { type: string, minLength: 1 }
+        jumlah: { type: integer, minimum: 0 }
+    PaymentContractInput:
+      allOf:
+        - type: object
+          required: [idTagihan, metode]
+          properties:
+            idTagihan: { type: string }
+            metode: { type: string, enum: [transfer, deposit] }
+            buktiBayar: { type: string, minLength: 1 }
+            jumlah: { type: integer, minimum: 0 }
+    ValidatePaymentInput:
+      type: object
+      additionalProperties: false
+      required: [keputusan]
+      description: "Keputusan tolak wajib alasan; setuju mengubah payment/invoice/order dan stok dalam satu transaksi."
+      properties:
+        keputusan: { type: string, enum: [setuju, tolak] }
+        alasan: { type: string, minLength: 1 }
+    QualityCheckInput:
+      type: object
+      additionalProperties: false
+      required: [kodeDitemukan]
+      properties:
+        kodeDitemukan:
+          { type: array, minItems: 1, items: { type: string, minLength: 1 } }
+    HandoverInput:
+      type: object
+      additionalProperties: false
+      required: [kurir, noResi]
+      properties:
+        kurir: { type: string, minLength: 1 }
+        noResi: { type: string, minLength: 1 }
+    ShipmentStatusInput:
+      type: object
+      additionalProperties: false
+      required: [status]
+      properties:
+        status: { type: string, enum: [diserahkan, dalam perjalanan, diterima] }
+        catatan: { type: string, minLength: 1 }
+    DeliveryInput:
+      type: object
+      additionalProperties: false
+      required: [noResi, status]
+      properties:
+        noResi: { type: string, minLength: 1 }
+        status: { type: string, enum: [diserahkan, dalam perjalanan, diterima] }
+    StrategyInput:
+      type: object
+      additionalProperties: false
+      required: [periode, isi, penerimaUserIds]
+      properties:
+        periode: { type: string, pattern: '^\\d{4}-(0[1-9]|1[0-2])$' }
+        isi: { type: string, minLength: 1 }
+        penerimaUserIds:
+          { type: array, minItems: 1, items: { type: string, minLength: 1 } }
+    ClaimInput:
+      type: object
+      additionalProperties: false
+      required: [kodeProduk, idPembeli, handlePembeli, waktuKomentar]
+      properties:
+        kodeProduk: { type: string, minLength: 1 }
+        idPembeli: { type: string, minLength: 1 }
+        handlePembeli: { type: string, minLength: 1 }
+        waktuKomentar: { type: string, format: date-time }
