@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="3290" viewBox="0 0 1800 3290" role="img" aria-labelledby="title desc"><title id="title">Activity diagram Zaraff Collection berdasarkan role</title><desc id="desc">Alur penerimaan bale sampai pesanan selesai, dipisahkan dalam swimlane Owner, Admin, Penyortir, Live Host, Tim Packing dan Sistem.</desc><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 Z" fill="#a08494"/></marker></defs><rect width="100%" height="100%" fill="white"/>
+<text x="900" y="48" fill="#35232d" font-family="Arial, sans-serif" font-size="30" font-weight="700" text-anchor="middle"><tspan x="900" dy="0">Alur Operasional Zaraff Collection</tspan></text>
+<text x="900" y="80" fill="#816c78" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle"><tspan x="900" dy="0">Activity diagram berdasarkan peran · dari penerimaan bale hingga pesanan selesai</tspan></text>
+<rect x="60" y="112" width="280" height="2965" fill="#ffffff" stroke="#e7cfdb"/><rect x="60" y="112" width="280" height="58" fill="#f9edf3" stroke="#e7cfdb"/>
+<text x="200" y="148" fill="#a94d7e" font-family="Arial, sans-serif" font-size="20" font-weight="700" text-anchor="middle"><tspan x="200" dy="0">Owner</tspan></text>
+<rect x="340" y="112" width="280" height="2965" fill="#fffafb" stroke="#e7cfdb"/><rect x="340" y="112" width="280" height="58" fill="#f9edf3" stroke="#e7cfdb"/>
+<text x="480" y="148" fill="#a94d7e" font-family="Arial, sans-serif" font-size="20" font-weight="700" text-anchor="middle"><tspan x="480" dy="0">Admin</tspan></text>
+<rect x="620" y="112" width="280" height="2965" fill="#ffffff" stroke="#e7cfdb"/><rect x="620" y="112" width="280" height="58" fill="#f9edf3" stroke="#e7cfdb"/>
+<text x="760" y="148" fill="#a94d7e" font-family="Arial, sans-serif" font-size="20" font-weight="700" text-anchor="middle"><tspan x="760" dy="0">Penyortir</tspan></text>
+<rect x="900" y="112" width="280" height="2965" fill="#fffafb" stroke="#e7cfdb"/><rect x="900" y="112" width="280" height="58" fill="#f9edf3" stroke="#e7cfdb"/>
+<text x="1040" y="148" fill="#a94d7e" font-family="Arial, sans-serif" font-size="20" font-weight="700" text-anchor="middle"><tspan x="1040" dy="0">Live Host</tspan></text>
+<rect x="1180" y="112" width="280" height="2965" fill="#ffffff" stroke="#e7cfdb"/><rect x="1180" y="112" width="280" height="58" fill="#f9edf3" stroke="#e7cfdb"/>
+<text x="1320" y="148" fill="#a94d7e" font-family="Arial, sans-serif" font-size="20" font-weight="700" text-anchor="middle"><tspan x="1320" dy="0">Tim Packing</tspan></text>
+<rect x="1460" y="112" width="280" height="2965" fill="#fffafb" stroke="#e7cfdb"/><rect x="1460" y="112" width="280" height="58" fill="#f9edf3" stroke="#e7cfdb"/>
+<text x="1600" y="148" fill="#a94d7e" font-family="Arial, sans-serif" font-size="20" font-weight="700" text-anchor="middle"><tspan x="1600" dy="0">Sistem</tspan></text>
+<rect x="60" y="188" width="1680" height="32" fill="#f5e8ef"/>
+<text x="900" y="210" fill="#a94d7e" font-family="Arial, sans-serif" font-size="15" font-weight="700" text-anchor="middle"><tspan x="900" dy="0">01   PENERIMAAN BALE DAN PENGELOLAAN STOK</tspan></text>
+<circle cx="760" cy="248" r="10" fill="#35232d"/>
+<rect x="642" y="286" width="236" height="68" rx="14" fill="#fff5f8" stroke="#e7cfdb" stroke-width="1.5"/>
+<text x="760" y="314.5" fill="#35232d" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle"><tspan x="760" dy="0">Terima dan catat bale</tspan><tspan x="760" dy="23">Tentukan lokasi bale</tspan></text>
+<rect x="642" y="386" width="236" height="68" rx="14" fill="#fff5f8" stroke="#e7cfdb" stroke-width="1.5"/>
+<text x="760" y="414.5" fill="#35232d" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle"><tspan x="760" dy="0">Mulai sortir per barang</tspan><tspan x="760" dy="23">Catat layak / retur + alasan</tspan></text>
+<rect x="642" y="486" width="236" height="68" rx="14" fill="#fff5f8" stroke="#e7cfdb" stroke-width="1.5"/>
+<text x="760" y="514.5" fill="#35232d" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle"><tspan x="760" dy="0">Selesaikan sortir</tspan><tspan x="760" dy="23">Lepas lokasi bale</tspan></text>
+<rect x="642" y="586" width="236" height="68" rx="14" fill="#fff5f8" stroke="#e7cfdb" stroke-width="1.5"/>
+<text x="760" y="614.5" fill="#35232d" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle"><tspan x="760" dy="0">Laundry barang layak</tspan><tspan x="760" dy="23">Isi grade, harga, dan rak</tspan></text>
+<rect x="1482" y="686" width="236" height="68" rx="14" fill="#f7f7fa" stroke="#e7cfdb" stroke-width="1.5"/>
+<text x="1600" y="714.5" fill="#35232d" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle"><tspan x="1600" dy="0">Barang Tersedia</tspan><tspan x="1600" dy="23">Siap dipilih untuk live</tspan></text>
+<text x="200" y="300" fill="#816c78" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="middle"><tspan x="200" dy="0">Owner juga dapat menjalankan</tspan><tspan x="200" dy="23">aksi Admin, Gudang,</tspan><tspan x="200" dy="23">dan Tim Packing.</tspan></text>
+<text x="760" y="770" fill="#816c78" font-family="Arial, sans-serif" font-size="14" font-weight="400" text-anchor="middle"><tspan x="760" dy="0">Barang retur tidak masuk stok jual.</tspan></text>
+<rect x="60" y="800" width="1680" height="32" fill="#f5e8ef"/>
+<text x="900" y="822" fill="#a94d7e" font-family="Arial, sans-serif" font-size="15" font-weight="700" text-anchor="middle"><tspan x="900" dy="0">02   JADWAL LIVE DAN PEMROSESAN KLAIM</tspan></text>
+<rect x="362" y="841" width="236" height="68" rx="14" fill="#fff5f8" stroke="#e7cfdb" stroke-width="1.5"/>
+<text x="480" y="869.5" fill="#35232d" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle"><tspan x="480" dy="0">Isi jadwal, host, konten</tspan><tspan x="480" dy="23">Pilih barang dan publikasi</tspan></text>
+<rect x="922" y="946" width="236" height="68" rx="14" fill="#fff5f8" stroke="#e7cfdb" stroke-width="1.5"/>
+<text x="1040" y="974.5" fill="#35232d" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle"><tspan x="1040" dy="0">Lihat jadwal penugasan</tspan><tspan x="1040" dy="23">Lakukan siaran live</tspan></text>
+<rect x="362" y="1056" width="236" height="68" rx="14" fill="#fff5f8" stroke="#e7cfdb" stroke-width="1.5"/>
+<text x="480" y="1084.5" fill="#35232d" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle"><tspan x="480" dy="0">Tandai live selesai</tspan><tspan x="480" dy="23">Input komentar / unggah CSV</tspan></text>
+<rect x="1482" y="1156" width="236" height="68" rx="14" fill="#f7f7fa" stroke="#e7cfdb" stroke-width="1.5"/>
+<text x="1600" y="1184.5" fill="#35232d" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle"><tspan x="1600" dy="0">Periksa kode dan klaim</tspan><tspan x="1600" dy="23">Gemini untuk komentar bebas</tspan></text>
+<path d="M 1600 1257 L 1712 1300 L 1600 1343 L 1488 1300 Z" fill="#f9e8ef" stroke="#a94d7e" stroke-width="1.5"/>
+<text x="1600" y="1294.5" fill="#35232d" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="middle"><tspan x="1600" dy="0">Ada klaim</tspan><tspan x="1600" dy="23">yang valid?</tspan></text>
+<rect x="1482" y="1376" width="236" height="68" rx="14" fill="#f7f7fa" stroke="#e7cfdb" stroke-width="1.5"/>
+<text x="1600" y="1404.5" fill="#35232d" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle"><tspan x="1600" dy="0">Pilih klaim valid tercepat</tspan><tspan x="1600" dy="23">Reservasi, pesanan, tagihan</tspan></text>
+<text x="760" y="1240" fill="#816c78" font-family="Arial, sans-serif" font-size="15" font-weight="400" text-anchor="middle"><tspan x="760" dy="0">Jika tidak valid:</tspan><tspan x="760" dy="23">periksa dan perbaiki input.</tspan></text>
+<rect x="60" y="1490" width="1680" height="32" fill="#f5e8ef"/>
+<text x="900" y="1512" fill="#a94d7e" font-family="Arial, sans-serif" font-size="15" font-weight="700" text-anchor="middle"><tspan x="900" dy="0">03   PENGAJUAN DAN VALIDASI PEMBAYARAN</tspan></text>
+<rect x="362" y="1536" width="236" height="68" rx="14" fill="#fff5f8" stroke="#e7cfdb" stroke-width="1.5"/>
+<text x="480" y="1564.5" fill="#35232d" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle"><tspan x="480" dy="0">Catat pengajuan pembeli</tspan><tspan x="480" dy="23">Transfer / saldo deposit</tspan></text>
+<rect x="362" y="1636" width="236" height="68" rx="14" fill="#fff5f8" stroke="#e7cfdb" stroke-width="1.5"/>
+<text x="480" y="1664.5" fill="#35232d" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle"><tspan x="480" dy="0">Periksa nominal, bukti</tspan><tspan x="480" dy="23">atau saldo, dan reservasi</tspan></text>
+<path d="M 480 1737 L 592 1780 L 480 1823 L 368 1780 Z" fill="#f9e8ef" stroke="#a94d7e" stroke-width="1.5"/>
+<text x="480" y="1774.5" fill="#35232d" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="middle"><tspan x="480" dy="0">Valid dan</tspan><tspan x="480" dy="23">disetujui?</tspan></text>
+<rect x="1482" y="1866" width="236" height="68" rx="14" fill="#f7f7fa" stroke="#e7cfdb" stroke-width="1.5"/>
+<text x="1600" y="1894.5" fill="#35232d" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle"><tspan x="1600" dy="0">Lunas; barang Terjual</tspan><tspan x="1600" dy="23">Debit saldo jika deposit</tspan></text>
+<text x="200" y="1860" fill="#816c78" font-family="Arial, sans-serif" font-size="15" font-weight="400" text-anchor="middle"><tspan x="200" dy="0">Omzet mengikuti pembayaran</tspan><tspan x="200" dy="23">yang sudah disetujui.</tspan></text>
+<rect x="60" y="1990" width="1680" height="32" fill="#f5e8ef"/>
+<text x="900" y="2012" fill="#a94d7e" font-family="Arial, sans-serif" font-size="15" font-weight="700" text-anchor="middle"><tspan x="900" dy="0">04   PACKING, PENGIRIMAN, DAN PENERIMAAN</tspan></text>
+<rect x="1202" y="2036" width="236" height="68" rx="14" fill="#fff5f8" stroke="#e7cfdb" stroke-width="1.5"/>
+<text x="1320" y="2064.5" fill="#35232d" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle"><tspan x="1320" dy="0">Ambil barang sesuai pesanan</tspan><tspan x="1320" dy="23">Lengkapi checklist packing</tspan></text>
+<rect x="1202" y="2136" width="236" height="68" rx="14" fill="#fff5f8" stroke="#e7cfdb" stroke-width="1.5"/>
+<text x="1320" y="2164.5" fill="#35232d" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle"><tspan x="1320" dy="0">Tandai dikemas</tspan><tspan x="1320" dy="23">Pesanan Siap dikirim</tspan></text>
+<rect x="362" y="2246" width="236" height="68" rx="14" fill="#fff5f8" stroke="#e7cfdb" stroke-width="1.5"/>
+<text x="480" y="2274.5" fill="#35232d" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle"><tspan x="480" dy="0">Isi kurir dan nomor resi</tspan><tspan x="480" dy="23">Konfirmasi serah terima</tspan></text>
+<rect x="1482" y="2356" width="236" height="68" rx="14" fill="#f7f7fa" stroke="#e7cfdb" stroke-width="1.5"/>
+<text x="1600" y="2384.5" fill="#35232d" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle"><tspan x="1600" dy="0">Pesanan Dikirim</tspan><tspan x="1600" dy="23">Barang Keluar; rak dilepas</tspan></text>
+<path d="M 480 2467 L 592 2510 L 480 2553 L 368 2510 Z" fill="#f9e8ef" stroke="#a94d7e" stroke-width="1.5"/>
+<text x="480" y="2504.5" fill="#35232d" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="middle"><tspan x="480" dy="0">Paket sudah</tspan><tspan x="480" dy="23">diterima pembeli?</tspan></text>
+<rect x="362" y="2606" width="236" height="68" rx="14" fill="#fff5f8" stroke="#e7cfdb" stroke-width="1.5"/>
+<text x="480" y="2634.5" fill="#35232d" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle"><tspan x="480" dy="0">Klik Konfirmasi penerimaan</tspan><tspan x="480" dy="23">Centang paket diterima</tspan></text>
+<rect x="362" y="2706" width="236" height="68" rx="14" fill="#fff5f8" stroke="#e7cfdb" stroke-width="1.5"/>
+<text x="480" y="2734.5" fill="#35232d" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle"><tspan x="480" dy="0">Pilih Ya,</tspan><tspan x="480" dy="23">selesaikan pesanan</tspan></text>
+<rect x="1482" y="2816" width="236" height="68" rx="14" fill="#f7f7fa" stroke="#e7cfdb" stroke-width="1.5"/>
+<text x="1600" y="2844.5" fill="#35232d" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle"><tspan x="1600" dy="0">Pesanan Selesai</tspan><tspan x="1600" dy="23">Simpan riwayat penerimaan</tspan></text>
+<rect x="82" y="2816" width="236" height="68" rx="14" fill="#fff5f8" stroke="#e7cfdb" stroke-width="1.5"/>
+<text x="200" y="2844.5" fill="#35232d" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle"><tspan x="200" dy="0">Lihat laporan penjualan</tspan><tspan x="200" dy="23">dan ringkasan operasional</tspan></text>
+<circle cx="1600" cy="2975" r="14" fill="white" stroke="#35232d" stroke-width="2"/><circle cx="1600" cy="2975" r="9" fill="#35232d"/>
+<path d="M 760 258 L 760 286" fill="none" stroke="#a08494" stroke-width="1.7" stroke-linejoin="round"  marker-end="url(#arrow)"/>
+<path d="M 760 354 L 760 386" fill="none" stroke="#a08494" stroke-width="1.7" stroke-linejoin="round"  marker-end="url(#arrow)"/>
+<path d="M 760 454 L 760 486" fill="none" stroke="#a08494" stroke-width="1.7" stroke-linejoin="round"  marker-end="url(#arrow)"/>
+<path d="M 760 554 L 760 586" fill="none" stroke="#a08494" stroke-width="1.7" stroke-linejoin="round"  marker-end="url(#arrow)"/>
+<path d="M 760 654 L 760 670 L 1600 670 L 1600 686" fill="none" stroke="#a08494" stroke-width="1.7" stroke-linejoin="round"  marker-end="url(#arrow)"/>
+<path d="M 1600 754 L 1600 797.5 L 480 797.5 L 480 841" fill="none" stroke="#a08494" stroke-width="1.7" stroke-linejoin="round"  marker-end="url(#arrow)"/>
+<path d="M 480 909 L 480 927.5 L 1040 927.5 L 1040 946" fill="none" stroke="#a08494" stroke-width="1.7" stroke-linejoin="round"  marker-end="url(#arrow)"/>
+<path d="M 1040 1014 L 1040 1035 L 480 1035 L 480 1056" fill="none" stroke="#a08494" stroke-width="1.7" stroke-linejoin="round"  marker-end="url(#arrow)"/>
+<path d="M 480 1124 L 480 1140 L 1600 1140 L 1600 1156" fill="none" stroke="#a08494" stroke-width="1.7" stroke-linejoin="round"  marker-end="url(#arrow)"/>
+<path d="M 1600 1224 L 1600 1257" fill="none" stroke="#a08494" stroke-width="1.7" stroke-linejoin="round"  marker-end="url(#arrow)"/>
+<path d="M 1600 1444 L 1600 1490 L 480 1490 L 480 1536" fill="none" stroke="#a08494" stroke-width="1.7" stroke-linejoin="round"  marker-end="url(#arrow)"/>
+<path d="M 480 1604 L 480 1636" fill="none" stroke="#a08494" stroke-width="1.7" stroke-linejoin="round"  marker-end="url(#arrow)"/>
+<path d="M 480 1704 L 480 1737" fill="none" stroke="#a08494" stroke-width="1.7" stroke-linejoin="round"  marker-end="url(#arrow)"/>
+<path d="M 1600 1934 L 1600 1985 L 1320 1985 L 1320 2036" fill="none" stroke="#a08494" stroke-width="1.7" stroke-linejoin="round"  marker-end="url(#arrow)"/>
+<path d="M 1320 2104 L 1320 2136" fill="none" stroke="#a08494" stroke-width="1.7" stroke-linejoin="round"  marker-end="url(#arrow)"/>
+<path d="M 1320 2204 L 1320 2225 L 480 2225 L 480 2246" fill="none" stroke="#a08494" stroke-width="1.7" stroke-linejoin="round"  marker-end="url(#arrow)"/>
+<path d="M 480 2314 L 480 2335 L 1600 2335 L 1600 2356" fill="none" stroke="#a08494" stroke-width="1.7" stroke-linejoin="round"  marker-end="url(#arrow)"/>
+<path d="M 1600 2424 L 1600 2445.5 L 480 2445.5 L 480 2467" fill="none" stroke="#a08494" stroke-width="1.7" stroke-linejoin="round"  marker-end="url(#arrow)"/>
+<path d="M 480 2674 L 480 2706" fill="none" stroke="#a08494" stroke-width="1.7" stroke-linejoin="round"  marker-end="url(#arrow)"/>
+<path d="M 480 2774 L 480 2795 L 1600 2795 L 1600 2816" fill="none" stroke="#a08494" stroke-width="1.7" stroke-linejoin="round"  marker-end="url(#arrow)"/>
+<path d="M 1600 1343 L 1600 1376" fill="none" stroke="#a08494" stroke-width="1.7" stroke-linejoin="round"  marker-end="url(#arrow)"/>
+<rect x="1610.8" y="1337.5" width="28.4" height="23" rx="4" fill="white"/>
+<text x="1625" y="1354.5" fill="#816c78" font-family="Arial, sans-serif" font-size="14" font-weight="400" text-anchor="middle"><tspan x="1625" dy="0">Ya</tspan></text>
+<path d="M 1488 1300 L 480 1300 L 480 1124" fill="none" stroke="#a08494" stroke-width="1.7" stroke-linejoin="round"  marker-end="url(#arrow)"/>
+<rect x="992" y="1276" width="56" height="23" rx="4" fill="white"/>
+<text x="1020" y="1293" fill="#816c78" font-family="Arial, sans-serif" font-size="14" font-weight="400" text-anchor="middle"><tspan x="1020" dy="0">Tidak</tspan></text>
+<path d="M 480 1823 L 480 1844.5 L 1600 1844.5 L 1600 1866" fill="none" stroke="#a08494" stroke-width="1.7" stroke-linejoin="round"  marker-end="url(#arrow)"/>
+<rect x="490.8" y="1822.5" width="28.4" height="23" rx="4" fill="white"/>
+<text x="505" y="1839.5" fill="#816c78" font-family="Arial, sans-serif" font-size="14" font-weight="400" text-anchor="middle"><tspan x="505" dy="0">Ya</tspan></text>
+<path d="M 368 1780 L 348 1780 L 348 1570 L 362 1570" fill="none" stroke="#a08494" stroke-width="1.7" stroke-linejoin="round"  marker-end="url(#arrow)"/>
+<rect x="90.00000000000001" y="1693" width="239.99999999999997" height="23" rx="4" fill="white"/>
+<text x="210" y="1710" fill="#816c78" font-family="Arial, sans-serif" font-size="14" font-weight="400" text-anchor="middle"><tspan x="210" dy="0">Tidak: tolak dan perbaiki</tspan></text>
+<path d="M 480 2553 L 480 2606" fill="none" stroke="#a08494" stroke-width="1.7" stroke-linejoin="round"  marker-end="url(#arrow)"/>
+<rect x="477" y="2557.5" width="56" height="23" rx="4" fill="white"/>
+<text x="505" y="2574.5" fill="#816c78" font-family="Arial, sans-serif" font-size="14" font-weight="400" text-anchor="middle"><tspan x="505" dy="0">Sudah</tspan></text>
+<path d="M 368 2510 L 345 2510 L 345 2580 L 480 2580 L 480 2553" fill="none" stroke="#a08494" stroke-width="1.7" stroke-linejoin="round"  marker-end="url(#arrow)"/>
+<rect x="129.60000000000002" y="2563" width="230.79999999999998" height="23" rx="4" fill="white"/>
+<text x="245" y="2580" fill="#816c78" font-family="Arial, sans-serif" font-size="14" font-weight="400" text-anchor="middle"><tspan x="245" dy="0">Belum: tunggu konfirmasi</tspan></text>
+<path d="M 1600 2884 L 1600 2960" fill="none" stroke="#a08494" stroke-width="1.7" stroke-linejoin="round"  marker-end="url(#arrow)"/>
+<path d="M 1482 2850 L 318 2850" fill="none" stroke="#a08494" stroke-width="1.7" stroke-linejoin="round" stroke-dasharray="6 5" marker-end="url(#arrow)"/>
+<rect x="812.4" y="2818" width="295.2" height="23" rx="4" fill="white"/>
+<text x="960" y="2835" fill="#816c78" font-family="Arial, sans-serif" font-size="14" font-weight="400" text-anchor="middle"><tspan x="960" dy="0">Baca data transaksi dan histori</tspan></text>
+<text x="900" y="3120" fill="#816c78" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle"><tspan x="900" dy="0">Pembagian di atas menunjukkan petugas utama, bukan pembatasan tambahan pada hak akses aplikasi.</tspan></text>
+<text x="900" y="3150" fill="#816c78" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle"><tspan x="900" dy="0">Owner/Admin juga dapat mengelola gudang dan packing. Live Host hanya membaca jadwal penugasan di dashboard.</tspan></text>
+<text x="900" y="3180" fill="#816c78" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle"><tspan x="900" dy="0">Klaim eksplisit tidak memerlukan Gemini. Waktu sama mengikuti urutan baris. Tanpa pemenang, barang tetap Tersedia.</tspan></text>
+<text x="900" y="3210" fill="#816c78" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle"><tspan x="900" dy="0">Laundry/grading dapat dikerjakan per item. Checklist packing wajib lengkap. Resi dan penerimaan dicatat manual oleh Owner/Admin.</tspan></text>
+</svg>
