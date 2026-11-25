@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
   canAccessPage,
@@ -10,40 +9,80 @@ import {
 import { getNavigation, getSearchPages } from "../src/config/navigation.ts";
 import { isRole, roles } from "../src/config/roles.ts";
 
-test("all annotated artboards match UI access, with confirmed Live Host override", () => {
-  const inventory = JSON.parse(
-    readFileSync(
-      new URL("../docs/design/inventory.json", import.meta.url),
-      "utf8",
-    ),
+test("every registered page follows the five-role access policy", () => {
+  // Product permissions are test fixtures, independent of archived design files.
+  const management = ["owner", "admin"];
+  const warehouse = [...management, "penyortir"];
+  const packing = [...management, "packing"];
+  const groups = [
+    {
+      ids: ["M01"],
+      allowed: ["owner", "admin", "penyortir", "live-host", "packing"],
+    },
+    { ids: ["B01"], allowed: ["owner"] },
+    { ids: ["B02"], allowed: ["penyortir"] },
+    { ids: ["B03"], allowed: ["admin"] },
+    { ids: ["B04"], allowed: ["packing"] },
+    { ids: ["B05"], allowed: ["live-host"] },
+    {
+      ids: ["G01", "G02", "G03", "G04", "G05", "G07", "G08", "G09", "G10"],
+      allowed: warehouse,
+    },
+    { ids: ["P01"], allowed: [...management, "live-host"] },
+    {
+      ids: [
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06",
+        "P07",
+        "P08",
+        "P09",
+        "P10",
+        "P11",
+        "Y01",
+        "Y02",
+        "Y03",
+        "Y05",
+        "Y06",
+        "D03",
+        "D04",
+        "D06",
+        "R01",
+        "R02",
+        "R03",
+        "R04",
+        "R05",
+        "R06",
+        "R07",
+        "S01",
+        "S02",
+        "S03",
+      ],
+      allowed: management,
+    },
+    { ids: ["D01", "D02"], allowed: packing },
+  ];
+  const expected = groups.flatMap(({ ids, allowed }) =>
+    ids.map((id) => ({ id, allowed })),
   );
-  const labels = {
-    owner: "Owner",
-    admin: "Admin",
-    penyortir: "Penyortir",
-    packing: "Tim Packing",
-  };
-  for (const screen of inventory) {
-    // Notification was explicitly removed from product scope by the user.
-    if (screen.id === "S05") continue;
-    assert.ok(
-      screen.accessNote,
-      `Missing source access annotation: ${screen.file}`,
-    );
-    assert.ok(
-      pages.some((page) => page.id === screen.id),
-      `Unmapped design: ${screen.file}`,
-    );
-    for (const [role, label] of Object.entries(labels)) {
-      const expected = screen.id === "M01" || screen.accessNote.includes(label);
+  assert.equal(new Set(expected.map((page) => page.id)).size, expected.length);
+  assert.deepEqual(
+    pages.map((page) => page.id).sort(),
+    expected.map((page) => page.id).sort(),
+  );
+  for (const { id, allowed } of expected) {
+    for (const role of roles) {
       assert.equal(
-        canAccessPage(role, screen.id),
-        expected,
-        `${screen.file}: ${role}`,
+        canAccessPage(role, id),
+        allowed.includes(role),
+        `${id}: ${role}`,
       );
     }
   }
 });
+
 test("Live Host has only home and live schedule; packing cannot dispatch shipments", () => {
   assert.deepEqual(
     getPagesForRole("live-host").map((page) => page.id),

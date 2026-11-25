@@ -264,5 +264,3 @@ Next.js App Router, React, TypeScript, Tailwind CSS, Drizzle ORM, SQLite dengan 
 | `docs/`               | Dokumentasi dan diagram                                    |
 
 Implementasi saat ini memakai SQLite dan unggahan pada disk lokal. Deployment memerlukan penyimpanan persisten; konfigurasi ini belum siap dipasang langsung sebagai aplikasi serverless Vercel. Publikasi promosi, pengingat tagihan, dan distribusi strategi hanya mencatat aktivitas internal; belum ada pengiriman otomatis ke TikTok/WhatsApp/email, payment gateway, atau integrasi status kurir.
-
-Dokumentasi lanjutan: [arsitektur](docs/architecture.md), [backend](docs/backend.md), [gudang](docs/warehouse.md), [penjualan](docs/sales.md), [pembayaran](docs/payments.md), [pengiriman](docs/shipping.md), [laporan](docs/reports.md), dan [pengaturan](docs/settings.md).
