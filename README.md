@@ -13,11 +13,11 @@ npm ci
 Salin `.env.example` ke `.env.local`, lalu:
 
 ```bash
-npm run db:setup
+npm run db:setup -- --small
 npm run dev
 ```
 
-Buka http://localhost:3000/masuk. `db:setup` menjalankan migration dan seed. Database default `data/zaraff.sqlite`; semua browser pada server yang sama menggunakan data yang sama. Seed aman diulang dan tidak menimpa transaksi pengguna. Data contoh mencakup September–November 2026; pilih periode tersebut pada laporan bila bulan berjalan berbeda.
+Buka http://localhost:3000/masuk. `db:setup -- --small` menjalankan migration dan seed ringkas: 5 akun role, 2 bale, 8 barang, 3 pelanggan, 2 sesi live, dan 3 pesanan (belum bayar, lunas menunggu packing, dan sedang dikirim). Transaksi contoh berada pada November 2026. Database mengikuti `DATABASE_URL` dengan default `data/zaraff.sqlite`; semua browser pada server yang sama menggunakan data yang sama. Seed aman diulang dan tidak menimpa transaksi pengguna. Tanpa `--small`, seed memakai fixture lengkap September–November untuk pengujian.
 
 ## Akun development
 
@@ -29,7 +29,7 @@ Buka http://localhost:3000/masuk. `db:setup` menjalankan migration dan seed. Dat
 | Live Host   | nadia    | HostDemo!2026    |
 | Tim Packing | rizky    | PackingDemo!2026 |
 
-Host pembanding `claudia` / `HostClaudia!2026` memiliki penugasan live terpisah untuk menguji isolasi data. Password ini khusus data contoh lokal. Override melalui `SEED_PASSWORD_*` sebelum seed pertama; menjalankan seed ulang tidak mengubah password akun yang sudah ada.
+Pada seed lengkap, host pembanding `claudia` / `HostClaudia!2026` memiliki penugasan live terpisah untuk menguji isolasi data; seed ringkas hanya memiliki 5 akun pada tabel di atas. Password ini khusus data contoh lokal. Override melalui `SEED_PASSWORD_*` sebelum seed pertama; menjalankan seed ulang tidak mengubah password akun yang sudah ada.
 
 Owner/Admin mengakses modul manajemen sesuai registry. Penyortir hanya Beranda/Gudang; Live Host hanya Beranda/jadwal miliknya; Tim Packing hanya Beranda/antrean dan detail packing. Query `?role=` tidak mengganti sesi. Pratinjau hanya development, wajib login, dan menampilkan pengguna saat ini. Fondasi dan notifikasi tidak termasuk scope.
 

@@ -19,7 +19,7 @@ try {
       );
     const { seedDatabase } = await import("../src/server/seed.ts");
     console.log(
-      seedDatabase(ctx)
+      seedDatabase(ctx, process.argv.includes("--small") ? "small" : "demo")
         ? "Seed berhasil disimpan."
         : "Seed sudah ada; data pengguna tidak diubah.",
     );

@@ -12,6 +12,7 @@ import { saveWorkspace } from "./workspace.ts";
 import type { DatabaseContext } from "./db.ts";
 import type { Workspace } from "../types/workspace";
 import * as t from "./schema.ts";
+import { createSmallWorkspace } from "./seed-small.ts";
 
 export const demoAccounts = [
   { role: "owner", username: "zahra", password: "OwnerDemo!2026" },
@@ -20,7 +21,10 @@ export const demoAccounts = [
   { role: "live-host", username: "nadia", password: "HostDemo!2026" },
   { role: "packing", username: "rizky", password: "PackingDemo!2026" },
 ] as const;
-export function seedDatabase(ctx: DatabaseContext) {
+export function seedDatabase(
+  ctx: DatabaseContext,
+  profile: "demo" | "small" = "demo",
+) {
   if (
     ctx.orm
       .select()
@@ -36,127 +40,132 @@ export function seedDatabase(ctx: DatabaseContext) {
     throw new Error("Database sudah berisi data. Seed tidak akan menimpanya.");
   const prepared = createSalesDemo(createWarehouseDemo());
   const data = createPaymentsDemo(prepared.sales, prepared.warehouse, true);
-  const state: Workspace = {
-    version: 1,
-    ...data,
-    shipping: createShippingDemo(data.sales),
-    reports: createReportsDemo(),
-    settings: createSettingsDemo(),
-  };
-  // Additional historical sales make monthly reports usable without fake totals.
-  for (const [index, month, category, price] of [
-    [1, "2026-09", "Jaket", 180000],
-    [2, "2026-10", "Hoodie", 150000],
-    [3, "2026-10", "Kemeja", 85000],
-  ] as const) {
-    const itemId = `ZR-${month.slice(2).replace("-", "")}-09${String(index).padStart(2, "0")}`;
-    const orderId = `ORD-${month.slice(2).replace("-", "")}15-09${index}`;
-    const soldAt = `${month}-15T10:00:00+07:00`;
-    state.warehouse.items.push({
-      ...state.warehouse.items[0],
-      id: itemId,
-      category,
-      grade: "A",
-      price,
-      status: "outbound",
-      locationId: null,
-      availableAt: `${month}-01T09:00:00+07:00`,
-      sortedAt: `${month}-01T08:00:00+07:00`,
-      laundryAt: `${month}-01T08:00:00+07:00`,
-      baleId: "BL-260731-001",
-      soldAt,
-      outboundAt: `${month}-16T10:00:00+07:00`,
-      orderId,
-    });
-    state.sales.orders.push({
-      id: orderId,
-      customerId: "customer-rina",
-      itemIds: [itemId],
-      lines: [{ itemId, category, grade: "A", price }],
-      subtotal: price,
-      memberDiscount: Math.round(price * 0.1),
-      total: Math.round(price * 0.9),
-      createdAt: soldAt,
-      status: "completed",
-      paymentStatus: "approved",
-      liveId: null,
-      shipment: {
-        id: `ship-${orderId}`,
+  const state: Workspace =
+    profile === "small"
+      ? createSmallWorkspace()
+      : {
+          version: 1,
+          ...data,
+          shipping: createShippingDemo(data.sales),
+          reports: createReportsDemo(),
+          settings: createSettingsDemo(),
+        };
+  if (profile === "demo") {
+    // Additional historical sales make monthly reports usable without fake totals.
+    for (const [index, month, category, price] of [
+      [1, "2026-09", "Jaket", 180000],
+      [2, "2026-10", "Hoodie", 150000],
+      [3, "2026-10", "Kemeja", 85000],
+    ] as const) {
+      const itemId = `ZR-${month.slice(2).replace("-", "")}-09${String(index).padStart(2, "0")}`;
+      const orderId = `ORD-${month.slice(2).replace("-", "")}15-09${index}`;
+      const soldAt = `${month}-15T10:00:00+07:00`;
+      state.warehouse.items.push({
+        ...state.warehouse.items[0],
+        id: itemId,
+        category,
+        grade: "A",
+        price,
+        status: "outbound",
+        locationId: null,
+        availableAt: `${month}-01T09:00:00+07:00`,
+        sortedAt: `${month}-01T08:00:00+07:00`,
+        laundryAt: `${month}-01T08:00:00+07:00`,
+        baleId: "BL-260731-001",
+        soldAt,
+        outboundAt: `${month}-16T10:00:00+07:00`,
         orderId,
-        courier: "JNE",
-        trackingNumber: `SEED${month.replace("-", "")}${index}`,
-        handedOverAt: `${month}-16T10:00:00+07:00`,
-        status: "delivered",
-        events: [
-          {
-            title: "Diterima Pembeli",
-            dateTime: `${month}-18T10:00:00+07:00`,
-            description: "Penerima: Rina",
-          },
-        ],
+      });
+      state.sales.orders.push({
+        id: orderId,
+        customerId: "customer-rina",
+        itemIds: [itemId],
+        lines: [{ itemId, category, grade: "A", price }],
+        subtotal: price,
+        memberDiscount: Math.round(price * 0.1),
+        total: Math.round(price * 0.9),
+        createdAt: soldAt,
+        status: "completed",
+        paymentStatus: "approved",
+        liveId: null,
+        shipment: {
+          id: `ship-${orderId}`,
+          orderId,
+          courier: "JNE",
+          trackingNumber: `SEED${month.replace("-", "")}${index}`,
+          handedOverAt: `${month}-16T10:00:00+07:00`,
+          status: "delivered",
+          events: [
+            {
+              title: "Diterima Pembeli",
+              dateTime: `${month}-18T10:00:00+07:00`,
+              description: "Penerima: Rina",
+            },
+          ],
+        },
+      });
+    }
+    // Future live assigned to a second host verifies assignment-level isolation.
+    state.sales.lives.push({
+      ...state.sales.lives[0],
+      id: "live-claudia",
+      title: "Live Claudia",
+      hostId: "host-claudia",
+      status: "published",
+      scheduledAt: "2026-12-03T19:00:00+07:00",
+      itemIds: [],
+      results: [],
+      claimsProcessed: false,
+    });
+    const rejectedLive = state.sales.lives.find(
+      (live) => live.id === "live-261121",
+    )!;
+    rejectedLive.results.push(
+      {
+        id: "seed-duplicate",
+        line: 90,
+        handle: "@dodi_ootd",
+        itemCode: "ZR-2610-0011",
+        time: "19:23:00.500",
+        milliseconds: 69780500,
+        error: null,
+        outcome: "rejected",
+        reason: "Kalah cepat dari pembeli pertama",
+        orderId: null,
       },
+      {
+        id: "seed-invalid",
+        line: 91,
+        handle: "@invalid",
+        itemCode: "BAD",
+        time: "—",
+        milliseconds: null,
+        error: "Format kode tidak valid",
+        outcome: "invalid",
+        reason: "Format kode tidak valid",
+        orderId: null,
+      },
+    );
+    rejectedLive.results.push({
+      ...rejectedLive.results[0],
+      id: "seed-repeated-comment",
+      line: 92,
+      outcome: "rejected",
+      reason: "Duplikat komentar",
+      orderId: null,
+    });
+    state.reports.strategies.push({
+      id: "strategy-2026-12",
+      month: "2026-12",
+      content:
+        "Prioritaskan stok berumur lebih dari 60 hari dan jadwal live akhir tahun.",
+      authorId: "user-owner",
+      authorName: "Zahra",
+      createdAt: "2026-11-24T09:00:00+07:00",
+      sentAt: null,
+      recipientIds: [],
     });
   }
-  // Future live assigned to a second host verifies assignment-level isolation.
-  state.sales.lives.push({
-    ...state.sales.lives[0],
-    id: "live-claudia",
-    title: "Live Claudia",
-    hostId: "host-claudia",
-    status: "published",
-    scheduledAt: "2026-12-03T19:00:00+07:00",
-    itemIds: [],
-    results: [],
-    claimsProcessed: false,
-  });
-  const rejectedLive = state.sales.lives.find(
-    (live) => live.id === "live-261121",
-  )!;
-  rejectedLive.results.push(
-    {
-      id: "seed-duplicate",
-      line: 90,
-      handle: "@dodi_ootd",
-      itemCode: "ZR-2610-0011",
-      time: "19:23:00.500",
-      milliseconds: 69780500,
-      error: null,
-      outcome: "rejected",
-      reason: "Kalah cepat dari pembeli pertama",
-      orderId: null,
-    },
-    {
-      id: "seed-invalid",
-      line: 91,
-      handle: "@invalid",
-      itemCode: "BAD",
-      time: "—",
-      milliseconds: null,
-      error: "Format kode tidak valid",
-      outcome: "invalid",
-      reason: "Format kode tidak valid",
-      orderId: null,
-    },
-  );
-  rejectedLive.results.push({
-    ...rejectedLive.results[0],
-    id: "seed-repeated-comment",
-    line: 92,
-    outcome: "rejected",
-    reason: "Duplikat komentar",
-    orderId: null,
-  });
-  state.reports.strategies.push({
-    id: "strategy-2026-12",
-    month: "2026-12",
-    content:
-      "Prioritaskan stok berumur lebih dari 60 hari dan jadwal live akhir tahun.",
-    authorId: "user-owner",
-    authorName: "Zahra",
-    createdAt: "2026-11-24T09:00:00+07:00",
-    sentAt: null,
-    recipientIds: [],
-  });
   for (const customer of state.sales.customers) {
     const sum = state.sales.deposits
       .filter((row) => row.customerId === customer.id)
@@ -170,9 +179,11 @@ export function seedDatabase(ctx: DatabaseContext) {
         occurredAt: "2026-08-01T00:00:00+07:00",
       });
   }
-  const completed = createPaymentsDemo(state.sales, state.warehouse);
-  state.payments = completed.payments;
-  state.shipping = createShippingDemo(state.sales);
+  if (profile === "demo") {
+    const completed = createPaymentsDemo(state.sales, state.warehouse);
+    state.payments = completed.payments;
+    state.shipping = createShippingDemo(state.sales);
+  }
   ctx.sqlite
     .transaction(() => {
       for (const user of mockUsers) {
@@ -192,20 +203,21 @@ export function seedDatabase(ctx: DatabaseContext) {
           })
           .run();
       }
-      ctx.orm
-        .insert(t.users)
-        .values({
-          id: "host-claudia",
-          username: "claudia",
-          name: "Claudia",
-          email: "claudia@zaraff.id",
-          role: "live-host",
-          active: true,
-          passwordHash: hashPassword(
-            process.env.SEED_PASSWORD_CLAUDIA ?? "HostClaudia!2026",
-          ),
-        })
-        .run();
+      if (profile === "demo")
+        ctx.orm
+          .insert(t.users)
+          .values({
+            id: "host-claudia",
+            username: "claudia",
+            name: "Claudia",
+            email: "claudia@zaraff.id",
+            role: "live-host",
+            active: true,
+            passwordHash: hashPassword(
+              process.env.SEED_PASSWORD_CLAUDIA ?? "HostClaudia!2026",
+            ),
+          })
+          .run();
       for (const category of categories)
         ctx.orm.insert(t.categories).values({ id: category }).run();
       saveWorkspace(ctx, state, "user-owner");
