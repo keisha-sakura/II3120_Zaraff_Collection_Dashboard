@@ -1,0 +1,306 @@
+{
+  "capturedAt": "2026-11-25T01:11:23.979Z",
+  "source": "http://localhost:3000",
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "captures": [
+    {
+      "file": "01-autentikasi/01-halaman-login.png",
+      "label": "Halaman login",
+      "path": "/masuk",
+      "role": "guest",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "02-beranda/01-beranda-owner.png",
+      "label": "Beranda Owner",
+      "path": "/beranda",
+      "role": "owner",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "02-beranda/02-beranda-admin.png",
+      "label": "Beranda Admin",
+      "path": "/beranda",
+      "role": "admin",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "03-gudang/01-daftar-bale.png",
+      "label": "Daftar bale dan sortir",
+      "path": "/gudang/bale",
+      "role": "admin",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "03-gudang/02-terima-bale.png",
+      "label": "Form terima bale",
+      "path": "/gudang/bale/baru",
+      "role": "admin",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "03-gudang/03-antrean-laundry.png",
+      "label": "Antrean laundry",
+      "path": "/gudang/laundry",
+      "role": "admin",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "03-gudang/04-inventaris-barang.png",
+      "label": "Inventaris barang",
+      "path": "/gudang/inventaris",
+      "role": "admin",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "04-penjualan/01-jadwal-live.png",
+      "label": "Jadwal live dan promosi",
+      "path": "/penjualan/live",
+      "role": "admin",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "04-penjualan/02-daftar-pesanan.png",
+      "label": "Daftar pesanan",
+      "path": "/penjualan/pesanan",
+      "role": "admin",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "04-penjualan/03-daftar-pelanggan.png",
+      "label": "Daftar pelanggan",
+      "path": "/penjualan/pelanggan",
+      "role": "admin",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "05-pembayaran/01-antrean-validasi.png",
+      "label": "Antrean validasi pembayaran",
+      "path": "/pembayaran/validasi",
+      "role": "admin",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "05-pembayaran/02-tagihan-belum-dibayar.png",
+      "label": "Tagihan belum dibayar",
+      "path": "/pembayaran/tagihan",
+      "role": "admin",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "06-pengiriman/01-antrean-packing.png",
+      "label": "Antrean packing",
+      "path": "/pengiriman/packing",
+      "role": "admin",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "06-pengiriman/02-siap-dikirim.png",
+      "label": "Pesanan siap dikirim",
+      "path": "/pengiriman/siap-dikirim",
+      "role": "admin",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "06-pengiriman/03-dalam-pengiriman.png",
+      "label": "Pesanan dalam pengiriman",
+      "path": "/pengiriman/dalam-pengiriman",
+      "role": "admin",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "07-laporan/01-ringkasan-bisnis.png",
+      "label": "Ringkasan bisnis",
+      "path": "/laporan/ringkasan",
+      "role": "admin",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "07-laporan/02-laporan-bulanan.png",
+      "label": "Laporan bulanan",
+      "path": "/laporan/bulanan",
+      "role": "admin",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "07-laporan/03-umur-stok.png",
+      "label": "Gudang dan umur stok",
+      "path": "/laporan/umur-stok",
+      "role": "admin",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "07-laporan/04-terjual-dan-keluar.png",
+      "label": "Barang terjual dan keluar",
+      "path": "/laporan/terjual-keluar",
+      "role": "admin",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "07-laporan/05-strategi-bulanan.png",
+      "label": "Strategi bulanan",
+      "path": "/laporan/strategi",
+      "role": "admin",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "08-pengaturan/01-aturan-harga.png",
+      "label": "Aturan harga",
+      "path": "/pengaturan/harga",
+      "role": "admin",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "08-pengaturan/02-diskon-member.png",
+      "label": "Diskon member",
+      "path": "/pengaturan/diskon",
+      "role": "admin",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "08-pengaturan/03-lokasi-penyimpanan.png",
+      "label": "Lokasi penyimpanan",
+      "path": "/pengaturan/lokasi",
+      "role": "admin",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "03-gudang/05-detail-bale.png",
+      "label": "Detail bale",
+      "path": "/gudang/bale/BL-261124-001",
+      "role": "admin",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "03-gudang/06-detail-barang.png",
+      "label": "Detail barang",
+      "path": "/gudang/inventaris/ZR-2610-0014",
+      "role": "admin",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "03-gudang/07-grading-barang.png",
+      "label": "Grading barang",
+      "path": "/gudang/laundry/ZR-2611-0020/grading",
+      "role": "admin",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "04-penjualan/04-detail-live.png",
+      "label": "Detail live dipublikasikan",
+      "path": "/penjualan/live/live-small-261128",
+      "role": "admin",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "04-penjualan/05-impor-komentar.png",
+      "label": "Impor komentar live",
+      "path": "/penjualan/live/live-small-261121/klaim/impor",
+      "role": "admin",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "04-penjualan/06-hasil-klaim.png",
+      "label": "Hasil klaim live",
+      "path": "/penjualan/live/live-small-261121/klaim",
+      "role": "admin",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "04-penjualan/07-detail-pesanan.png",
+      "label": "Detail pesanan",
+      "path": "/penjualan/pesanan/ORD-261115-002",
+      "role": "admin",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "04-penjualan/08-detail-pelanggan.png",
+      "label": "Detail pelanggan",
+      "path": "/penjualan/pelanggan/customer-rina",
+      "role": "admin",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "05-pembayaran/03-detail-tagihan.png",
+      "label": "Detail tagihan",
+      "path": "/pembayaran/tagihan/INV-261121-004",
+      "role": "admin",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "02-beranda/03-beranda-penyortir.png",
+      "label": "Beranda penyortir",
+      "path": "/beranda",
+      "role": "penyortir",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "02-beranda/04-beranda-live-host.png",
+      "label": "Beranda live-host",
+      "path": "/beranda",
+      "role": "live-host",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "04-penjualan/09-jadwal-live-host.png",
+      "label": "Jadwal penugasan Live Host",
+      "path": "/penjualan/live",
+      "role": "live-host",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "02-beranda/05-beranda-tim-packing.png",
+      "label": "Beranda packing",
+      "path": "/beranda",
+      "role": "packing",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "06-pengiriman/04-checklist-packing.png",
+      "label": "Checklist Tim Packing",
+      "path": "/pengiriman/packing/ORD-261121-001",
+      "role": "packing",
+      "width": 1440,
+      "height": 1000
+    }
+  ]
+}
