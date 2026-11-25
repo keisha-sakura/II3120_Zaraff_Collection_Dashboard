@@ -48,7 +48,7 @@ Font Plus Jakarta Sans 400–800 di-host lokal melalui `@fontsource/plus-jakarta
 - `ModuleTabs`: navigasi halaman dalam modul; berikan tab dari `getNavigation(role)` dan active tab induk untuk halaman detail.
 - `PageHeader`: satu slot primary, satu secondary, satu cancel teks. Form stepper, dialog, dan halaman harus tetap mengikuti batas aksi GUIDE.
 - `Button`: primary, secondary, danger, text. Batal memakai text.
-- `DataTable<T>`: kolom typed, empty state, row link untuk detail tanpa tombol aksi. Satu link keyboard per row; seluruh sel mengarah ke detail. Jangan gabungkan mode row link dengan checkbox/input/link lain.
+- `DataTable<T>`: kolom typed, empty state, dan row link untuk detail. Kolom yang berisi tombol/input/link mandiri wajib memakai `interactive: true` agar kontrol berada di luar tautan baris. Panah detail tetap tersedia di ujung kanan; tombol aksi dan panah mempunyai target klik serta fokus keyboard terpisah.
 - `FormField`, `Input`, `Select`, `Textarea`, `FilterSelect`: label, hint, error, dan filter. Select memakai menu custom bertoken global, tanda centang pilihan aktif, keyboard panah/Home/End/Enter/Space, pencarian lewat ketikan, Escape, dan penutupan klik luar. Popover top layer menjaga menu terlihat di dalam dialog; nilai native select tersembunyi mempertahankan FormData dan validasi required. Hubungkan `id`, `aria-describedby`, dan `aria-invalid` pada call site.
 - `Badge`, `LocationBadge`, `Card`, `StatCard`, `Progress`, `EmptyState`: komponen presentasi tanpa ketergantungan fixture.
 - `Stepper`: tahapan jadwal live/proses pesanan; `Timeline`: riwayat bale, barang, tagihan, pengiriman; `Checkbox`: checklist QC dan packing; `Alert`: rekomendasi grading, feedback sortir, atau nominal pembayaran yang tidak sesuai.

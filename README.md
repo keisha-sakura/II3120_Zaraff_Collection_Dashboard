@@ -70,7 +70,7 @@ npm start
 
 Klaim hanya bersumber dari input komentar manual atau CSV. Tombol Proses klaim langsung memeriksa komentar dengan Gemini untuk mengenali kode barang serta membedakan klaim dari pertanyaan/percakapan biasa, kemudian server menentukan pemenang berdasarkan timestamp milidetik dan nomor baris sumber. Gemini tidak mengubah handle atau waktu. Tidak ada pratinjau klaim atau unggah screenshot. Konfigurasi `GEMINI_API_KEY` dan `GEMINI_MODEL` hanya di server; CSV klaim eksplisit `handle,kode,waktu` tetap dapat diproses tanpa AI. Contoh input dan CSV: [panduan komentar](docs/claim-comments.md).
 
-Publikasi promosi, pengingat invoice, dan distribusi strategi hanya mencatat aktivitas internal; belum mengirim ke TikTok/WhatsApp/email. Transfer divalidasi petugas berdasarkan unggahan, tanpa payment gateway. Pelacakan kurir diperbarui manual melalui **Perbarui status**; belum ada API kurir. Gemini perlu kredensial/model aktif dan belum diuji dengan akun eksternal.
+Publikasi promosi, pengingat invoice, dan distribusi strategi hanya mencatat aktivitas internal; belum mengirim ke TikTok/WhatsApp/email. Transfer divalidasi petugas berdasarkan unggahan, tanpa payment gateway. Pengiriman diperbarui manual melalui **Konfirmasi penerimaan** untuk menyelesaikan pesanan; belum ada API kurir. Gemini perlu kredensial/model aktif dan belum diuji dengan akun eksternal.
 
 ## Struktur
 
